@@ -195,6 +195,8 @@ BORROW = {
     "Dr. Schulze Core Drill Motors, Stands & Packages": "Dr. Schulze DK 32", "Husqvarna Power Cutters & Batteries": "Husqvarna K 970",
     "Husqvarna K4000 Electric Saws": "Husqvarna K 770", "Walk-Behind & Early-Entry Saws": "Husqvarna FS400",
     "3MLB Low-HP Concrete": "Americut Pro Series", "KMLB Low-HP Asphalt & Green": "Americut Pro Series",
+    "Dixie Hard Rock": "Americut Pro Series", "Dixie Pro Concrete 65-110 HP": "Americut Pro Series", "Dixie Pro Concrete 35-60 HP": "Americut Pro Series",
+    "Dixie Asphalt": "Americut Pro Series", "Dixie Overlay": "Americut Pro Series",
     "Cut-n-Break Blade Set": "Husqvarna K 760 Cut-n-Break", 'Husqvarna 10.5" Battery Saw Blades': "Eagle Supreme Masonry",
     "Dry Tile Blade": "Alpha PT Cutter", "Dry Tile Supreme": "Alpha PT Cutter", "Razor Porcelain Blade": "Alpha PT Cutter",
     "Turbo Superblade": "Alpha PT Cutter", "Wet Tile Blade": "Alpha PT Cutter", "J-Slot Granite Blade": "Alpha PT Cutter",
@@ -303,7 +305,7 @@ def main():
             if r["extra"].get("saw") and "POWERHEAD" not in r["desc"]: note = note
         elif r["sheet"] == "MASTER":
             target, size, note = r["section"], r["extra"]["size"], ""
-            cats = ["green"] if target.startswith(("Zenesis", "Arix Green Kut")) else ["core"]
+            cats = ["green"] if target.startswith(("Zenesis", "Arix Green Kut")) else ["wet"] if target.startswith("Dixie") else ["core"]
         elif r["sheet"] == "SAWS":
             sec = r["section"].upper()
             target = next((n for rx, n in RULES if re.search(rx, sku)), None) or next((n for k, n in SAWSEC if k in sec), "Grinders & Circular Saws")
