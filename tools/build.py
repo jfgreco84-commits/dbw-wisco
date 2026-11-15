@@ -398,7 +398,7 @@ def main():
         if mcol:
             agg = {"Yellow": "soft", "Orange": "medium soft", "Red": "medium", "Green": "medium hard", "Purple": "hard", "Black": "critically hard"}.get(mcol.group(2))
             what = "bonded for %s aggregate" % agg if agg else "with a harder bond for slabs you cut the next day"
-            d["hook"] = ("Arix diamond alignment, %s. Every diamond lined up and working." % what) if mcol.group(1) == "Arix " else ("Zenesis diamond alignment, %s. More footage per blade and chip-free joints." % what) if mcol.group(1) else ("Early-entry blade %s. Our premium alternative to Soff-Cut." % what)
+            d["hook"] = ("Arix, %s. Our fastest-cutting early-entry line." % what) if mcol.group(1) == "Arix " else ("Zenesis, %s. The best we make: speed and life in one blade." % what) if mcol.group(1) else ("Green Kut, %s. Our longest-lasting early-entry line." % what)
         elif "chain" in cats and d["hook"].startswith("Chains, bars, sprockets and powerheads"):
             d["hook"] = "Chains, bars and sprockets for the %s. Reorder by the exact part number." % re.sub(r"\s+Systems?$", "", name)
         out.append(d)

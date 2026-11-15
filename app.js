@@ -25,7 +25,7 @@
   var TIER = { supreme: "Supreme grade", premium: "Better · Premium grade", standard: "Good · Standard grade", economy: "Value · Economy grade", pro: "Pro Series" };
   /* "Best" belongs to the Dragons alone. The Superblade family and Swordfish sit one step under: High Performance. */
   var TOPTAG = { "dragon-supreme": "Best · Supreme grade", "dragon": "Best · Supreme grade", "superblade-extreme": "High Performance · Supreme grade", "super-g": "High Performance · Supreme grade", "superblade-g3": "High Performance · Supreme grade", "superblade-arrow": "High Performance · Supreme grade", "swordfish": "High Performance · Supreme grade" };
-  function tierTag(f) { return TOPTAG[f.id] || TIER[f.tier]; }
+  function tierTag(f) { return /^Zenesis Green Kut/.test(f.n) ? "Top early-entry · Speed and life" : /^Arix Green Kut/.test(f.n) ? "Built for speed" : /^Green Kut/.test(f.n) ? "Built for long life" : TOPTAG[f.id] || TIER[f.tier]; }
   var TR = { supreme: 4, pro: 4, premium: 3, standard: 2, economy: 1, "": 0 };
   var SAWDIA = { grinder: [3, 9], cutoff: [12, 16], walk: [14, 99] };
 
@@ -72,7 +72,7 @@
   var LINES = [
     { k: "dragons", n: "The Dragons", s: "Our top multi-purpose blades. Red for long life. Purple when the job is everything at once.", ids: ["dragon-supreme", "dragon"], img: ["dragon-supreme", "dragon"] },
     { k: "superblades", n: "The Superblades", s: "Extreme, Super G, G3 and Arrow. Built to drop your cost per cut.", ids: ["superblade-extreme", "super-g", "superblade-g3", "superblade-arrow"], img: ["superblade-g3", "superblade-arrow"] },
-    { k: "zenesis", n: "Green Kut Early-Entry", s: "Three lines: Zenesis, Arix and Green Kut. Every one color-matched to your aggregate.", ids: ["zenesis-green-kut-purple", "zenesis-green-kut-orange", "zenesis-green-kut-green", "zenesis-green-kut-red", "zenesis-green-kut-yellow", "arix-green-kut-purple", "arix-green-kut-orange", "arix-green-kut-green", "arix-green-kut-red", "arix-green-kut-yellow", "green-kut-purple", "green-kut-orange", "green-kut-green", "green-kut-red", "green-kut-yellow", "green-kut-black", "green-kut-next-day"], img: ["zenesis-green-kut-purple"] },
+    { k: "zenesis", n: "Green Kut Early-Entry", s: "Zenesis for speed and life. Arix for speed. Green Kut for life. Every one color-matched to your aggregate.", ids: ["zenesis-green-kut-purple", "zenesis-green-kut-orange", "zenesis-green-kut-green", "zenesis-green-kut-red", "zenesis-green-kut-yellow", "arix-green-kut-purple", "arix-green-kut-orange", "arix-green-kut-green", "arix-green-kut-red", "arix-green-kut-yellow", "green-kut-purple", "green-kut-orange", "green-kut-green", "green-kut-red", "green-kut-yellow", "green-kut-black", "green-kut-next-day"], img: ["zenesis-green-kut-purple"] },
     { k: "4-core", n: "4-Core Bits", s: "Punisher, Wolv and Sabertooth. Pro Series bits for heavy rebar and hard aggregate.", ids: ["punisher", "wolv", "sabertooth"], img: ["punisher", "wolv", "sabertooth"] }
   ];
   LINES.push(
@@ -616,6 +616,7 @@
       '<div class="frank"><b class="h">1. Tap where you cut</b><p>Find your area on the map and tap it. Colors on the map show how hard the aggregate is there.</p><div class="aggmap" id="aggmap"><span class="note">Loading the map…</span></div>' +
       '<div class="agglegend">' + AGG.map(function (x) { return '<span><i style="background:' + x.hex + '"></i>' + esc(x.n) + "</span>"; }).join("") + "</div></div>" +
       '<div class="frank"><b class="h">Or 2. Pick your aggregate</b><div class="aggs">' + AGG.map(function (x) { return '<button type="button" class="agg" data-agg="' + x.k + '" aria-pressed="' + (x.k === eeSel) + '"><b>' + esc(x.n) + "</b><span>" + esc(x.rocks) + "</span></button>"; }).join("") + "</div></div>" +
+      '<div class="eelines"><div><b>Zenesis</b><span>The best. Speed and life in one blade.</span></div><div><b>Arix</b><span>Built for speed. Cuts fast, gives up some life.</span></div><div><b>Green Kut</b><span>Built for life. Lasts long, gives up some speed.</span></div></div>' +
       '<div id="eeres">' + (a ? '<div class="eepick"><span>' + esc(a.n) + " aggregate</span><b>Run " + esc(a.color.toUpperCase()) + "</b><small>" + esc(a.rocks) + ".</small></div>" +
         (fams.length ? '<div class="results">' + fams.map(function (f) { return cardHTML(f); }).join("") + "</div>" : "") : "") + "</div>" +
       '<div class="frank"><b class="h">The whole color chart</b><table class="cmp"><thead><tr><th>Blade color</th><th>Aggregate</th></tr></thead><tbody>' +
