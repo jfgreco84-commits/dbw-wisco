@@ -525,6 +525,7 @@
       '<input class="search-big" id="rq" type="search" placeholder="Search: Dragon 14 or AES14SGC1" autocomplete="off" aria-label="Search by blade, size or part number">' +
       '<div class="hintchips gold" id="rhints">' + ["Dragon 14", "Superblade Extreme 14", "Super G 14", "T-Rex 14", "Viper 14", "Blue Tornado 7"].map(function (x) { return '<button data-hint="' + esc(x) + '">' + esc(x) + "</button>"; }).join("") + "</div>" +
       '<div class="hits" id="rhits"></div>' +
+      '<div class="pkgbox"><b class="pkg-h">Saw Packages</b><p>Bundle a saw with your blades. One price, one invoice. Tap one to build it.</p>' + pkgButtons(0) + "</div>" +
       (n ? '<div class="last"><div><b>Same as last time?</b><span>' + n + (n === 1 ? " line" : " lines") + " from " + esc(last.date) + '</span></div><button class="btn red sm" data-reorder>Reorder it</button></div>' : "") +
       '<h2 class="wiz-h2">Tap a quantity</h2><p class="lead sm">Our most common blades. ' + (HIDE ? "Bigger quantities get better pricing. Your rep confirms the number. " : RNG ? "The more you buy, the closer you land to the low end of the range. " : "The price drops at every button. ") + esc(mixLine()) + "</p>" + quickRows() +
       '<div class="center"><a class="btn gold" href="#shop">Browse our full catalog</a><button class="btn gold" data-pricing>Ask ' + esc(WHO()) + " about pricing" + "</button></div>" +
@@ -637,8 +638,20 @@
   /* ---------- saw package calculator ---------- */
   var SD = C.sawdeal || { tiers: [], saws: [] };
   function dealBlades() { return C.families.filter(function (f) { return f.id.indexOf("eagle") !== 0 && f.vars.some(function (v) { return v[5]; }); }); }
+  /* Saw packages: [blades, saws, better blade price?]. Set in config.js as sawPackages. */
+  var PKGS = (W.sawPackages || [[15, 1, 0], [25, 1, 1], [36, 2, 0], [50, 2, 1]]).slice().sort(function (a, b) { return a[0] - b[0]; });
+  function pkgFor(n) { var p = null; PKGS.forEach(function (x) { if (n >= x[0]) p = x; }); return p; }
+  function sawsTxt(k) { return k + (k === 1 ? " saw" : " saws"); }
+  function pkgButtons(cur) {
+    return '<div class="pkgs" role="group" aria-label="Saw packages">' + PKGS.map(function (x) { return '<button type="button" class="pkg' + (cur === x[0] ? " on" : "") + '" data-pkgq="' + x[0] + '"><b>' + x[0] + " blades</b><span>+ " + sawsTxt(x[1]) + "</span>" + (x[2] ? "<em>Better price per blade</em>" : "") + "</button>"; }).join("") + "</div>";
+  }
+  function pkgLine(n) {
+    var p = pkgFor(n); if (!p) return "Add " + (PKGS[0][0] - n) + " more to make a " + PKGS[0][0] + "-blade package.";
+    return sawsTxt(p[1]).replace(/^(\d+)/, function (m) { return m === "1" ? "1" : m; }) + " in the package" + (p[2] ? ", and a better price per blade." : ".");
+  }
+  var dealPreset = 0;
   function dealCount() { return deal.lines.reduce(function (n, l) { return n + l.q; }, 0); }
-  function dealTier(n) { var t = null; SD.tiers.forEach(function (x) { if (n >= x[0]) t = x; }); return t; }
+  function dealTier(n) { return pkgFor(n); }
   function dealTotal() { return null; }
   function dealReady() { return false && deal.lines.every(function (l) { var f = FAM[l.f], v = f && findVar(f, l.v); return v && v[6]; }); }
   function dealBIN() {
@@ -668,7 +681,7 @@
     $("#dqout").textContent = q + (q === 1 ? " blade" : " blades"); if (document.activeElement !== $("#dqn")) $("#dqn").value = q; if (document.activeElement !== $("#dqty")) $("#dqty").value = Math.min(50, q);
     $("#deallines").innerHTML = d.lines.length ? d.lines.map(function (x) { return '<div class="dl" data-i="' + deal.lines.indexOf(x.l) + '"><span><b>' + x.l.q + " x " + esc(x.f.n) + "</b><small>" + esc(vlabel(x.v)) + (HIDE ? "" : " · " + money(x.each) + " each") + '</small></span><button class="link" data-dealrm>Remove</button></div>'; }).join("") : "";
     $("#dealout").innerHTML = !saw ? '<div class="dealtotal off"><span>Pick a saw to see your package</span></div>' :
-      HIDE ? '<div class="dealtotal"><span>Your package</span><div class="drow"><i>' + d.n + (d.n === 1 ? " blade" : " blades") + '</i><b>✓</b></div><div class="drow"><i>' + esc(saw.n) + '</i><b>✓</b></div><strong>One price for the whole package, saw included. Send it and your rep comes back with your number.</strong><small>Nothing is charged on this site.</small></div>' :
+      HIDE ? '<div class="dealtotal"><span>Your package</span><div class="drow"><i>' + d.n + (d.n === 1 ? " blade" : " blades") + '</i><b>✓</b></div><div class="drow"><i>' + (pkgFor(d.n) ? pkgFor(d.n)[1] + " x " : "") + esc(saw.n) + "</i><b>" + (pkgFor(d.n) ? "✓" : "") + '</b></div><strong>' + esc(pkgLine(d.n)) + "</strong>" + (pkgFor(d.n) ? "<span>One package price. Send it and your rep comes back with your total.</span>" : "") + '<small>Nothing is charged on this site.</small></div>' :
       '<div class="dealtotal"><span>Your package</span>' +
       '<div class="drow"><i>' + d.n + (d.n === 1 ? " blade" : " blades") + "</i><b>" + money(d.blades) + "</b></div>" +
       (d.save > 0.005 ? '<div class="drow good"><i>Quantity pricing took off</i><b>− ' + money(d.save) + "</b></div>" : "") +
@@ -677,6 +690,7 @@
       (d.n ? '<strong>' + (d.net <= 0 ? "Your blade savings cover the whole saw." : d.save > 0.005 ? "After your blade savings, the saw works out to " + money(d.net) + ", down from " + money(d.sawP) + "." : ACCT ? "That’s at list. Your rep prices the package on your account, and every blade you add brings the saw down." : "Add blades and watch the saw get cheaper. The price drops at 12.") + "</strong>" : "<strong>Slide the blades up and watch the price move.</strong>") +
       "<small>Before freight and tax. Your rep can sharpen this further on a real package.</small></div>";
     var sb = $("[data-dealsend]"); if (sb) sb.disabled = !(saw && d.n);
+    var pw = $("#pkgwrap"); if (pw) { var pc = pkgFor(d.n); pw.innerHTML = pkgButtons(pc ? pc[0] : 0); }
     var rp = $("#r-price"); if (rp) { rp.value = HIDE ? "" : d.sawP || ""; rentCalc(); }
   }
   function sawDeal() {
@@ -685,6 +699,7 @@
     var h = "<h1>Build your saw package.</h1>" + says(HIDE ? "Bundle a saw with your blades. One package price. Saw included. Your rep confirms your total." : "The more you buy, the better the price. Every blade you add lowers the price of the package.") +
       '<div class="frank"><b class="h">1. Pick your saw</b><select id="dsaw" class="bigsel" aria-label="Saw"><option value="">Choose a saw…</option>' + SD.saws.map(function (x) { return '<option value="' + esc(x.sku) + '"' + (x.sku === deal.saw ? " selected" : "") + ">" + esc(x.n) + "</option>"; }).join("") + "</select></div>" +
       '<div class="frank"><b class="h">2. Stack your blades</b><div class="dealadd two"><select id="dfam" aria-label="Blade">' + fams.map(function (f) { return '<option value="' + f.id + '"' + (f.id === "superblade-extreme" ? " selected" : "") + ">" + esc(f.n) + "</option>"; }).join("") + '</select><select id="dvar" aria-label="Size"></select></div>' +
+      '<p class="note" style="margin-top:10px">Pick a package, or set your own number below.</p><div id="pkgwrap">' + pkgButtons(0) + "</div>" +
       '<div class="slide"><div class="slidetop"><b id="dqout">0 blades</b><span>Slide it, or type a number</span></div><input id="dqty" type="range" min="0" max="50" step="1" value="0" aria-label="How many blades"><div class="ticks"><i>0</i><i>12</i><i>24</i><i>36</i><i>50+</i></div>' +
       '<div class="slidenum"><button type="button" class="stp" data-dstep="-1" aria-label="One fewer">−</button><input id="dqn" type="number" inputmode="numeric" min="0" max="9999" value="0" aria-label="Number of blades"><button type="button" class="stp" data-dstep="1" aria-label="One more">+</button></div></div>' +
       '<p class="note">' + (HIDE ? "Most crews package 15, 25, 36, 50 or 100 blades with a saw. " : "Pricing gets better at 12, 24, 36, 50 and 100 blades. Most crews package 15, 25, 36, 50 or 100. ") + esc(mixLine()) + '</p><div class="deallines" id="deallines"></div></div>' +
@@ -693,7 +708,7 @@
       rentBox() +
       '<p class="note light">Want a saw that isn’t listed, or a bigger stack? Your rep can build any package. That’s where the real deals are.</p>';
     app.innerHTML = shell("Build your own saw package", 0, 0, h);
-    fillDealVars(); dealSync(); dealRefresh(); setNav("#saw-deal");
+    fillDealVars(); if (dealPreset) { deal.lines = []; dealSetQty(dealPreset); dealPreset = 0; } dealSync(); dealRefresh(); setNav("#saw-deal");
   }
   function rentBox() {
     return '<div class="frank cc"><b class="h">Renting your saws? Do the math.</b><p>Two sliders. That’s it.</p>' +
@@ -708,8 +723,9 @@
   }
   function dealText() {
     var saw = SD.saws.filter(function (s) { return s.sku === deal.saw; })[0], n = dealCount(), t = dealTier(n), L = [];
-    L.push("SAW PACKAGE REQUEST (" + (t ? t[0] + "-pack" : n + " blades") + ")");
-    if (saw) L.push("Saw: " + saw.n + " (" + saw.sku + ")");
+    L.push("SAW PACKAGE REQUEST (" + n + " blades" + (t ? ", " + sawsTxt(t[1]) : "") + ")");
+    if (saw) L.push("Saw: " + (t ? t[1] + " x " : "") + saw.n + " (" + saw.sku + ")");
+    if (t) L.push("Package: " + t[0] + "+ blades = " + sawsTxt(t[1]) + (t[2] ? ", better price per blade" : ""));
     deal.lines.forEach(function (l) { var f = FAM[l.f], v = f && findVar(f, l.v); if (v) L.push(l.q + " x " + v[0] + "  " + f.n + " " + vlabel(v)); });
     var dc = dealCalc(); if (dc.n && !HIDE) L.push("Site price: blades " + money(dc.blades) + " + saw " + money(dc.sawP) + " = " + money(dc.total) + "  (before freight and tax, customer wants your best package price)");
     return L.join("\n");
@@ -1200,6 +1216,7 @@
     if (t.closest("[data-ccex]")) { [["ca-p", 110], ["ca-f", 1500], ["cb-f", 5000], ["c-ft", 10000]].forEach(function (x) { $("#" + x[0]).value = x[1]; }); if (!(parseFloat($("#cb-p").value) > 0)) $("#cb-p").value = 240; costCalc(); toast("Example numbers. Put in your own."); return; }
     if ((el = t.closest("[data-dealrm]"))) { deal.lines.splice(parseInt(el.closest(".dl").dataset.i, 10), 1); store.set("deal2", deal); sawDeal(); return; }
     if (t.closest("[data-dealclear]")) { deal = { saw: "TS420", lines: [] }; store.set("deal2", deal); sawDeal(); return; }
+    if ((el = t.closest("[data-pkgq]"))) { var pq = parseInt(el.dataset.pkgq, 10); if ($("#dqn") && document.body.dataset.r === "saw") { dealSetQty(pq); dealSync(); } else { dealPreset = pq; go("#saw-deal"); } return; }
     if (t.closest("[data-dealsend]")) { openSend("saw"); return; }
     if ((el = t.closest("[data-eqadd]"))) { var hitE = SKU[el.dataset.eqadd.toUpperCase().replace(/[^A-Z0-9.]/g, "")]; if (hitE) { addToCart(hitE[0].id, vkey(hitE[0].vars[hitE[1]]), 1); flash(el); } return; }
     if ((el = t.closest("[data-add]"))) {

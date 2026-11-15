@@ -683,3 +683,15 @@ table.cmp .add.pk { margin-left: 6px; background: var(--gold); color: var(--gold
 .replinks b { font: 800 15px var(--sans) } .replinks span:last-child { font: 800 13px var(--sans); color: var(--royal) }
 
 .mine .mine-id small.mine-247 { margin-top: 5px; font-weight: 700; color: #F7C948 }
+
+/* v34: saw package buttons */
+.pkgs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px }
+.pkg { display: grid; gap: 1px; align-content: center; min-height: 78px; padding: 10px 8px; border-radius: 14px; border: 2px solid #E0A313; background: var(--gold); color: var(--gold-ink); text-align: center; cursor: pointer; box-shadow: 0 3px 0 rgba(0,0,0,.14) }
+.pkg b { font: 900 19px/1.1 var(--sans) } .pkg span { font: 900 14px var(--sans); letter-spacing: .04em; text-transform: uppercase }
+.pkg em { font: 700 11.5px var(--sans); font-style: normal; opacity: .85 }
+.pkg.on { background: var(--navy-2); border-color: #fff; color: #fff; box-shadow: 0 0 0 3px #F7C948 }
+.pkgbox { background: rgba(7,20,51,.62); border: 1px solid rgba(255,255,255,.45); border-radius: 16px; padding: 14px; margin: 16px 0 6px; display: grid; gap: 8px }
+.pkg-h { font: 400 24px/1 var(--slab); text-transform: uppercase; color: #fff } .pkgbox p { margin: 0; font: 600 14px/1.4 var(--sans); color: #dbe4ff }
+.dealtotal strong + span { display: block; margin-top: 4px; font: 600 13.5px/1.4 var(--sans) }
+@media (min-width: 720px) { .pkgs { grid-template-columns: repeat(4, minmax(0, 1fr)) } }
+.dealtotal strong + span { text-transform: none; letter-spacing: 0; color: var(--ink); text-align: center }

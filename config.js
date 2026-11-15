@@ -78,6 +78,9 @@ window.WISCO = {
   breaks: [12, 24, 36, 50, 100, 150, 200, 500],
   // The quantity buttons on Fast Reorder.
   quickQty: [12, 24, 36, 50],
+
+  // Saw packages: [blades, saws in the package, 1 if that step also gets a better price per blade].
+  sawPackages: [[15, 1, 0], [25, 1, 1], [36, 2, 0], [50, 2, 1]],
   // Walk-behind saws at or under this horsepower get the low-horsepower blades in Blade Finder.
   lowHpMax: 20,
   // Account levels, lowest to highest.
