@@ -785,10 +785,23 @@
     setNav("");
   }
 
+  /* Every page change lands at the top. Said three times because iPhone Safari can settle the old scroll
+     position back in after the new page is drawn. */
+  try { if ("scrollRestoration" in history) history.scrollRestoration = "manual"; } catch (e) {}
+  function toTop() {
+    var z = function () { window.scrollTo(0, 0); document.documentElement.scrollTop = 0; document.body.scrollTop = 0; };
+    z(); if (window.requestAnimationFrame) requestAnimationFrame(z); setTimeout(z, 60);
+  }
+  /* Tapping a button for the page you are already on still takes you to its top. */
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest && e.target.closest('a[href^="#"]'); if (!a) return;
+    var h = a.getAttribute("href"); if (!h || h.length < 2 || h.indexOf("#blade-") === 0) return;
+    if (h === (location.hash || "#home")) { e.preventDefault(); route(); }
+  });
   function route() {
     var h = location.hash || "#home"; document.body.dataset.r = h.slice(1).split("-")[0];
     if (h.indexOf("#blade-") === 0) { var f = FAM[h.slice(7)]; if (!app.innerHTML) home(); if (f) openDetail(f); return; }
-    window.scrollTo(0, 0);
+    toTop();
     if (h === "#finder" || h === "#ask-frank") {
       var mode = h === "#finder" ? "finder" : "ask";
       if (!wiz.keep) { wiz.mat = wiz.saw = null; } wiz.hp = null; wiz.hpn = null;
