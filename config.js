@@ -77,7 +77,7 @@ window.WISCO = {
   // Quantity price breaks a customer can ask for.
   breaks: [12, 24, 36, 50, 100, 150, 200, 500],
   // The quantity buttons on Fast Reorder.
-  quickQty: [12, 24, 36, 50, 100],
+  quickQty: [12, 24, 36, 50],
   // Walk-behind saws at or under this horsepower get the low-horsepower blades in Blade Finder.
   lowHpMax: 20,
   // Account levels, lowest to highest.

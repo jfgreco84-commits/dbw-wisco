@@ -632,3 +632,10 @@ table.cmp .add.pk { margin-left: 6px; background: var(--gold); color: var(--gold
 .mine .mine-act { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px }
 .mine .mine-act .btn { min-width: 0; padding-inline: 4px; text-align: center; justify-content: center; white-space: nowrap; font-size: 12.5px; letter-spacing: .06em }
 @media (max-width: 360px) { .mine .mine-act .btn { font-size: 11.5px; letter-spacing: .02em } }
+
+/* v29: Fast Reorder quantity row: a label and five even buttons */
+.qhow { grid-column: 1 / -1; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 10px; border-top: 1px solid var(--line); padding-top: 10px; margin-top: 2px }
+.qhow > span { font: 900 11.5px var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--muted, #5b6785); white-space: nowrap }
+.qhow .qchips { grid-column: auto; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 7px }
+.qhow .qchips button { height: 44px; border-radius: 999px; font-size: 16px; box-shadow: 0 2px 0 rgba(0,0,0,.12) }
+@media (min-width: 760px) { .qhow { grid-column: auto; border-top: 0; padding-top: 0; margin-top: 0 } .qhow .qchips { grid-template-columns: repeat(5, 54px) } }

@@ -228,7 +228,7 @@
   function totTxt(t) { if (HIDE && !t.quoted) return "Priced by your rep"; return RNG && !t.quoted && t.low < t.total - 0.005 ? money(t.low) + " to " + money(t.total) : money(t.total); }
   function buyRow(v) { if (HIDE) return '<div class="buy-row" data-row><div class="partno">Part # ' + esc(v[0]) + '</div><div class="act">' + qtyHTML(1) + '<button class="add" data-add>Add to order</button></div></div>';
     return '<div class="buy-row" data-row><div class="price' + (tiered(v) || ranged(v) ? " rng" : "") + '">' + rangeTxt(v) + "<small>" + (HIDE ? "confirmed by your rep before it ships · " : tiered(v) ? "each, by quantity · " : ranged(v) ? "each · your rep sets your price · " : RNG ? "each · " : ACCT ? "list price · " : "") + esc(v[0]) + '</small></div><div class="act">' + qtyHTML(1) + '<button class="add" data-add>Add to order</button></div></div>'; }
-  var MIXM = W.mixMonths || [3, 5, 8, 10], ONEMIN = W.singleItemMin || 24, QUICK = W.quickQty || [12, 24, 36, 50, 100], MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  var MIXM = W.mixMonths || [3, 5, 8, 10], ONEMIN = W.singleItemMin || 24, QUICK = W.quickQty || [12, 24, 36, 50], MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   function mixOn() { return MIXM.indexOf(new Date().getMonth() + 1) >= 0; }
   function breakList() { return BREAKS.slice(0, -1).join(", ") + " and " + BREAKS[BREAKS.length - 1]; }
   function mixNames() { var a = MIXM.map(function (m) { return MONTHS[m - 1]; }); return a.slice(0, -1).join(", ") + " and " + a[a.length - 1]; }
@@ -490,7 +490,7 @@
       var vs = f.vars, d = defVar(f, vs);
       return '<div class="qrow" data-f="' + f.id + '">' + pic(f) + '<div class="qmain"><b>' + esc(f.n) + "</b>" +
         (vs.length > 1 ? '<select aria-label="Size" data-qsize>' + vs.map(function (v) { return '<option value="' + esc(vkey(v)) + '"' + (v === d ? " selected" : "") + ">" + esc(vlabel(v)) + "</option>"; }).join("") + "</select>" : '<span class="one">' + esc(vlabel(d)) + "</span>") + '<small class="qrng" data-qrng>' + (HIDE ? "Part # " + esc(d[0]) : rangeTxt(d) + " each") + "</small>" +
-        '</div><div class="qchips" role="group" aria-label="Quantity">' + [1].concat(QUICK).map(function (q) { return '<button type="button" data-qadd="' + q + '">' + (q === 1 ? "1–11" : q) + "</button>"; }).join("") + "</div></div>";
+        '</div><div class="qhow"><span>How many?</span><div class="qchips" role="group" aria-label="How many to add">' + [1].concat(QUICK).map(function (q) { return '<button type="button" data-qadd="' + q + '" aria-label="Add ' + q + '">' + q + "</button>"; }).join("") + "</div></div></div>";
     }).join("") + "</div>";
   }
   var CREWS = [
