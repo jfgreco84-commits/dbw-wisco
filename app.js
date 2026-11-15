@@ -22,7 +22,10 @@
   var FRANK = (W.managerName || "Frank").split(" ")[0];
   var RW = W.rewards || { review: "10% off your next order", referrer: "10% off their next order" };
   var BREAKS = W.breaks || [12, 24, 36, 50, 100, 150, 200, 500];
-  var TIER = { supreme: "Best · Supreme grade", premium: "Better · Premium grade", standard: "Good · Standard grade", economy: "Value · Economy grade", pro: "Pro Series" };
+  var TIER = { supreme: "Supreme grade", premium: "Better · Premium grade", standard: "Good · Standard grade", economy: "Value · Economy grade", pro: "Pro Series" };
+  /* "Best" belongs to the Dragons alone. The Superblade family and Swordfish sit one step under: High Performance. */
+  var TOPTAG = { "dragon-supreme": "Best · Supreme grade", "dragon": "Best · Supreme grade", "superblade-extreme": "High Performance · Supreme grade", "super-g": "High Performance · Supreme grade", "superblade-g3": "High Performance · Supreme grade", "superblade-arrow": "High Performance · Supreme grade", "swordfish": "High Performance · Supreme grade" };
+  function tierTag(f) { return TOPTAG[f.id] || TIER[f.tier]; }
   var TR = { supreme: 4, pro: 4, premium: 3, standard: 2, economy: 1, "": 0 };
   var SAWDIA = { grinder: [3, 9], cutoff: [12, 16], walk: [14, 99] };
 
@@ -69,7 +72,7 @@
   var LINES = [
     { k: "dragons", n: "The Dragons", s: "Our top multi-purpose blades. Red for long life. Purple when the job is everything at once.", ids: ["dragon-supreme", "dragon"], img: ["dragon-supreme", "dragon"] },
     { k: "superblades", n: "The Superblades", s: "Extreme, Super G, G3 and Arrow. Built to drop your cost per cut.", ids: ["superblade-extreme", "super-g", "superblade-g3", "superblade-arrow"], img: ["superblade-g3", "superblade-arrow"] },
-    { k: "zenesis", n: "Zenesis Green Kut", s: "Early-entry blades with Zenesis diamond alignment. More footage, chip-free joints.", ids: ["zenesis-green-kut-purple", "zenesis-green-kut-orange", "zenesis-green-kut-green", "zenesis-green-kut-red", "zenesis-green-kut-yellow"], img: ["zenesis-green-kut-purple"] },
+    { k: "zenesis", n: "Green Kut Early-Entry", s: "Three lines: Zenesis, Arix and Green Kut. Every one color-matched to your aggregate.", ids: ["zenesis-green-kut-purple", "zenesis-green-kut-orange", "zenesis-green-kut-green", "zenesis-green-kut-red", "zenesis-green-kut-yellow", "arix-green-kut-purple", "arix-green-kut-orange", "arix-green-kut-green", "arix-green-kut-red", "arix-green-kut-yellow", "green-kut-purple", "green-kut-orange", "green-kut-green", "green-kut-red", "green-kut-yellow", "green-kut-black", "green-kut-next-day"], img: ["zenesis-green-kut-purple"] },
     { k: "4-core", n: "4-Core Bits", s: "Punisher, Wolv and Sabertooth. Pro Series bits for heavy rebar and hard aggregate.", ids: ["punisher", "wolv", "sabertooth"], img: ["punisher", "wolv", "sabertooth"] }
   ];
   LINES.push(
@@ -120,7 +123,7 @@
     sp: "Double row for a flat floor. T-Seg for stripping coatings."
   };
   var TIERQUIP = { supreme: "More per blade, less per cut. That’s the whole point of this one.", pro: "Pro Series. Built for the hard jobs.", premium: "Good everyday blade. Crews stock these by the box.", standard: "Does the job at a fair price. Step up when the material gets hard.", economy: "Budget blade. Fine for the short job." };
-  function says(text, big) { return '<div class="bfs' + (big ? " big" : "") + '"><img alt="" src="brand/frank-cool' + (big ? "" : "-sm") + '.webp"><div><b>Big ' + esc(FRANK) + " says</b><p>" + esc(text) + "</p></div></div>"; }
+  function says(text, big) { return '<div class="bfs' + (big ? " big" : "") + '"><img alt="" src="' + askImg(big) + '"><div><b>' + esc(SAYER()) + " says</b><p>" + esc(text) + "</p></div></div>"; }
 
   /* Blade trouble guide. Causes and fixes follow the DBW troubleshooting page. */
   var FIX = [
@@ -221,10 +224,11 @@
   var BRK = [12, 24, 36, 50, 100];
   function tiered(v) { return v && Array.isArray(v[6]); }
   function eachAt(v, q) { if (!tiered(v)) return v[3]; var i = 0; BRK.forEach(function (b, k) { if (q >= b) i = k + 1; }); return i ? v[6][i - 1] : v[3]; }
-  function rangeTxt(v) { if (HIDE) return "Your price"; return tiered(v) ? money(v[6][4]) + " to " + money(v[3]) : ranged(v) ? money(lowOf(v)) + " to " + money(v[3]) : money(v[3]); }
+  function rangeTxt(v) { if (HIDE) return ""; return tiered(v) ? money(v[6][4]) + " to " + money(v[3]) : ranged(v) ? money(lowOf(v)) + " to " + money(v[3]) : money(v[3]); }
   function totTxt(t) { if (HIDE && !t.quoted) return "Priced by your rep"; return RNG && !t.quoted && t.low < t.total - 0.005 ? money(t.low) + " to " + money(t.total) : money(t.total); }
-  function buyRow(v) { return '<div class="buy-row" data-row><div class="price' + (tiered(v) || ranged(v) ? " rng" : "") + '">' + rangeTxt(v) + "<small>" + (HIDE ? "confirmed by your rep before it ships · " : tiered(v) ? "each, by quantity · " : ranged(v) ? "each · your rep sets your price · " : RNG ? "each · " : ACCT ? "list price · " : "") + esc(v[0]) + '</small></div><div class="act">' + qtyHTML(1) + '<button class="add" data-add>Add to order</button></div></div>'; }
-  var MIXM = W.mixMonths || [3, 5, 8, 10], ONEMIN = W.singleItemMin || 24, QUICK = W.quickQty || [12, 24, 36, 50, 100], MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  function buyRow(v) { if (HIDE) return '<div class="buy-row" data-row><div class="partno">Part # ' + esc(v[0]) + '</div><div class="act">' + qtyHTML(1) + '<button class="add" data-add>Add to order</button></div></div>';
+    return '<div class="buy-row" data-row><div class="price' + (tiered(v) || ranged(v) ? " rng" : "") + '">' + rangeTxt(v) + "<small>" + (HIDE ? "confirmed by your rep before it ships · " : tiered(v) ? "each, by quantity · " : ranged(v) ? "each · your rep sets your price · " : RNG ? "each · " : ACCT ? "list price · " : "") + esc(v[0]) + '</small></div><div class="act">' + qtyHTML(1) + '<button class="add" data-add>Add to order</button></div></div>'; }
+  var MIXM = W.mixMonths || [3, 5, 8, 10], ONEMIN = W.singleItemMin || 24, QUICK = W.quickQty || [12, 24, 36, 50], MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   function mixOn() { return MIXM.indexOf(new Date().getMonth() + 1) >= 0; }
   function breakList() { return BREAKS.slice(0, -1).join(", ") + " and " + BREAKS[BREAKS.length - 1]; }
   function mixNames() { var a = MIXM.map(function (m) { return MONTHS[m - 1]; }); return a.slice(0, -1).join(", ") + " and " + a[a.length - 1]; }
@@ -248,7 +252,7 @@
     return '<article class="card' + (o.pick ? " pick" : "") + '" data-f="' + f.id + '">' +
       (o.ribbon ? '<div class="ribbon ' + (o.rc || "") + '"><span>' + o.ribbon + "</span>" + (o.ribbon2 ? "<span>" + o.ribbon2 + "</span>" : "") + "</div>" : "") +
       '<button class="c-top" data-open aria-label="Details for ' + esc(f.n) + '">' + pic(f) + "<span>" +
-      (f.tier ? '<span class="tier ' + f.tier + '">' + (o.ribbon ? TIER[f.tier].split(" · ").pop() : TIER[f.tier]) + "</span>" : "") + "<h3>" + esc(f.n) + "</h3>" +
+      (f.tier ? '<span class="tier ' + f.tier + '">' + (o.ribbon ? tierTag(f).split(" · ").pop() : tierTag(f)) + "</span>" : "") + "<h3>" + esc(f.n) + "</h3>" +
       (r ? '<span class="rate">' + stars(r) + "<span>Our rating <b>" + r.toFixed(1) + "</b> on " + esc(o.mat.n) + "</span></span>" : "") + "</span></button>" +
       (f.hook ? '<p class="hook">' + esc(f.hook) + "</p>" : "") +
       '<div class="buy">' + size + buyRow(first) + '<button class="more" data-open>Details, ratings and all ' + f.vars.length + (f.vars.length === 1 ? " size" : " sizes") + "</button>" + (f.cats.indexOf("equip") >= 0 ? '<button class="btn gold sm block" data-equip>Negotiate with your sales rep</button>' : "") + "</div></article>";
@@ -305,12 +309,13 @@
   }
   /* A rep's own page: their face, their name, their phone. */
   function isBoss(r) { return (r.aka || []).indexOf("frank") >= 0; }
-  function repFirst(r) { return isBoss(r) ? "Big Frank" : r.name.replace(/[“"].*?[”"]\s*/, "").split(" ")[0]; }
+  function repFirst(r) { return isBoss(r) ? "Big Frank" : r.nick ? r.nick : r.name.replace(/[“"].*?[”"]\s*/, "").split(" ")[0]; }
+  function prettyPhone(c) { var d = String(c || "").replace(/\D/g, "").slice(-10); return d.length === 10 ? "(" + d.slice(0, 3) + ") " + d.slice(3, 6) + "-" + d.slice(6) : ""; }
   function mineCard(r) {
-    var cell = r.cell || W.textNumber || "", who = repFirst(r);
+    var cell = r.cell || W.textNumber || "", mail = r.email || W.orderEmail || "", who = isBoss(r) ? FRANK : repFirst(r);
     return '<div class="mine">' + (r.photo ? '<img alt="" src="brand/reps/' + esc(r.photo) + '">' : '<span class="av">' + esc(initials(r.name)) + "</span>") +
-      "<div><b>" + esc(isBoss(r) ? "Big Frank" : r.name) + "</b><span>Your Blade Guy</span></div>" +
-      (cell ? '<div class="mine-act"><a class="btn chrome sm" href="sms:' + esc(cell) + '">Text ' + esc(who) + '</a><a class="btn ghost sm" href="tel:' + esc(cell) + '">Call</a></div>' : "") + "</div>";
+      '<div class="mine-id"><b>' + esc(isBoss(r) ? "Big Frank" : r.name) + "</b><span>Your Blade Guy</span>" + (prettyPhone(cell) ? '<a class="mine-num" href="tel:' + esc(cell) + '">' + prettyPhone(cell) + "</a>" : "") + "<small>Text, email or call. A real person answers.</small></div>" +
+      '<div class="mine-act">' + (cell ? '<a class="btn chrome sm" href="sms:' + esc(cell) + '">Text ' + esc(who) + "</a>" : "") + (mail ? '<a class="btn chrome sm" href="mailto:' + esc(mail) + '">Email ' + esc(who) + "</a>" : "") + (cell ? '<a class="btn chrome sm" href="tel:' + esc(cell) + '">Call ' + esc(who) + "</a>" : "") + '</div><button type="button" class="mine-x" data-norep>Not your rep? Tap here</button></div>';
   }
   var WHY = [
     ["Deep warehouse.", "Stock on the shelf means it ships same day or next. I’ll put our warehouse up against anybody’s."],
@@ -349,7 +354,7 @@
       '<div class="doors">' +
       '<a class="door d1 shine" href="#finder"><div><b>Blade Finder</b><span>Two taps. We line up the right blade.</span></div><em>→</em></a>' +
       '<a class="door d2" href="#reorder"><div><b>Fast Reorder</b><span>Know what you run? Punch it in and go.</span></div><em>→</em></a>' +
-      '<a class="door d3 withav" href="#ask-frank"><img alt="" src="brand/frank-cool-sm.webp"><div><b>Ask ' + esc(FRANK) + "</b><span>Not sure? Get Big " + esc(FRANK) + "’s pick in 3 taps.</span></div><em>→</em></a>" +
+      '<a class="door d3 withav" href="#ask-frank"><img alt="" src="' + askImg() + '"><div><b>Ask ' + esc(WHO()) + "</b><span>Not sure? Get " + esc(SAYER()) + "’s pick in 3 taps.</span></div><em>→</em></a>" +
       "</div>" +
       '</div><div class="art"><img class="logo" src="brand/logo.webp" alt="DBW WISCO, a division of Diamond Blade Warehouse" width="430" height="458">' +
       '<div class="stage"><div class="lineup">' + line.map(function (n) { return '<img alt="" src="brand/lineup/' + n + '.webp">'; }).join("") + "</div></div></div></div></section>" +
@@ -386,7 +391,7 @@
       '<section class="sec dark"><div class="wrap"><div class="sec-head"><h2>Two ways to save</h2><p>No points, no fine print. Your rep applies it to your next order.</p></div><div class="three swipe">' +
       '<div class="point"><b>Leave a review</b><p>Tell us how the blades held up, good or bad. An honest review earns you ' + esc(RW.review) + '.</p><button class="btn chrome sm" data-review style="margin-top:12px">Leave a review</button></div>' +
       '<div class="point"><b>Refer a contractor</b><p>Send someone our way. When they place a first order and name you, you get ' + esc(RW.referrer) + '.</p><button class="btn chrome sm" data-refer style="margin-top:12px">Refer a contractor</button></div>' +
-      '<div class="point"><b>Just tell us</b><p>Something off with an order, a blade or a rep? ' + esc(FRANK) + ' reads every note.</p><button class="btn ghost sm" data-feedback style="margin-top:12px">Send ' + esc(FRANK) + " a note</button></div>" +
+      '<div class="point"><b>Just tell us</b><p>Something off with an order, a blade or a rep? ' + esc(WHO()) + ' reads every note.</p><button class="btn ghost sm" data-feedback style="margin-top:12px">Send ' + esc(WHO()) + " a note</button></div>" +
       "</div></div></section>";
     setNav("#home");
   }
@@ -402,11 +407,11 @@
     return '<div class="frank aggbox"><b class="h">What’s in your concrete matters</b>' +
       "<p>Limestone, dolomite, sandstone, pit gravel, river rock, traprock, granite, basalt, quartzite, chert, flint. They don’t cut the same, and they change from one part of the country to the next. Houston river rock is some of the hardest there is, so the bond has to be very soft. That same blade is the wrong blade in Wisconsin.</p>" +
       "<p><b>We take that seriously.</b> Tell me where you cut and I’ll recommend the bond for the aggregate you actually have. The goal is the most footage for your money, not the most blades sold per year. We want to save you money and be your blade guys every year after this one.</p>" +
-      '<div class="hprow"><input id="aggloc" type="text" placeholder="City, state" autocomplete="address-level2" aria-label="City and state"><button class="btn gold sm" data-aggask>Get ' + esc(FRANK) + '’s recommendation</button></div>' +
+      '<div class="hprow"><input id="aggloc" type="text" placeholder="City, state" autocomplete="address-level2" aria-label="City and state"><button class="btn gold sm" data-aggask>Get ' + esc(WHO()) + '’s recommendation</button></div>' +
       '<div class="center" style="margin-top:10px"><a class="btn ghost-d sm" href="#early">See the aggregate map</a></div></div>';
   }
   function wizard() {
-    var ask = wiz.mode === "ask", total = ask ? 3 : 2, kick = ask ? "Ask " + esc(FRANK) : "Blade Finder";
+    var ask = wiz.mode === "ask", total = ask ? 3 : 2, kick = ask ? "Ask " + esc(WHO()) : "Blade Finder";
     if (!wiz.mat) { app.innerHTML = shell(kick, 1, total, "<h1>What are you cutting?</h1>" + says(QUIP.mat[0]) + tiles(MATS, "mat") + aggBox()); return; }
     if (!wiz.saw) {
       var saws = SAWS.filter(function (s) { return (!s.only || s.only.indexOf(wiz.mat.k) >= 0) && candidates(wiz.mat, s).length; });
@@ -426,14 +431,14 @@
       if (wiz.hp === "low") list = list.filter(lowFam).concat(list.filter(function (f) { return !lowFam(f); }));
       h += '<div class="frank wetbox"><b class="h">Wet blades, bonded for you</b><p>' + esc(WETLINE) + (wiz.hp === "high" ? " High-horsepower wet blades are built to order. Tell us the saw, the horsepower and where you cut." : "") + '</p><div class="sendrow"><button class="btn gold sm" data-wetspec>Spec my wet blade</button></div></div>';
     }
-    if (!list.length) { app.innerHTML = shell(kick, 0, 0, h + "<h1>That one’s a phone call.</h1>" + '<div class="empty">Nothing on the shelf matches that combo. ' + esc(FRANK) + " will spec it for you.</div>" + frankBox("")); return; }
+    if (!list.length) { app.innerHTML = shell(kick, 0, 0, h + "<h1>That one’s a phone call.</h1>" + '<div class="empty">Nothing on the shelf matches that combo. ' + esc(WHO()) + " will spec it for you.</div>" + frankBox("")); return; }
     if (ask) {
       var r = rank(list, wiz.mat, wiz.saw, wiz.want.k), ladA = rungs(ladder(list)), picksA = ladA.length >= 3 ? ladA : bestBetterGood(list, wiz.mat, wiz.saw);
       var top = r.filter(function (f) { return picksA.some(function (p) { return p.f === f; }); })[0] || r[0];
       if (!picksA.some(function (p) { return p.f === top; })) picksA = [{ f: top, label: "Best", rc: "b" }].concat(picksA).slice(0, 4);
       var why = { speed: "it’s the fastest of the three for that job", life: "it’ll outlast the others on that saw", price: "it’s the lowest cost-in that still does the job right", frank: "it’s what I’d put on my own saw" }[wiz.want.k];
       h += says("Good, better, best. My pick is the " + top.n + ". For " + wiz.mat.n.toLowerCase() + (/^[aeiou]/i.test(wiz.saw.n) ? " on an " : " on a ") + wiz.saw.n.toLowerCase() + ", " + why + ".", true) +
-        '<div class="results">' + picksA.map(function (p) { var mine = p.f === top; return cardHTML(p.f, { mat: wiz.mat, saw: wiz.saw, pick: mine, ribbon: p.label, ribbon2: mine ? "★ " + esc(FRANK) + "’s Pick" : "", rc: p.rc }); }).join("") + "</div>" + frankBox(top.n);
+        '<div class="results">' + picksA.map(function (p) { var mine = p.f === top; return cardHTML(p.f, { mat: wiz.mat, saw: wiz.saw, pick: mine, ribbon: p.label, ribbon2: mine ? "★ " + esc(WHO()) + "’s Pick" : "", rc: p.rc }); }).join("") + "</div>" + frankBox(top.n);
     } else {
       var lad = ladder(list), picks = lad.length >= 3 ? lad : bestBetterGood(list, wiz.mat, wiz.saw), shown = {};
       var pre = wiz.saw.k === "walk" && wiz.hp === "low" ? list.filter(function (f) { return /low-hp/.test(f.id); }) : [];
@@ -442,23 +447,23 @@
       var rest = rank(list, wiz.mat, wiz.saw).filter(function (f) { return !shown[f.id]; });
       h += "<h1>Here’s your lineup.</h1>" + says(((bigSaw(wiz.saw) && MATQUIP[wiz.mat.k]) || "Start at the top and work down.") + " " + list.length + (list.length === 1 ? " blade fits." : " fit, best first.")) +
         '<div class="results">' + picks.map(function (p, i) { return cardHTML(p.f, { mat: wiz.mat, saw: wiz.saw, pick: i === 0, ribbon: p.label, rc: p.rc }); }).join("") + rest.map(function (f) { return cardHTML(f, o); }).join("") + "</div>" +
-        '<div class="center"><a class="btn gold" href="#ask-frank" data-keep>Still not sure? Ask ' + esc(FRANK) + "</a></div>";
+        '<div class="center"><a class="btn gold" href="#ask-frank" data-keep>Still not sure? Ask ' + esc(WHO()) + "</a></div>";
     }
     app.innerHTML = shell(kick, 0, 0, h);
   }
   function frankMsg(pickName) {
-    return "Hey " + FRANK + ", question from the Wisco site." + (wiz.mat ? " I’m cutting " + wiz.mat.n.toLowerCase() : "") + (wiz.saw ? " with a " + wiz.saw.n.toLowerCase() : "") + (wiz.want ? ". Priority: " + wiz.want.n.toLowerCase() : "") + "." + (pickName ? " The site says run the " + pickName + "." : "") + " My question: ";
+    return "Hey " + WHO() + ", question from the DBW WISCO site." + (wiz.mat ? " I’m cutting " + wiz.mat.n.toLowerCase() : "") + (wiz.saw ? " with a " + wiz.saw.n.toLowerCase() : "") + (wiz.want ? ". Priority: " + wiz.want.n.toLowerCase() : "") + "." + (pickName ? " The site says run the " + pickName + "." : "") + " My question: ";
   }
   function frankBox(pickName) {
-    return '<div class="frank" data-frank="' + esc(pickName) + '"><div class="frankme"><img alt="' + esc(W.managerName || "Frank") + '" src="brand/frank-cool.webp" width="96" height="104" loading="lazy"><div><b class="h">Talk it through with me.</b>' +
+    return '<div class="frank" data-frank="' + esc(pickName) + '"><div class="frankme"><img alt="' + esc(SAYER()) + '" src="' + askImg(1) + '" width="96" height="104" loading="lazy"><div><b class="h">Talk it through with me.</b>' +
       "<p>I’ve got 25 years in this industry. I’m not always right, but I’m not wrong very often either. Send over your question and your setup, and tell me what you’re looking to accomplish. I’ll get you set up right. I can promise you that.</p>" +
       '<span class="sig">' + esc(W.managerName || "Frank") + ", " + esc(W.managerTitle || "") + "</span></div></div>" +
-      '<div class="sendrow">' + (W.textNumber ? '<button class="btn gold sm" data-fsms>Text ' + esc(FRANK) + "</button>" : "") + '<button class="btn gold sm" data-femail>Email ' + esc(FRANK) + '</button><button class="btn ghost-d sm" data-fcopy>Copy my question</button></div>' +
+      '<div class="sendrow">' + (W.textNumber ? '<button class="btn gold sm" data-fsms>Text ' + esc(WHO()) + "</button>" : "") + '<button class="btn gold sm" data-femail>Email ' + esc(WHO()) + '</button><button class="btn ghost-d sm" data-fcopy>Copy my question</button></div>' +
       '<p class="note">' + (W.textDisplay ? "Text: <b style=\"user-select:all\">" + esc(W.textDisplay) + "</b> · " : "") + 'Email: <b style="user-select:all">' + esc(W.orderEmail || "") + "</b></p></div>";
   }
 
   function hitHTML(f, v) {
-    return '<div class="hit" data-f="' + f.id + '" data-v="' + esc(vkey(v)) + '">' + pic(f) + "<div><h4>" + esc(f.n) + '</h4><div class="meta">' + esc(vlabel(v)) + "<br>" + esc(v[0]) + '</div></div><div class="r"><span class="p">' + rangeTxt(v) + '</span><span class="act">' + qtyHTML(1) + '<button class="add" data-add>Add</button></span></div></div>';
+    return '<div class="hit" data-f="' + f.id + '" data-v="' + esc(vkey(v)) + '">' + pic(f) + "<div><h4>" + esc(f.n) + '</h4><div class="meta">' + esc(vlabel(v)) + "<br>" + esc(v[0]) + '</div></div><div class="r">' + (HIDE ? "" : '<span class="p">' + rangeTxt(v) + "</span>") + '<span class="act">' + qtyHTML(1) + '<button class="add" data-add>Add</button></span></div></div>';
   }
   function searchVars(q, limit, fuzzy) {
     var t = q.toLowerCase().replace(/["”]/g, "").split(/\s+/).filter(Boolean), out = [];
@@ -480,12 +485,12 @@
   }
   function lev(a, b) { if (Math.abs(a.length - b.length) > 2) return 9; var p = [], i, j; for (j = 0; j <= b.length; j++) p[j] = j; for (i = 1; i <= a.length; i++) { var q = [i]; for (j = 1; j <= b.length; j++) q[j] = Math.min(p[j] + 1, q[j - 1] + 1, p[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); p = q; } return p[b.length]; }
   function quickRows() {
-    var fs = C.families.filter(function (f) { return f.rank < 99 && f.id.indexOf("eagle") !== 0; }).slice(0, 12);
+    var fs = C.families.filter(function (f) { return f.rank < 99 && f.id.indexOf("eagle") !== 0; }).slice(0, 14);
     return '<div class="qrows">' + fs.map(function (f) {
       var vs = f.vars, d = defVar(f, vs);
       return '<div class="qrow" data-f="' + f.id + '">' + pic(f) + '<div class="qmain"><b>' + esc(f.n) + "</b>" +
-        (vs.length > 1 ? '<select aria-label="Size" data-qsize>' + vs.map(function (v) { return '<option value="' + esc(vkey(v)) + '"' + (v === d ? " selected" : "") + ">" + esc(vlabel(v)) + "</option>"; }).join("") + "</select>" : '<span class="one">' + esc(vlabel(d)) + "</span>") + '<small class="qrng" data-qrng>' + rangeTxt(d) + " each</small>" +
-        '</div><div class="qchips" role="group" aria-label="Quantity">' + [1].concat(QUICK).map(function (q) { return '<button type="button" data-qadd="' + q + '">' + (q === 1 ? "1–11" : q) + "</button>"; }).join("") + "</div></div>";
+        (vs.length > 1 ? '<select aria-label="Size" data-qsize>' + vs.map(function (v) { return '<option value="' + esc(vkey(v)) + '"' + (v === d ? " selected" : "") + ">" + esc(vlabel(v)) + "</option>"; }).join("") + "</select>" : '<span class="one">' + esc(vlabel(d)) + "</span>") + '<small class="qrng" data-qrng>' + (HIDE ? "Part # " + esc(d[0]) : rangeTxt(d) + " each") + "</small>" + (f.cats.indexOf("green") >= 0 ? '<a class="qmore" href="#early">Other colors and how to pick ›</a>' : "") +
+        '</div><div class="qhow"><span>How many?</span><div class="qchips" role="group" aria-label="How many to add">' + [1].concat(QUICK).map(function (q) { return '<button type="button" data-qadd="' + q + '" aria-label="Add ' + q + '">' + q + "</button>"; }).join("") + "</div></div></div>";
     }).join("") + "</div>";
   }
   var CREWS = [
@@ -503,7 +508,7 @@
       (n ? '<div class="last"><div><b>Same as last time?</b><span>' + n + (n === 1 ? " line" : " lines") + " from " + esc(last.date) + '</span></div><button class="btn red sm" data-reorder>Reorder it</button></div>' : "") +
       '<h2 class="wiz-h2">Tap a quantity</h2><p class="lead sm">Our most common blades. ' + (HIDE ? "Bigger quantities get better pricing. Your rep confirms the number. " : RNG ? "The more you buy, the closer you land to the low end of the range. " : "The price drops at every button. ") + esc(mixLine()) + "</p>" + quickRows() +
       '<div class="center"><a class="btn gold" href="#shop">Browse our full catalog</a><button class="btn gold" data-pricing>Ask ' + esc(WHO()) + " about pricing" + "</button></div>" +
-      (W.textNumber ? '<div class="frank photo"><b class="h">Easiest reorder there is</b><p>Snap a picture of your old blade and send it to ' + esc(FRANK) + '. We’ll read the label and write it up.</p><a class="bignum" href="#" data-photo>' + esc(W.textDisplay || "") + '</a><div class="sendrow"><button class="btn gold" data-photo>Text ' + esc(FRANK) + ' a photo</button><button class="btn blue" data-photomail>Email a photo</button></div></div>' : "") +
+      (W.textNumber ? '<div class="frank photo"><b class="h">Easiest reorder there is</b><p>Snap a picture of your old blade and send it to ' + esc(WHO()) + '. We’ll read the label and write it up.</p><a class="bignum" href="#" data-photo>' + esc(W.textDisplay || "") + '</a><div class="sendrow"><button class="btn gold" data-photo>Text ' + esc(WHO()) + ' a photo</button><button class="btn blue" data-photomail>Email a photo</button></div></div>' : "") +
       '<h2 class="wiz-h2">Not sure what to reorder?</h2><p class="lead sm">Pick your crew and we walk you to the right blade.</p><div class="tiles">' + CREWS.map(function (c) { return '<button class="tile" data-crew="' + c.mat + '"><b>' + esc(c.n) + "</b><span>" + esc(c.s) + "</span></button>"; }).join("") + "</div>" +
       '<div class="frank"><b class="h">Your rep can build your list for you</b><p>Ask your rep to text you a reorder link. It opens with your usual blades already in the cart. You can change anything before you send it.</p></div>');
     $("#rq").addEventListener("input", function (e) { runSearch(e.target.value); });
@@ -511,7 +516,7 @@
   function runSearch(q) {
     var hits = searchVars(q.trim(), 40), box = $("#rhits");
     $("#rhints").hidden = !!q.trim();
-    box.innerHTML = !q.trim() ? "" : hits.length ? hits.map(function (h) { return hitHTML(h[0], h[1]); }).join("") : '<div class="empty">No match for “' + esc(q) + "”. Try the blade name or fewer words." + (W.textNumber ? ' <button class="btn chrome sm" data-photo style="margin-top:10px">Text ' + esc(FRANK) + " a photo of it</button>" : "") + "</div>";
+    box.innerHTML = !q.trim() ? "" : hits.length ? hits.map(function (h) { return hitHTML(h[0], h[1]); }).join("") : '<div class="empty">No match for “' + esc(q) + "”. Try the blade name or fewer words." + (W.textNumber ? ' <button class="btn chrome sm" data-photo style="margin-top:10px">Text ' + esc(WHO()) + " a photo of it</button>" : "") + "</div>";
   }
 
   var moreIO = null;
@@ -555,7 +560,7 @@
     var left = list.length - shop.n;
     var grid = list.length ? list.slice(0, shop.n).map(function (f) { return cardHTML(f); }).join("") + (left > 0 ? '<div id="shopmore" style="grid-column:1/-1;height:1px"></div>' : "")
       : shop.tag === "highhp" ? '<div class="frank" style="grid-column:1/-1"><b class="h">High-horsepower blades are built for you</b><p>' + esc(WETLINE) + ' Tell us the saw, the horsepower and where you cut.</p><div class="sendrow"><button class="btn gold sm" data-wetspec>Spec my blade</button></div></div>'
-      : '<div class="empty d" style="grid-column:1/-1">Nothing matches that. Clear a filter, try fewer words, or ask ' + esc(FRANK) + ".</div>";
+      : '<div class="empty d" style="grid-column:1/-1">Nothing matches that. Clear a filter, try fewer words, or ask ' + esc(WHO()) + ".</div>";
     setTimeout(watchMore, 0);
     if ($("#shopgrid")) { $("#shopgrid").innerHTML = grid; $("#shopn").textContent = list.length + (list.length === 1 ? " product" : " products"); $("#shopblurb").textContent = curCat.s; $$(".cat").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.cat === shop.cat); }); $$(".tagc").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.tag === shop.tag); }); return; }
     app.innerHTML = '<section class="sec"><div class="wrap"><div class="sec-head"><h2>Shop everything</h2><p>Pick what you’re after. The more you buy, the better your price.</p></div>' +
@@ -587,7 +592,7 @@
   ], eeSel = "";
   function earlyPick(k) { eeSel = k; earlyScreen(true); var r = $("#eeres"); if (r) r.scrollIntoView({ block: "start", behavior: "smooth" }); }
   function earlyScreen(keep) {
-    var a = byK(AGG, eeSel), fams = a ? C.families.filter(function (f) { return f.cats.indexOf("green") >= 0 && new RegExp("\\b" + a.color + "$", "i").test(f.n); }) : [];
+    var a = byK(AGG, eeSel), fams = a ? C.families.filter(function (f) { return f.cats.indexOf("green") >= 0 && new RegExp("\\b" + a.color + "$", "i").test(f.n); }).sort(function (x, y) { var o = function (f) { return /^Zenesis/.test(f.n) ? 0 : /^Arix/.test(f.n) ? 1 : 2; }; return o(x) - o(y); }) : [];
     var y = keep ? window.scrollY : 0;
     app.innerHTML = shell("Early-entry saws", 0, 0, "<h1>Which color blade?</h1>" + says("Soff-Cut style or Gorilla style, the color is the bond. Match it to your aggregate and the joint comes out clean.") +
       '<div class="frank"><b class="h">1. Tap where you cut</b><p>Find your area on the map and tap it. Colors on the map show how hard the aggregate is there.</p><div class="aggmap" id="aggmap"><span class="note">Loading the map…</span></div>' +
@@ -597,7 +602,7 @@
         (fams.length ? '<div class="results">' + fams.map(function (f) { return cardHTML(f); }).join("") + "</div>" : "") : "") + "</div>" +
       '<div class="frank"><b class="h">The whole color chart</b><table class="cmp"><thead><tr><th>Blade color</th><th>Aggregate</th></tr></thead><tbody>' +
       [["White", "Soft and abrasive"], ["Yellow", "Soft"], ["Orange", "Medium soft"], ["Red", "Medium"], ["Green", "Medium hard"], ["Purple", "Hard"], ["Black", "Critically hard"], ["Next Day", "Cutting the next day, partially cured"]].map(function (r) { return "<tr><td><b>" + r[0] + "</b></td><td>" + r[1] + "</td></tr>"; }).join("") + '</tbody></table><p class="note">Fits Soff-Cut and Core Cut early-entry saws. Zenesis Green Kut also comes in Gorilla arbors. Aggregate changes from one pit to the next, so if you’re between two colors, ask.</p></div>' +
-      '<div class="frank"><b class="h">Not sure? Tell me where you cut</b><div class="hprow"><input id="eeloc" type="text" placeholder="City, state" autocomplete="address-level2" aria-label="City and state"><button class="btn gold sm" data-eeask>Ask ' + esc(FRANK) + "</button></div><p class=\"note\">I’ll confirm the color for your area and your mix.</p></div>");
+      '<div class="frank"><b class="h">Not sure? Tell me where you cut</b><div class="hprow"><input id="eeloc" type="text" placeholder="City, state" autocomplete="address-level2" aria-label="City and state"><button class="btn gold sm" data-eeask>Ask ' + esc(WHO()) + "</button></div><p class=\"note\">I’ll confirm the color for your area and your mix.</p></div>");
     setNav(""); if (keep) window.scrollTo(0, y);
     var put = function () { var m = $("#aggmap"); if (!m || !window.AGGMAP) return; m.innerHTML = window.AGGMAP; m.addEventListener("click", function (e) { var c = e.target.getAttribute && e.target.getAttribute("class"), hit = AGG.filter(function (x) { return x.cls === c; })[0]; if (hit) earlyPick(hit.k); }); };
     if (window.AGGMAP) put(); else { var sc = document.createElement("script"); sc.src = "aggmap.js"; sc.onload = put; sc.onerror = function () { var m = $("#aggmap"); if (m) m.innerHTML = '<span class="note">Map didn’t load. Pick your aggregate below.</span>'; }; document.head.appendChild(sc); }
@@ -710,7 +715,7 @@
     var eq = C.families.filter(function (f) { return f.cats.indexOf("equip") >= 0 || f.cats.indexOf("dust") >= 0; });
     app.innerHTML = shell("Equipment deals", 0, 0,
       "<h1>If they make it, we can get it.</h1>" + says(QUIP.equipment[0]) +
-      '<div class="frank"><b class="h">Tap what you need</b><p>Pick as many as you want. ' + esc(FRANK) + " goes hunting and comes back with a price. Bundle a saw with your blades: one price, one invoice.</p>" + equipPicker("Go find me the best price") + '<div class="center"><a class="btn blue sm" href="#saw-deal">Build a saw package</a></div></div>' +
+      '<div class="frank"><b class="h">Tap what you need</b><p>Pick as many as you want. ' + esc(WHO()) + " goes hunting and comes back with a price. Bundle a saw with your blades: one price, one invoice.</p>" + equipPicker("Go find me the best price") + '<div class="center"><a class="btn blue sm" href="#saw-deal">Build a saw package</a></div></div>' +
       '<div class="frank"><b class="h">Gas cut-off saws, side by side</b><p class="pknote"><b>Bundle a saw with your blades. One package price, one invoice.</b> Tap <b>+ Blades</b> on any saw to build the package. Your rep confirms your total.</p><div class="tablewrap"><table class="cmp saws"><thead><tr><th>Saw</th><th>Blade</th><th>Max depth</th>' + (HIDE ? "" : '<th class="num">Buy now</th>') + '<th></th></tr></thead><tbody>' + rows + '</tbody></table></div><p class="note">Depth is typical for that blade size. Buying blades with it? Your rep can do better on the saw.</p><div class="center"><button class="btn gold sm" data-equip>Negotiate with your sales rep</button></div></div>' +
       '<h2 class="wiz-h2">Equipment on the shelf</h2><div class="results two-up swipe">' + eq.map(function (f) { return cardHTML(f); }).join("") + "</div>", true);
     setNav("#equipment");
@@ -781,10 +786,23 @@
     setNav("");
   }
 
+  /* Every page change lands at the top. Said three times because iPhone Safari can settle the old scroll
+     position back in after the new page is drawn. */
+  try { if ("scrollRestoration" in history) history.scrollRestoration = "manual"; } catch (e) {}
+  function toTop() {
+    var z = function () { window.scrollTo(0, 0); document.documentElement.scrollTop = 0; document.body.scrollTop = 0; };
+    z(); if (window.requestAnimationFrame) requestAnimationFrame(z); setTimeout(z, 60);
+  }
+  /* Tapping a button for the page you are already on still takes you to its top. */
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest && e.target.closest('a[href^="#"]'); if (!a) return;
+    var h = a.getAttribute("href"); if (!h || h.length < 2 || h.indexOf("#blade-") === 0) return;
+    if (h === (location.hash || "#home")) { e.preventDefault(); route(); }
+  });
   function route() {
     var h = location.hash || "#home"; document.body.dataset.r = h.slice(1).split("-")[0];
     if (h.indexOf("#blade-") === 0) { var f = FAM[h.slice(7)]; if (!app.innerHTML) home(); if (f) openDetail(f); return; }
-    window.scrollTo(0, 0);
+    toTop();
     if (h === "#finder" || h === "#ask-frank") {
       var mode = h === "#finder" ? "finder" : "ask";
       if (!wiz.keep) { wiz.mat = wiz.saw = null; } wiz.hp = null; wiz.hpn = null;
@@ -889,6 +907,8 @@
   function me() { return store.get("me", {}); }
   function myRep() { var r = repBySlug(me().rep); return r && !isBoss(r) ? r : null; }
   function WHO() { var r = myRep(); return r ? repFirst(r) : FRANK; }
+  function SAYER() { var r = myRep(); return r ? repFirst(r) : "Big " + FRANK; }
+  function askImg(big) { var r = myRep(); return r && r.photo ? "brand/reps/" + r.photo : "brand/frank-cool" + (big ? "" : "-sm") + ".webp"; }
   function isPackage(t) { var saw = false, blade = false; t.lines.forEach(function (l) { if (l.f.cats.indexOf("equip") >= 0) saw = true; else blade = true; }); return saw && blade; }
   /* The order text for someone whose name this phone already knows: no form. */
   function quickOrder() { var i = me(); return { name: i.name || "", company: i.company || "", phone: i.phone || "", email: i.email || "", po: "", notes: "", rep: repBySlug(i.rep) ? i.rep : "", pay: i.pay || PAY0, feedback: "", msg: "", acct: i.acct || "existing", addr: i.addr || "", city: i.city || "", state: i.state || "", zip: i.zip || "", ref: "", limit: "", r1: "", r1p: "", r2: "", r2p: "", r3: "", r3p: "", stars: "", review: "", fname: "", fco: "", intent: "buy", pub: false, disc: [] }; }
@@ -1068,14 +1088,14 @@
   /* ---------- product detail ---------- */
   function openDetail(f) {
     var vurl = (W.videos || {})[f.id], mats = Object.keys(f.m).sort(function (a, b) { return f.m[b] - f.m[a]; }), cur = wiz.mat ? wiz.mat.keys : [];
-    var h = '<div class="pd"><div>' + pic(f) + "</div><div>" + (f.tier ? '<span class="tier ' + f.tier + '">' + TIER[f.tier] + "</span>" : "") + "<h3>" + esc(f.n) + "</h3>" +
+    var h = '<div class="pd"><div>' + pic(f) + "</div><div>" + (f.tier ? '<span class="tier ' + f.tier + '">' + tierTag(f) + "</span>" : "") + "<h3>" + esc(f.n) + "</h3>" +
       (f.hook ? '<p class="lede">' + esc(f.hook) + "</p>" : "") +
       (f.ben.length ? '<ul class="ben">' + f.ben.map(function (b) { return "<li>" + (b[0] ? "<b>" + esc(b[0]) + "</b>" : "") + esc(b[1]) + "</li>"; }).join("") + "</ul>" : (f.desc ? '<p class="note" style="font-size:15px;color:var(--ink)">' + esc(f.desc) + "</p>" : "")) + "</div></div>";
     var fly = (W.flyers || {})[f.id];
     if (fly) h += '<div class="center"><a class="btn gold" href="' + esc(fly) + '" target="_blank" rel="noopener">View the product flyer (PDF)</a></div>';
     if (TIERQUIP[f.tier]) h += says(TIERQUIP[f.tier]);
     h += '<div class="blk"><h4>Pick your size</h4><div class="sizes">' + f.vars.map(function (v) {
-      return '<div class="sz' + (inSaw(v, wiz.saw) ? "" : " dim") + '" data-v="' + esc(vkey(v)) + '"><div><b>' + esc(vlabel(v)) + "</b><small>" + esc(v[0]) + (depthFor(f, v) ? " · cuts about " + depthFor(f, v) + " deep" : "") + '</small></div><div class="r"><span class="p">' + rangeTxt(v) + "</span>" + qtyHTML(1) + '<button class="add" data-add>Add</button></div></div>';
+      return '<div class="sz' + (inSaw(v, wiz.saw) ? "" : " dim") + '" data-v="' + esc(vkey(v)) + '"><div><b>' + esc(vlabel(v)) + "</b><small>" + esc(v[0]) + (depthFor(f, v) ? " · cuts about " + depthFor(f, v) + " deep" : "") + '</small></div><div class="r">' + (HIDE ? "" : '<span class="p">' + rangeTxt(v) + "</span>") + qtyHTML(1) + '<button class="add" data-add>Add</button></div></div>';
     }).join("") + "</div></div>";
     var tv = defVar(f, f.vars);
     if (tiered(tv)) h += '<div class="blk"><h4>The more you buy, the better the price</h4><div class="tiers">' + ["1 to 11", "12+", "24+", "36+", "50+", "100+"].map(function (lab, i) { return "<div><span>" + lab + "</span><b>" + money(i ? tv[6][i - 1] : tv[3]) + "</b></div>"; }).join("") + '</div><p class="note">Each, for the ' + esc(vlabel(tv)) + ". " + esc(mixLine()) + " Your account may do better.</p></div>";
@@ -1083,7 +1103,7 @@
     if (mats.length) h += '<div class="blk"><h4>How it rates</h4><div class="rates">' + mats.map(function (k) { return '<div class="' + (cur.indexOf(k) >= 0 ? "on" : "") + '"><span>' + esc(MATNAME[k]) + "</span><span>" + stars(f.m[k]) + " " + f.m[k].toFixed(1) + "</span></div>"; }).join("") + "</div></div>";
     if (vurl) {h += '<div class="blk"><h4>Watch it cut</h4>' + (vurl
       ? '<a class="video" href="' + esc(vurl) + '" target="_blank" rel="noopener"><span class="play"></span><span><b>See the ' + esc(f.n) + " in action</b><span>Opens the video in a new tab</span></span></a>"
-      : '<div class="video soon"><span class="play"></span><span><b>Video coming soon</b><span>Want to see it cut first? Ask ' + esc(FRANK) + " for a demo.</span></span></div>") + "</div>"; }
+      : '<div class="video soon"><span class="play"></span><span><b>Video coming soon</b><span>Want to see it cut first? Ask ' + esc(WHO()) + " for a demo.</span></span></div>") + "</div>"; }
     if (f.saws.length) h += '<div class="blk"><h4>Runs on</h4><div class="tags">' + f.saws.map(function (k) { return "<span>" + esc(SAWNAME[k]) + "</span>"; }).join("") + "</div></div>";
     $("#detailtitle").textContent = f.n;
     var b = $("#detailbody"); b.innerHTML = h; b.dataset.f = f.id; b.scrollTop = 0;
@@ -1126,6 +1146,7 @@
     if ((el = t.closest("[data-qadd]"))) { var qr = el.closest(".qrow"), qf = FAM[qr.dataset.f], qs = $("[data-qsize]", qr), qk = qs ? qs.value : vkey(defVar(qf, qf.vars)), qn = parseInt(el.dataset.qadd, 10), qv = findVar(qf, qk); addToCart(qf.id, qk, qn); flash(el, "✓"); toast(qn + " x " + qf.n + (ACCT ? " added to your order" : " added at " + money(eachAt(qv, qn)) + " each")); return; }
     if ((el = t.closest("[data-eqpick]"))) { var on = el.getAttribute("aria-pressed") !== "true"; el.setAttribute("aria-pressed", on); var ix2 = eqSel.indexOf(el.dataset.eqpick); if (on && ix2 < 0) eqSel.push(el.dataset.eqpick); if (!on && ix2 >= 0) eqSel.splice(ix2, 1); $$("[data-eqpick]").forEach(function (b) { b.setAttribute("aria-pressed", eqSel.indexOf(b.dataset.eqpick) >= 0); }); return; }
     if ((el = t.closest("[data-intent]"))) { setIntent(el.dataset.intent); return; }
+    if (t.closest("[data-norep]")) { var nr = me(); nr.rep = ""; store.set("me", nr); store.set("replock", 0); contactWire(); go("#home"); toast("Okay. You’re on the main DBW WISCO page."); return; }
     if (t.closest("[data-repchange]")) { store.set("replock", 0); renderReps($("#f-rep").value); var rdc = $("#repd"); if (rdc) rdc.open = true; return; }
     if ((el = t.closest("[data-tag]"))) { shop.tag = shop.tag === el.dataset.tag ? "" : el.dataset.tag; shop.n = SHOPPAGE; shopScreen(); return; }
     if ((el = t.closest("[data-agg]"))) { earlyPick(el.dataset.agg); return; }
@@ -1186,15 +1207,15 @@
     if (t.closest("[data-sms]")) { if (needName("sms")) return; var fo = formData(); sms(buildText(fo), route2(fo.rep).cell); afterSend("sms"); return; }
     if (t.closest("[data-copy]")) { if (needName()) return; copyText(buildText(formData()), function () { afterSend("copied"); }); return; }
     if (t.closest("[data-share]")) { copyText(shareLink(), function () { toast("Reorder link copied. Text it to anyone."); }); return; }
-    if ((el = t.closest("[data-fsms]"))) { sms(frankMsg(el.closest("[data-frank]").dataset.frank)); return; }
-    if ((el = t.closest("[data-femail]"))) { mailto(W.orderEmail, "Blade question from the Wisco site", frankMsg(el.closest("[data-frank]").dataset.frank)); return; }
+    if ((el = t.closest("[data-fsms]"))) { sms(frankMsg(el.closest("[data-frank]").dataset.frank), route2(repBySlug(me().rep) ? me().rep : "").cell); return; }
+    if ((el = t.closest("[data-femail]"))) { var fq = route2(repBySlug(me().rep) ? me().rep : ""); mailto(fq.to, "Blade question from the DBW WISCO site", frankMsg(el.closest("[data-frank]").dataset.frank), fq.cc); return; }
     if ((el = t.closest("[data-fcopy]"))) { copyText(frankMsg(el.closest("[data-frank]").dataset.frank), function () { toast("Copied. Paste it in a text to " + FRANK + "."); }); return; }
     if (t.closest("[data-emptycart]")) { cart = []; saveCart(); renderCart(); return; }
     if (t.tagName === "DIALOG") t.close();
   });
   document.addEventListener("change", function (e) {
     if (e.target.matches && e.target.matches("[data-rp]")) { var li = parseInt(e.target.closest(".line").dataset.i, 10), pv = parseFloat(e.target.value); if (cart[li]) { if (pv > 0) cart[li].p = Math.round(pv * 100) / 100; else delete cart[li].p; saveCart(); renderCart(); } return; }
-    if (e.target.matches && e.target.matches("[data-qsize]")) { var qr2 = e.target.closest(".qrow"), qv2 = findVar(FAM[qr2.dataset.f], e.target.value); if (qv2) $("[data-qrng]", qr2).textContent = rangeTxt(qv2) + " each"; }
+    if (e.target.matches && e.target.matches("[data-qsize]")) { var qr2 = e.target.closest(".qrow"), qv2 = findVar(FAM[qr2.dataset.f], e.target.value); if (qv2) $("[data-qrng]", qr2).textContent = HIDE ? "Part # " + qv2[0] : rangeTxt(qv2) + " each"; }
     var t = e.target, card = t.closest(".card"), line = t.closest(".line");
     if (t.matches("[data-size]") && card) { var f = FAM[card.dataset.f], keep = $(".qty input", card).value; $("[data-row]", card).outerHTML = buyRow(findVar(f, t.value)); $(".qty input", card).value = keep; }
     if (line && t.matches(".qty input")) { cart[parseInt(line.dataset.i, 10)].q = Math.max(1, parseInt(t.value, 10) || 1); saveCart(); renderCart(); }
@@ -1229,6 +1250,10 @@
     $$("[data-text-btn]").forEach(function (a) { a.href = "sms:" + cell; if (a.closest(".footact")) a.textContent = "Text " + who; });
     $$("[data-call-btn]").forEach(function (a) { a.href = "tel:" + cell; a.textContent = "Call " + who; });
     $$("[data-mail-btn]").forEach(function (a) { a.href = "mailto:" + mail; a.textContent = "Email " + who; });
+    $$("[data-askname]").forEach(function (a) { a.textContent = "Ask " + who; });
+    $$("[data-sayname]").forEach(function (a) { a.textContent = (r ? who : "Big " + FRANK) + " says"; });
+    $$("[data-askimg]").forEach(function (a) { a.src = askImg(); a.classList.toggle("repface", !!(r && r.photo)); });
+    var bfa = $("#bf"); if (bfa) bfa.setAttribute("aria-label", (r ? who : "Big " + FRANK) + " says");
     $$("[data-mgr]").forEach(function (a) { a.textContent = r ? r.name + ", your rep" : (W.managerName || "Frank") + ", " + (W.managerTitle || ""); });
   }
   $$("[data-oemail-link]").forEach(function (a) { a.textContent = W.orderEmail || ""; a.href = "mailto:" + (W.orderEmail || ""); });

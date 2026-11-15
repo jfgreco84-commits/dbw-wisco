@@ -59,7 +59,7 @@ def load(path):
 FOURCORE = {"BLACKCAT": "Blackcat", "PUNISHER": "Punisher", "SABERTOOTH": "Sabertooth", "SMASH": "Smash", "VALKYRIE": "Valkyrie", "WOLVERINE": "Wolv"}
 ZCOLOR = {"G": "Green", "O": "Orange", "P": "Purple", "R": "Red", "Y": "Yellow"}
 def load_master_extra(path):
-    """Lines the monthly list leaves out: 4-Core Pro Series core bits and Zenesis Green Kut.
+    """Lines the monthly list leaves out: 4-Core Pro Series core bits, Zenesis Green Kut and Arix Green Kut.
     Core bits are priced 3.0 x cost (same as the monthly list's core bit sheet).
     Zenesis uses the book's own top column (2.2M), which sits just above standard Green Kut MSRP."""
     wb = openpyxl.load_workbook(path, data_only=True); rows = []
@@ -85,4 +85,12 @@ def load_master_extra(path):
             if not m: continue
             size = re.sub(r"\s*ZENESIS.*$", "", str(r[1]), flags=re.I).replace("x", " x ")
             rows.append(dict(sheet="MASTER", section="Zenesis Green Kut " + ZCOLOR[m.group(1)], sku=a.strip(), desc=str(r[1]), cost=r[2], price=None, basis="x", extra={"size": re.sub(r"\s+", " ", size)}))
+    # Arix Green Kut: the middle early-entry line, also only in the master book.
+    for r in wb["Green Kut"].iter_rows(values_only=True):
+        r = list(r) + [None] * 6; a = r[0]
+        if not (isinstance(a, str) and num(r[2]) and r[2] > 0): continue
+        m = re.match(r"^GK[\d.]+AXQ5-([GOPRY])$", a.strip())
+        if not m: continue
+        size = re.sub(r"\s*ARIX.*$", "", str(r[1]), flags=re.I).replace("x", " x ")
+        rows.append(dict(sheet="MASTER", section="Arix Green Kut " + ZCOLOR[m.group(1)], sku=a.strip(), desc=str(r[1]), cost=r[2], price=None, basis="x", extra={"size": re.sub(r"\s+", " ", size)}))
     return rows

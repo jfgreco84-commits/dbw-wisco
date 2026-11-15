@@ -50,7 +50,7 @@ window.WISCO = {
   reps: [
     { name: "Big Frank Greco", photo: "frank.webp", email: "", cell: "", manager: "", aka: ["frank"] },
     { name: "John Anthony", photo: "john-anthony.webp", email: "janthony@diamondbladewarehouse.com", cell: "+14143630323", manager: "", aka: ["ronny", "ronny-b"] },
-    { name: "Adam West", photo: "batman.webp", email: "awest@diamondbladewarehouse.com", cell: "+14143665237", manager: "", aka: ["batman"] },
+    { name: "Adam West", photo: "batman.webp", email: "awest@diamondbladewarehouse.com", cell: "+14143665237", manager: "", aka: ["adamwest", "batman", "adam-west"] },
     { name: "Adam Misurek", photo: "miz.webp", email: "amisurek@diamondbladewarehouse.com", cell: "+14145207257", manager: "", aka: ["miz"] },
     { name: "Joey “The Stinger” DeRuki", photo: "snacks.webp", email: "jderuki@diamondbladewarehouse.com", cell: "+12629579839", manager: "", aka: ["snacks", "joey-deruki"] },
     { name: "T.J. Sutton", photo: "tj.webp", email: "tsutton@diamondbladewarehouse.com", cell: "+12624200326", manager: "", aka: ["tj"] },
@@ -77,7 +77,7 @@ window.WISCO = {
   // Quantity price breaks a customer can ask for.
   breaks: [12, 24, 36, 50, 100, 150, 200, 500],
   // The quantity buttons on Fast Reorder.
-  quickQty: [12, 24, 36, 50, 100],
+  quickQty: [12, 24, 36, 50],
   // Walk-behind saws at or under this horsepower get the low-horsepower blades in Blade Finder.
   lowHpMax: 20,
   // Account levels, lowest to highest.

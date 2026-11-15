@@ -105,7 +105,7 @@ img { max-width: 100% }
 .sec-head h2 { font: 400 clamp(26px, 4vw, 38px)/1.05 var(--slab); text-transform: uppercase; margin: 0 0 6px; color: var(--navy-2); text-wrap: balance }
 .sec.dark .sec-head h2 { background: var(--chrome-text); -webkit-background-clip: text; background-clip: text; color: transparent }
 .sec-head p { margin: 0; color: var(--muted); font-weight: 600 } .sec.dark .sec-head p { color: #DCE7FF }
-.sec-head h2::after { content: "★ ★ ★"; display: block; font: 400 13px var(--sans); letter-spacing: .5em; color: var(--red); margin-top: 8px; -webkit-text-fill-color: var(--red) }
+.sec-head h2::after { content: "★ ★ ★ ★ ★"; display: block; font: 400 13px var(--sans); letter-spacing: .5em; color: var(--red); margin-top: 8px; -webkit-text-fill-color: var(--red) }
 .three { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px }
 .point { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.22); border-radius: var(--radius); padding: 18px }
 .point b { font: 900 15px var(--sans); letter-spacing: .1em; text-transform: uppercase; display: block; margin-bottom: 6px } .point p { margin: 0; color: #DCE7FF; font-size: 15px }
@@ -606,3 +606,40 @@ table.cmp .add.pk { margin-left: 6px; background: var(--gold); color: var(--gold
 .bigref { display: block; margin-top: 8px; font: 800 15px var(--sans); color: var(--navy-2) } .bigref b { font-size: 20px; letter-spacing: .04em }
 .newhere { background: rgba(7,20,51,.62); border: 1px solid rgba(255,255,255,.45); border-radius: 16px; padding: 12px 14px; margin: 0 0 14px; max-width: 520px; display: grid; gap: 6px }
 .newhere b { font: 900 18px var(--sans); color: #fff } .newhere span { font: 600 14px/1.45 var(--sans); color: #dbe4ff }
+
+/* v26: cleaner quick-access strip; a rep's face on their own page */
+.tools .wrap { gap: 8px; padding-block: 10px; padding-right: 72px; scroll-padding-inline: 16px 72px }
+.tools a { min-height: 42px; padding: 0 14px; font-size: 13px }
+.tsc { color: #fff; font-size: 24px; line-height: 1; width: auto }
+.tsc.r { padding-left: 40px; padding-right: 22px; background: linear-gradient(90deg, rgba(11,29,74,0) 0, #0B1D4A 30px) }
+.tsc.l { padding-right: 40px; padding-left: 22px; background: linear-gradient(270deg, rgba(11,29,74,0) 0, #0B1D4A 30px) }
+.tsc.r::after, .tsc.l::after { top: 50%; bottom: auto; width: 40px; height: 40px; margin-top: -20px; background: #0B1D4A; border: 1.5px solid rgba(255,255,255,.8); box-shadow: none }
+.tsc.r::after { left: auto; right: 8px } .tsc.l::after { right: auto; left: 8px }
+.bf-av img.repface { height: 100%; object-fit: cover; margin-top: -4px }
+.bfs img[src*="brand/reps/"], .door.withav img[src*="brand/reps/"], .frankme img[src*="brand/reps/"] { border-radius: 50%; aspect-ratio: 1; object-fit: cover; height: auto }
+.tsc.r { box-shadow: 14px 0 0 #0B1D4A } .tsc.l { box-shadow: -14px 0 0 #0B1D4A }
+
+/* v27: no price slot when prices are private */
+.partno { font: 700 12.5px var(--sans); letter-spacing: .04em; color: var(--muted, #5b6785) }
+.qrng { color: var(--muted, #5b6785); font-weight: 700 }
+
+/* v28: rep card fills its box: number, a line, and three equal buttons */
+.mine { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 12px 14px; align-items: center; padding: 14px; max-width: 560px }
+.mine img, .mine .av { width: 76px; height: 76px }
+.mine .mine-id { min-width: 0 } .mine .mine-id b { font-size: 21px }
+.mine .mine-num { display: block; margin-top: 4px; font: 900 18px var(--sans); letter-spacing: .02em; color: #fff; text-decoration: none }
+.mine .mine-id small { display: block; margin-top: 2px; font: 600 12.5px/1.35 var(--sans); color: #c9d5ff; letter-spacing: 0; text-transform: none }
+.mine .mine-act { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px }
+.mine .mine-act .btn { min-width: 0; padding-inline: 4px; text-align: center; justify-content: center; white-space: nowrap; font-size: 12.5px; letter-spacing: .06em }
+@media (max-width: 360px) { .mine .mine-act .btn { font-size: 11.5px; letter-spacing: .02em } }
+
+/* v29: Fast Reorder quantity row: a label and five even buttons */
+.qhow { grid-column: 1 / -1; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 10px; border-top: 1px solid var(--line); padding-top: 10px; margin-top: 2px }
+.qhow > span { font: 900 11.5px var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--muted, #5b6785); white-space: nowrap }
+.qhow .qchips { grid-column: auto; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 7px }
+.qhow .qchips button { height: 44px; border-radius: 999px; font-size: 16px; box-shadow: 0 2px 0 rgba(0,0,0,.12) }
+@media (min-width: 760px) { .qhow { grid-column: auto; border-top: 0; padding-top: 0; margin-top: 0 } .qhow .qchips { grid-template-columns: repeat(5, 54px) } }
+
+.qmore { font: 800 12.5px var(--sans); color: var(--royal); text-decoration: underline; margin-top: 2px }
+
+.mine .mine-x { grid-column: 1 / -1; justify-self: start; background: none; border: 0; padding: 2px 0; font: 700 12.5px var(--sans); color: #c9d5ff; text-decoration: underline; cursor: pointer }

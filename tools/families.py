@@ -414,5 +414,7 @@ fam("Sabertooth", "pro", dict(r=5, c=5, a=4, b=4.5, pc=4.5),
     [("Years of segment R&D", "You stop matching bits to aggregate. This one just works."),
      ("Multi-use bond", "Concrete, block, asphalt. Same bit, same speed."),
      ('15", 18" and 24" barrels', "Covers shallow slabs to deep walls.")], cat="core")
+for _c in ["Green", "Orange", "Purple", "Red", "Yellow"]:
+    new("Arix Green Kut " + _c, "green", "supreme", dict(g=5), "Arix diamond alignment for early-entry joints.", img="Green Kut " + _c)
 new("Zenesis Green Kut Red", "green", "supreme", dict(g=5), "Zenesis diamond alignment for more footage per blade and chip-free joints.", img="Zenesis Green Kut Purple")
 new("Zenesis Green Kut Yellow", "green", "supreme", dict(g=5), "Zenesis diamond alignment for more footage per blade and chip-free joints.", img="Zenesis Green Kut Purple")

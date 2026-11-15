@@ -170,9 +170,9 @@ SAWSEC = [
     ("BR/CC", "Walk-Behind & Early-Entry Saws"), ("SOFF", "Walk-Behind & Early-Entry Saws"),
 ]
 POPULAR = ["Dragon Supreme", "Dragon", "Superblade Extreme", "Super G", "T-Rex", "Viper General Purpose",
-           "Superblade G3", "Superblade Arrow", "Zenesis Green Kut Purple", "Punisher", "Wolv", "Sabertooth", "Viper Premium",
+           "Superblade G3", "Superblade Arrow", "Zenesis Green Kut Purple", "Arix Green Kut Purple", "Green Kut Purple", "Punisher", "Wolv", "Sabertooth", "Viper Premium",
            "Blue Tornado", "Blacksmyth", "Swordfish", "Jaguar",
-           "Wolverine Premium", "Turbo Cup - Premium", "Blue Cheetah", "V-Shape Wet Corebit", "Green Kut Purple",
+           "Wolverine Premium", "Turbo Cup - Premium", "Blue Cheetah", "V-Shape Wet Corebit",
            "Hybrid", "Tornado", "Double Row", "Segmented Dry Corebit"]
 
 
@@ -303,7 +303,7 @@ def main():
             if r["extra"].get("saw") and "POWERHEAD" not in r["desc"]: note = note
         elif r["sheet"] == "MASTER":
             target, size, note = r["section"], r["extra"]["size"], ""
-            cats = ["core"] if not target.startswith("Zenesis") else ["green"]
+            cats = ["green"] if target.startswith(("Zenesis", "Arix Green Kut")) else ["core"]
         elif r["sheet"] == "SAWS":
             sec = r["section"].upper()
             target = next((n for rx, n in RULES if re.search(rx, sku)), None) or next((n for k, n in SAWSEC if k in sec), "Grinders & Circular Saws")
@@ -394,11 +394,11 @@ def main():
                  vars=f["vars"])
         if name in NOT_WISCO: continue
         # One-liners that were shared word for word across a whole line get their own.
-        mcol = re.match(r"^(Zenesis )?Green Kut (Yellow|Orange|Red|Green|Purple|Black|Next Day)$", name)
+        mcol = re.match(r"^(Zenesis |Arix )?Green Kut (Yellow|Orange|Red|Green|Purple|Black|Next Day)$", name)
         if mcol:
             agg = {"Yellow": "soft", "Orange": "medium soft", "Red": "medium", "Green": "medium hard", "Purple": "hard", "Black": "critically hard"}.get(mcol.group(2))
             what = "bonded for %s aggregate" % agg if agg else "with a harder bond for slabs you cut the next day"
-            d["hook"] = ("Zenesis diamond alignment, %s. More footage per blade and chip-free joints." % what) if mcol.group(1) else ("Early-entry blade %s. Our premium alternative to Soff-Cut." % what)
+            d["hook"] = ("Arix diamond alignment, %s. Every diamond lined up and working." % what) if mcol.group(1) == "Arix " else ("Zenesis diamond alignment, %s. More footage per blade and chip-free joints." % what) if mcol.group(1) else ("Early-entry blade %s. Our premium alternative to Soff-Cut." % what)
         elif "chain" in cats and d["hook"].startswith("Chains, bars, sprockets and powerheads"):
             d["hook"] = "Chains, bars and sprockets for the %s. Reorder by the exact part number." % re.sub(r"\s+Systems?$", "", name)
         out.append(d)
@@ -420,6 +420,7 @@ def main():
             b = by.get(d["borrow"] or "")
             if not b and "chain" in d["cats"]: b = chainimg
             if not b and d["n"].startswith("Zenesis"): b = by.get("Zenesis Green Kut Purple")
+            if not b and d["n"].startswith("Arix Green Kut"): b = by.get(d["n"][5:]) or by.get("Green Kut Green")
             if not b and d["n"].startswith("Green Kut"): b = by.get("Green Kut Green")
             if b and b["img"]: d["img"] = b["img"]
     if imgdir:
