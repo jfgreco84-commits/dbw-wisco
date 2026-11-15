@@ -1816,5 +1816,87 @@
    "What else do I need?",
    "Check the hose size and length for your setup. Hoses, a Y-connector for two tools and pre-filter bags are listed here. A full bag or a clogged filter cuts suction."
   ]
+ ],
+ "dixie-hard-rock": [
+  [
+   "Hard aggregate glazing your blade over?",
+   "Hard rock closes up a blade that is bonded too hard. Dixie Hard Rock is made for cured concrete with hard rock aggregate, so the blade stays open and keeps cutting."
+  ],
+  [
+   "Running a 65 to 110 HP flat saw?",
+   "A big saw needs a blade made for that power. This line is specified for 65 to 110 HP flat saws."
+  ],
+  [
+   "Is one bond right for every job?",
+   "No. Aggregate changes from one area to the next. Our wet blades are bonded for your area and what you are cutting. Tell your rep the saw, the horsepower and where you cut."
+  ],
+  [
+   "Need a size that is hard to find?",
+   "This line runs from 14 inch to 60 inch in the widths flat saw crews use. Pick the size here and your rep confirms the part before it ships."
+  ]
+ ],
+ "dixie-pro-concrete-65-110-hp": [
+  [
+   "Running a 65 to 110 HP flat saw on cured concrete?",
+   "A blade made for a small saw will not hold up on a big one. Dixie Pro Concrete in this class is specified for 65 to 110 HP flat saws on cured concrete."
+  ],
+  [
+   "Is one bond right for every job?",
+   "No. Aggregate changes from one area to the next. Our wet blades are bonded for your area and what you are cutting. Tell your rep the saw, the horsepower and where you cut."
+  ],
+  [
+   "Need a size that is hard to find?",
+   "This line runs from 12 inch to 60 inch in the widths flat saw crews use. Pick the size here and your rep confirms the part before it ships."
+  ]
+ ],
+ "dixie-pro-concrete-35-60-hp": [
+  [
+   "Running a 35 to 60 HP flat saw on cured concrete?",
+   "Horsepower changes the bond. This Dixie Pro Concrete class is specified for 35 to 60 HP flat saws, so the saw and the blade work together."
+  ],
+  [
+   "Is one bond right for every job?",
+   "No. Aggregate changes from one area to the next. Our wet blades are bonded for your area and what you are cutting. Tell your rep the saw, the horsepower and where you cut."
+  ],
+  [
+   "Need a size that is hard to find?",
+   "This line runs from 12 inch to 36 inch in the widths flat saw crews use. Pick the size here and your rep confirms the part before it ships."
+  ]
+ ],
+ "dixie-asphalt": [
+  [
+   "Asphalt eating your blades?",
+   "Asphalt is abrasive and wears a soft blade fast. Dixie Asphalt is made for asphalt on 65 to 110 HP flat saws."
+  ],
+  [
+   "Running a 65 to 110 HP flat saw?",
+   "A big saw needs a blade made for that power. This line is specified for 65 to 110 HP flat saws."
+  ],
+  [
+   "Is one bond right for every job?",
+   "No. Aggregate changes from one area to the next. Our wet blades are bonded for your area and what you are cutting. Tell your rep the saw, the horsepower and where you cut."
+  ],
+  [
+   "Need a size that is hard to find?",
+   "This line runs from 14 inch to 54 inch in the widths flat saw crews use. Pick the size here and your rep confirms the part before it ships."
+  ]
+ ],
+ "dixie-overlay": [
+  [
+   "Cutting asphalt laid over concrete?",
+   "Two materials in one cut is hard on a blade made for one of them. Dixie Overlay is made for asphalt over concrete on 65 to 110 HP flat saws."
+  ],
+  [
+   "Running a 65 to 110 HP flat saw?",
+   "A big saw needs a blade made for that power. This line is specified for 65 to 110 HP flat saws."
+  ],
+  [
+   "Is one bond right for every job?",
+   "No. Aggregate changes from one area to the next. Our wet blades are bonded for your area and what you are cutting. Tell your rep the saw, the horsepower and where you cut."
+  ],
+  [
+   "Need a size that is hard to find?",
+   "This line runs from 18 inch to 48 inch in the widths flat saw crews use. Pick the size here and your rep confirms the part before it ships."
+  ]
  ]
 }

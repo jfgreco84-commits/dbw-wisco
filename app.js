@@ -195,7 +195,7 @@
   var isPreview = !/^https?:$/.test(location.protocol) || /claude|anthropic/.test(location.hostname);
   var wiz = { mode: "finder", mat: null, saw: null, want: null, all: false, hp: null };
   var LOWHP = W.lowHpMax || 20, WETLINE = "Our wet blades are specifically bonded for your area and what you are cutting, so you get optimal performance every time.";
-  var HPS = [{ k: "low", n: "Low horsepower", s: "Up to " + LOWHP + " HP. Push saws and small walk-behinds." }, { k: "high", n: "High horsepower", s: "Over " + LOWHP + " HP, up to Pro 65 class." }, { k: "any", n: "Not sure", s: "Show me what fits and I’ll ask." }];
+  var HPS = [{ k: "low", n: "Low horsepower", s: "Up to " + LOWHP + " HP. Push saws and small walk-behinds." }, { k: "high", n: "High horsepower", s: "Over " + LOWHP + " HP. Flat saws from 35 to 110 HP." }, { k: "any", n: "Not sure", s: "Show me what fits and I’ll ask." }];
   var SHOPPAGE = 24, ordRef = "";
   var shop = { cat: "all", q: "", sort: "pop", n: SHOPPAGE, tag: "" };
   var deal = store.get("deal2", { saw: "", lines: [] });
@@ -261,6 +261,8 @@
   }
 
   /* ---------- picking blades ---------- */
+  function isDixie(f) { return f.id.indexOf("dixie") === 0; }
+  function hpClass(f) { return /35-60/.test(f.id) ? "35 to 60 HP saws" : "65 to 110 HP saws"; }
   function candidates(mat, saw) {
     var all = candidatesRaw(mat, saw), wolf = mat && (mat.k === "a" || mat.k === "g");
     var good = all.filter(function (f) { return f.id.indexOf("eagle") !== 0 && (wolf || f.id.indexOf("wolverine") !== 0) && f.cats.indexOf("equip") < 0 && (mat.k === "x" || f.cats.indexOf("metal") < 0); });
@@ -447,9 +449,14 @@
     if (wiz.saw.k === "early") h += '<div class="frank wetbox"><b class="h">Which color for your aggregate?</b><p>The color is the bond. Tap your area on the map and we tell you which one to run.</p><div class="sendrow"><a class="btn gold sm" href="#early">Open the color guide</a></div></div>';
     if (wiz.saw.k === "walk") {
       var lowFam = function (f) { return /low-hp/.test(f.id); };
-      if (wiz.hp === "high") list = list.filter(function (f) { return !lowFam(f); });
-      if (wiz.hp === "low") list = list.filter(lowFam).concat(list.filter(function (f) { return !lowFam(f); }));
-      h += '<div class="frank wetbox"><b class="h">Wet blades, bonded for you</b><p>' + esc(WETLINE) + (wiz.hp === "high" ? " High-horsepower wet blades are built to order. Tell us the saw, the horsepower and where you cut." : "") + '</p><div class="sendrow"><button class="btn gold sm" data-wetspec>Spec my wet blade</button></div></div>';
+      /* High horsepower means the Dixie wet blades. A typed horsepower picks the 35-60 or the 65-110 class. */
+      if (wiz.hp === "high") {
+        var dl = list.filter(isDixie);
+        if (wiz.hpn) { var mid = wiz.hpn <= 60, cls = dl.filter(function (f) { return /35-60/.test(f.id) === mid; }); if (cls.length) dl = cls; }
+        list = dl.length ? dl : list.filter(function (f) { return !lowFam(f); });
+      }
+      if (wiz.hp === "low") list = list.filter(lowFam).concat(list.filter(function (f) { return !lowFam(f) && !isDixie(f); }));
+      h += '<div class="frank wetbox"><b class="h">Wet blades, bonded for you</b><p>' + esc(WETLINE) + (wiz.hp === "high" ? " On a high-horsepower saw that means our Dixie wet blades, 35 to 110 HP. Tell us the saw, the horsepower and where you cut and we match the bond." : "") + '</p><div class="sendrow"><button class="btn gold sm" data-wetspec>Spec my wet blade</button></div></div>';
     }
     if (!list.length) { app.innerHTML = shell(kick, 0, 0, h + "<h1>That one’s a phone call.</h1>" + '<div class="empty">Nothing on the shelf matches that combo. ' + esc(WHO()) + " will spec it for you.</div>" + frankBox("")); return; }
     if (ask) {
@@ -463,6 +470,7 @@
       var lad = ladder(list), picks = lad.length >= 3 ? lad : bestBetterGood(list, wiz.mat, wiz.saw), shown = {};
       var pre = wiz.saw.k === "walk" && wiz.hp === "low" ? list.filter(function (f) { return /low-hp/.test(f.id); }) : [];
       picks = pre.map(function (f) { return { f: f, label: "Built for low horsepower", rc: "" }; }).concat(picks);
+      if (wiz.saw.k === "walk" && wiz.hp === "high" && list.every(isDixie)) picks = rank(list, wiz.mat, wiz.saw).map(function (f) { return { f: f, label: hpClass(f), rc: "" }; });
       picks.forEach(function (p) { shown[p.f.id] = 1; });
       var rest = rank(list, wiz.mat, wiz.saw).filter(function (f) { return !shown[f.id]; });
       h += "<h1>Here’s your lineup.</h1>" + says(((bigSaw(wiz.saw) && MATQUIP[wiz.mat.k]) || "Start at the top and work down.") + " " + list.length + (list.length === 1 ? " blade fits." : " fit, best first.")) +
@@ -585,7 +593,7 @@
     { k: "greenc", n: "Green concrete", t: function (f) { return (f.m.g || 0) >= 4; } },
     { k: "asph", n: "Asphalt", t: function (f) { return (f.m.a || 0) >= 4; } },
     { k: "lowhp", n: "Low horsepower", t: function (f) { return /low-hp/.test(f.id); } },
-    { k: "highhp", n: "High horsepower", t: function () { return false; } }
+    { k: "highhp", n: "High horsepower", t: function (f) { return isDixie(f); } }
   ];
   function shopScreen() {
     var cats = SHOPCATS.filter(function (c) { return c.k === "all" || C.families.some(function (f) { return f.cats.indexOf(c.k) >= 0; }); });
