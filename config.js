@@ -58,7 +58,7 @@ window.WISCO = {
     { name: "Robert Redman", photo: "cutty.webp", email: "rredman@diamondbladewarehouse.com", cell: "+14145731192", manager: "", aka: ["robertredman", "cutty", "rob-redman", "robert-redman"] },
     { name: "Kerry Smith", photo: "kerry.webp", email: "ksmith@diamondbladewarehouse.com", cell: "+14144037004", manager: "", aka: ["kerrysmith", "kerry"] },
     { name: "Geoff Nurse", photo: "geoff.webp", email: "gnurse@diamondbladewarehouse.com", cell: "+14142544197", manager: "", aka: ["geoffnurse", "geoff", "jeff"] },
-    { name: "Luis Millan", photo: "luis.webp", email: "lmillan@diamondbladewarehouse.com", cell: "+14142161941", manager: "", aka: ["luismillan", "luis", "luis-milan"] },
+    { name: "Joyner Lucas", photo: "joyner.webp", email: "lmillan@diamondbladewarehouse.com", cell: "+14142161941", manager: "", aka: ["joynerlucas", "joyner", "joyner-lucas", "luismillan", "luis", "luis-milan"] },
     { name: "Les", photo: "les.webp", email: "lkubeny@diamondbladewarehouse.com", cell: "+14142072487", manager: "", aka: ["les"] }
   ],
 
