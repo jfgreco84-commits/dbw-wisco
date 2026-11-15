@@ -22,7 +22,10 @@
   var FRANK = (W.managerName || "Frank").split(" ")[0];
   var RW = W.rewards || { review: "10% off your next order", referrer: "10% off their next order" };
   var BREAKS = W.breaks || [12, 24, 36, 50, 100, 150, 200, 500];
-  var TIER = { supreme: "Best · Supreme grade", premium: "Better · Premium grade", standard: "Good · Standard grade", economy: "Value · Economy grade", pro: "Pro Series" };
+  var TIER = { supreme: "Supreme grade", premium: "Better · Premium grade", standard: "Good · Standard grade", economy: "Value · Economy grade", pro: "Pro Series" };
+  /* "Best" belongs to the Dragons alone. The Superblade family and Swordfish sit one step under: High Performance. */
+  var TOPTAG = { "dragon-supreme": "Best · Supreme grade", "dragon": "Best · Supreme grade", "superblade-extreme": "High Performance · Supreme grade", "super-g": "High Performance · Supreme grade", "superblade-g3": "High Performance · Supreme grade", "superblade-arrow": "High Performance · Supreme grade", "swordfish": "High Performance · Supreme grade" };
+  function tierTag(f) { return TOPTAG[f.id] || TIER[f.tier]; }
   var TR = { supreme: 4, pro: 4, premium: 3, standard: 2, economy: 1, "": 0 };
   var SAWDIA = { grinder: [3, 9], cutoff: [12, 16], walk: [14, 99] };
 
@@ -248,7 +251,7 @@
     return '<article class="card' + (o.pick ? " pick" : "") + '" data-f="' + f.id + '">' +
       (o.ribbon ? '<div class="ribbon ' + (o.rc || "") + '"><span>' + o.ribbon + "</span>" + (o.ribbon2 ? "<span>" + o.ribbon2 + "</span>" : "") + "</div>" : "") +
       '<button class="c-top" data-open aria-label="Details for ' + esc(f.n) + '">' + pic(f) + "<span>" +
-      (f.tier ? '<span class="tier ' + f.tier + '">' + (o.ribbon ? TIER[f.tier].split(" · ").pop() : TIER[f.tier]) + "</span>" : "") + "<h3>" + esc(f.n) + "</h3>" +
+      (f.tier ? '<span class="tier ' + f.tier + '">' + (o.ribbon ? tierTag(f).split(" · ").pop() : tierTag(f)) + "</span>" : "") + "<h3>" + esc(f.n) + "</h3>" +
       (r ? '<span class="rate">' + stars(r) + "<span>Our rating <b>" + r.toFixed(1) + "</b> on " + esc(o.mat.n) + "</span></span>" : "") + "</span></button>" +
       (f.hook ? '<p class="hook">' + esc(f.hook) + "</p>" : "") +
       '<div class="buy">' + size + buyRow(first) + '<button class="more" data-open>Details, ratings and all ' + f.vars.length + (f.vars.length === 1 ? " size" : " sizes") + "</button>" + (f.cats.indexOf("equip") >= 0 ? '<button class="btn gold sm block" data-equip>Negotiate with your sales rep</button>' : "") + "</div></article>";
@@ -1070,7 +1073,7 @@
   /* ---------- product detail ---------- */
   function openDetail(f) {
     var vurl = (W.videos || {})[f.id], mats = Object.keys(f.m).sort(function (a, b) { return f.m[b] - f.m[a]; }), cur = wiz.mat ? wiz.mat.keys : [];
-    var h = '<div class="pd"><div>' + pic(f) + "</div><div>" + (f.tier ? '<span class="tier ' + f.tier + '">' + TIER[f.tier] + "</span>" : "") + "<h3>" + esc(f.n) + "</h3>" +
+    var h = '<div class="pd"><div>' + pic(f) + "</div><div>" + (f.tier ? '<span class="tier ' + f.tier + '">' + tierTag(f) + "</span>" : "") + "<h3>" + esc(f.n) + "</h3>" +
       (f.hook ? '<p class="lede">' + esc(f.hook) + "</p>" : "") +
       (f.ben.length ? '<ul class="ben">' + f.ben.map(function (b) { return "<li>" + (b[0] ? "<b>" + esc(b[0]) + "</b>" : "") + esc(b[1]) + "</li>"; }).join("") + "</ul>" : (f.desc ? '<p class="note" style="font-size:15px;color:var(--ink)">' + esc(f.desc) + "</p>" : "")) + "</div></div>";
     var fly = (W.flyers || {})[f.id];
