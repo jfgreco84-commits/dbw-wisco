@@ -72,7 +72,7 @@
   var LINES = [
     { k: "dragons", n: "The Dragons", s: "Our top multi-purpose blades. Red for long life. Purple when the job is everything at once.", ids: ["dragon-supreme", "dragon"], img: ["dragon-supreme", "dragon"] },
     { k: "superblades", n: "The Superblades", s: "Extreme, Super G, G3 and Arrow. Built to drop your cost per cut.", ids: ["superblade-extreme", "super-g", "superblade-g3", "superblade-arrow"], img: ["superblade-g3", "superblade-arrow"] },
-    { k: "zenesis", n: "Zenesis Green Kut", s: "Early-entry blades with Zenesis diamond alignment. More footage, chip-free joints.", ids: ["zenesis-green-kut-purple", "zenesis-green-kut-orange", "zenesis-green-kut-green", "zenesis-green-kut-red", "zenesis-green-kut-yellow"], img: ["zenesis-green-kut-purple"] },
+    { k: "zenesis", n: "Green Kut Early-Entry", s: "Three lines: Zenesis, Arix and Green Kut. Every one color-matched to your aggregate.", ids: ["zenesis-green-kut-purple", "zenesis-green-kut-orange", "zenesis-green-kut-green", "zenesis-green-kut-red", "zenesis-green-kut-yellow", "arix-green-kut-purple", "arix-green-kut-orange", "arix-green-kut-green", "arix-green-kut-red", "arix-green-kut-yellow", "green-kut-purple", "green-kut-orange", "green-kut-green", "green-kut-red", "green-kut-yellow", "green-kut-black", "green-kut-next-day"], img: ["zenesis-green-kut-purple"] },
     { k: "4-core", n: "4-Core Bits", s: "Punisher, Wolv and Sabertooth. Pro Series bits for heavy rebar and hard aggregate.", ids: ["punisher", "wolv", "sabertooth"], img: ["punisher", "wolv", "sabertooth"] }
   ];
   LINES.push(
@@ -485,11 +485,11 @@
   }
   function lev(a, b) { if (Math.abs(a.length - b.length) > 2) return 9; var p = [], i, j; for (j = 0; j <= b.length; j++) p[j] = j; for (i = 1; i <= a.length; i++) { var q = [i]; for (j = 1; j <= b.length; j++) q[j] = Math.min(p[j] + 1, q[j - 1] + 1, p[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); p = q; } return p[b.length]; }
   function quickRows() {
-    var fs = C.families.filter(function (f) { return f.rank < 99 && f.id.indexOf("eagle") !== 0; }).slice(0, 12);
+    var fs = C.families.filter(function (f) { return f.rank < 99 && f.id.indexOf("eagle") !== 0; }).slice(0, 14);
     return '<div class="qrows">' + fs.map(function (f) {
       var vs = f.vars, d = defVar(f, vs);
       return '<div class="qrow" data-f="' + f.id + '">' + pic(f) + '<div class="qmain"><b>' + esc(f.n) + "</b>" +
-        (vs.length > 1 ? '<select aria-label="Size" data-qsize>' + vs.map(function (v) { return '<option value="' + esc(vkey(v)) + '"' + (v === d ? " selected" : "") + ">" + esc(vlabel(v)) + "</option>"; }).join("") + "</select>" : '<span class="one">' + esc(vlabel(d)) + "</span>") + '<small class="qrng" data-qrng>' + (HIDE ? "Part # " + esc(d[0]) : rangeTxt(d) + " each") + "</small>" +
+        (vs.length > 1 ? '<select aria-label="Size" data-qsize>' + vs.map(function (v) { return '<option value="' + esc(vkey(v)) + '"' + (v === d ? " selected" : "") + ">" + esc(vlabel(v)) + "</option>"; }).join("") + "</select>" : '<span class="one">' + esc(vlabel(d)) + "</span>") + '<small class="qrng" data-qrng>' + (HIDE ? "Part # " + esc(d[0]) : rangeTxt(d) + " each") + "</small>" + (f.cats.indexOf("green") >= 0 ? '<a class="qmore" href="#early">Other colors and how to pick ›</a>' : "") +
         '</div><div class="qhow"><span>How many?</span><div class="qchips" role="group" aria-label="How many to add">' + [1].concat(QUICK).map(function (q) { return '<button type="button" data-qadd="' + q + '" aria-label="Add ' + q + '">' + q + "</button>"; }).join("") + "</div></div></div>";
     }).join("") + "</div>";
   }
@@ -592,7 +592,7 @@
   ], eeSel = "";
   function earlyPick(k) { eeSel = k; earlyScreen(true); var r = $("#eeres"); if (r) r.scrollIntoView({ block: "start", behavior: "smooth" }); }
   function earlyScreen(keep) {
-    var a = byK(AGG, eeSel), fams = a ? C.families.filter(function (f) { return f.cats.indexOf("green") >= 0 && new RegExp("\\b" + a.color + "$", "i").test(f.n); }) : [];
+    var a = byK(AGG, eeSel), fams = a ? C.families.filter(function (f) { return f.cats.indexOf("green") >= 0 && new RegExp("\\b" + a.color + "$", "i").test(f.n); }).sort(function (x, y) { var o = function (f) { return /^Zenesis/.test(f.n) ? 0 : /^Arix/.test(f.n) ? 1 : 2; }; return o(x) - o(y); }) : [];
     var y = keep ? window.scrollY : 0;
     app.innerHTML = shell("Early-entry saws", 0, 0, "<h1>Which color blade?</h1>" + says("Soff-Cut style or Gorilla style, the color is the bond. Match it to your aggregate and the joint comes out clean.") +
       '<div class="frank"><b class="h">1. Tap where you cut</b><p>Find your area on the map and tap it. Colors on the map show how hard the aggregate is there.</p><div class="aggmap" id="aggmap"><span class="note">Loading the map…</span></div>' +
