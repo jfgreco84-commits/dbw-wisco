@@ -18,7 +18,7 @@ def roster():
     src = open(os.path.join(SITE, "config.js"), encoding="utf8").read()
     block = src[src.index("reps: ["):]
     out = []
-    for m in re.finditer(r'\{\s*name:\s*"([^"]+)",\s*photo:\s*"([^"]*)".*?aka:\s*\[([^\]]*)\]', block):
+    for m in re.finditer(r'\{\s*name:\s*"([^"]+)",[^{}]*?photo:\s*"([^"]*)".*?aka:\s*\[([^\]]*)\]', block):
         aka = re.findall(r'"([^"]+)"', m.group(3))
         if aka and aka[0] not in RESERVED: out.append(dict(name=m.group(1), photo=m.group(2), slug=aka[0]))
     return out

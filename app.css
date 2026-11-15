@@ -606,3 +606,15 @@ table.cmp .add.pk { margin-left: 6px; background: var(--gold); color: var(--gold
 .bigref { display: block; margin-top: 8px; font: 800 15px var(--sans); color: var(--navy-2) } .bigref b { font-size: 20px; letter-spacing: .04em }
 .newhere { background: rgba(7,20,51,.62); border: 1px solid rgba(255,255,255,.45); border-radius: 16px; padding: 12px 14px; margin: 0 0 14px; max-width: 520px; display: grid; gap: 6px }
 .newhere b { font: 900 18px var(--sans); color: #fff } .newhere span { font: 600 14px/1.45 var(--sans); color: #dbe4ff }
+
+/* v26: cleaner quick-access strip; a rep's face on their own page */
+.tools .wrap { gap: 8px; padding-block: 10px; padding-right: 72px; scroll-padding-inline: 16px 72px }
+.tools a { min-height: 42px; padding: 0 14px; font-size: 13px }
+.tsc { color: #fff; font-size: 24px; line-height: 1; width: auto }
+.tsc.r { padding-left: 40px; padding-right: 22px; background: linear-gradient(90deg, rgba(11,29,74,0) 0, #0B1D4A 30px) }
+.tsc.l { padding-right: 40px; padding-left: 22px; background: linear-gradient(270deg, rgba(11,29,74,0) 0, #0B1D4A 30px) }
+.tsc.r::after, .tsc.l::after { top: 50%; bottom: auto; width: 40px; height: 40px; margin-top: -20px; background: #0B1D4A; border: 1.5px solid rgba(255,255,255,.8); box-shadow: none }
+.tsc.r::after { left: auto; right: 8px } .tsc.l::after { right: auto; left: 8px }
+.bf-av img.repface { height: 100%; object-fit: cover; margin-top: -4px }
+.bfs img[src*="brand/reps/"], .door.withav img[src*="brand/reps/"], .frankme img[src*="brand/reps/"] { border-radius: 50%; aspect-ratio: 1; object-fit: cover; height: auto }
+.tsc.r { box-shadow: 14px 0 0 #0B1D4A } .tsc.l { box-shadow: -14px 0 0 #0B1D4A }
