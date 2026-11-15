@@ -1,6 +1,6 @@
 {
- "name": "Luis Millan · DBW WISCO",
- "short_name": "Luis Millan",
+ "name": "Joyner Lucas · DBW WISCO",
+ "short_name": "Joyner Lucas",
  "start_url": "./",
  "scope": "./",
  "display": "standalone",
@@ -8,12 +8,12 @@
  "theme_color": "#071433",
  "icons": [
   {
-   "src": "../brand/repicon/luismillan-180.png",
+   "src": "../brand/repicon/joynerlucas-180.png",
    "sizes": "180x180",
    "type": "image/png"
   },
   {
-   "src": "../brand/repicon/luismillan-512.png",
+   "src": "../brand/repicon/joynerlucas-512.png",
    "sizes": "512x512",
    "type": "image/png"
   }
