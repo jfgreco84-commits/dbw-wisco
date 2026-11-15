@@ -519,11 +519,17 @@
     { n: "Masonry crew", s: "Brick, block, mortar joints", mat: "m" }, { n: "Demolition crew", s: "Rebar and hard aggregate", mat: "r" }
   ];
   /* Fast Reorder picker: blade, then size, then how many. Every size of every blade, not just 14 inch. */
-  var p3 = { f: "", v: "" };
+  var p3 = { f: "", v: "", tab: "top" };
+  /* Step 1 is sorted into types, so every blade, bit, cup and chain is one tap away. */
+  var P3TABS = [["top", "Most popular"], ["highspeed", "High-speed"], ["wet", "Wet & walk-behind"], ["small", "Small diameter"], ["green", "Early-entry"], ["core", "Core bits"], ["cup", "Cup wheels"], ["tuck", "Tuck point"], ["tile", "Tile & stone"], ["metal", "Metal & rescue"], ["abrasive", "Abrasive wheels"], ["chain", "Diamond chain"]];
+  function p3List(tab) {
+    if (tab === "top") return pickFams();
+    return C.families.filter(function (f) { return f.cats.indexOf(tab) >= 0; }).sort(function (a, b) { var ea = a.id.indexOf("eagle") === 0 ? 1 : 0, eb = b.id.indexOf("eagle") === 0 ? 1 : 0; return ea - eb || a.rank - b.rank || (TR[b.tier] || 0) - (TR[a.tier] || 0) || a.n.localeCompare(b.n); });
+  }
   function pickFams() { return C.families.filter(function (f) { return f.rank < 99 && f.id.indexOf("eagle") !== 0; }).slice(0, 14); }
   function pick3HTML() {
     var f = FAM[p3.f], v = f && p3.v ? findVar(f, p3.v) : null;
-    return '<div class="p3s"><b class="p3h"><i>1</i> Pick your blade</b><div class="p3chips">' + pickFams().map(function (x) { return '<button type="button" data-pf="' + x.id + '" aria-pressed="' + (p3.f === x.id) + '">' + esc(x.n) + "</button>"; }).join("") + '<a class="p3more" href="#shop">More blades ›</a></div></div>' +
+    return '<div class="p3s"><b class="p3h"><i>1</i> Pick your blade</b><div class="p3tabs" role="group" aria-label="Type">' + P3TABS.filter(function (x) { return x[0] === "top" || p3List(x[0]).length; }).map(function (x) { return '<button type="button" data-ptab="' + x[0] + '" aria-pressed="' + (p3.tab === x[0]) + '">' + esc(x[1]) + "</button>"; }).join("") + '</div><div class="p3chips" id="p3blades">' + p3List(p3.tab).map(function (x) { return '<button type="button" data-pf="' + x.id + '" aria-pressed="' + (p3.f === x.id) + '">' + esc(x.n) + "</button>"; }).join("") + '<a class="p3more" href="#shop">More blades ›</a></div></div>' +
       (f ? '<div class="p3s" id="p3size"><b class="p3h"><i>2</i> Pick the size</b><div class="p3chips sizes">' + f.vars.map(function (x) { return '<button type="button" data-pv="' + esc(vkey(x)) + '" aria-pressed="' + (p3.v === vkey(x)) + '">' + esc(vlabel(x)) + "</button>"; }).join("") + "</div></div>" : "") +
       (v ? '<div class="p3s" id="p3qty"><b class="p3h"><i>3</i> How many?</b><div class="qchips p3q" role="group" aria-label="How many to add">' + [1].concat(QUICK).map(function (q) { return '<button type="button" data-pq="' + q + '" aria-label="Add ' + q + '">' + q + "</button>"; }).join("") + '</div><small class="p3part">' + esc(f.n) + " · " + esc(vlabel(v)) + " · Part # " + esc(v[0]) + "</small></div>" : "");
   }
@@ -1214,6 +1220,7 @@
     if (t.closest("[data-shopmore]")) { shop.n += SHOPPAGE; shopScreen(); return; }
     if (t.closest("[data-remind]")) { remind(); return; }
     if ((el = t.closest("[data-hint]"))) { $("#rq").value = el.dataset.hint; runSearch(el.dataset.hint); return; }
+    if ((el = t.closest("[data-ptab]"))) { p3.tab = el.dataset.ptab; if (p3.f && p3List(p3.tab).map(function (x) { return x.id; }).indexOf(p3.f) < 0) { p3.f = ""; p3.v = ""; } pick3Draw(); return; }
     if ((el = t.closest("[data-pf]"))) { var pf = FAM[el.dataset.pf]; p3.f = pf.id; p3.v = pf.vars.length === 1 ? vkey(pf.vars[0]) : ""; pick3Draw(p3.v ? "p3qty" : "p3size"); return; }
     if ((el = t.closest("[data-pv]"))) { p3.v = el.dataset.pv; pick3Draw("p3qty"); return; }
     if ((el = t.closest("[data-pq]"))) { var kf = FAM[p3.f], kv = kf && findVar(kf, p3.v), kq = parseInt(el.dataset.pq, 10); if (!kv) return; addToCart(kf.id, p3.v, kq); flash(el, "✓"); toast(kq + " x " + kf.n + " " + vlabel(kv) + " added to your order"); return; }
