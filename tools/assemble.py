@@ -38,6 +38,7 @@ full = f"""<!DOCTYPE html>
 </head>
 <body>
 {body}
+<script>window.WISCO_VER="{ver}";</script>
 <script src="config.js?v={ver}"></script>
 <script src="catalog.js?v={ver}"></script>
 <script src="app.js?v={ver}"></script>
@@ -45,6 +46,7 @@ full = f"""<!DOCTYPE html>
 </html>
 """
 open(os.path.join(SITE, "index.html"), "w", encoding="utf8").write(full)
+open(os.path.join(SITE, "version.txt"), "w", encoding="utf8").write(ver + "\n")   # lets an open phone notice a newer build
 print("wrote index.html")
 import rep_pages
 print("rep pages:", ", ".join(rep_pages.build(SITE_URL)))

@@ -148,8 +148,8 @@
     ["I already have a blade supplier.", "Good. You should. Are you under contract, or just used to calling the same guy? When’s the last time he called you with a better deal? We’re not asking you to switch. Compare one blade and decide."],
     ["Your price looks high.", "Compared to what? Send us what you’re paying and we’ll show you where we are. If we can’t beat it or match it, we’ll be the first to tell you. And the price on the site is a range. The more you buy, the closer you land to the low end."],
     ["I can get blades cheaper at the supply house.", "Per box, maybe. Price per foot of cut is what counts on a job. A blade that lasts longer costs less per cut. Run it yourself in the cost-per-cut calculator."],
-    ["What if I don’t like them?", "Tell me what you were cutting and what went wrong. Most of the time it’s the wrong bond for the material, and that’s fixable. Call or text me direct and we’ll get the right blade on that saw."],
-    ["I don’t like ordering this way.", "Then start small. Order a few, run them hard, and tell us what your crew thinks. Nothing on this site charges a card. A person confirms every order."],
+    ["What if a blade doesn’t do what you said?", "Then I make it right. If one of my blades doesn’t do everything I told you it would, and more, I’ll do whatever it takes to fix it. Most of the time it’s the wrong bond for the material, and that’s on me to get right. You won’t be left holding a blade that isn’t worth what you paid."],
+    ["I don’t like ordering this way.", "Then don’t. Call or text your rep and order the way you always have. This site is for the days you just want to punch it in and go. Nothing here charges a card, and a person confirms every order."],
     ["I just bought blades. I’m good right now.", "I’m not asking you to throw out your stock. Run one of ours next to whatever’s on the saw now. That one comparison is all I need. Let the blades do the talking."],
     ["It’s slow right now. Call me in the spring.", "Slow season is the smart time to buy. You’re not buying for today. You’re buying so the first day your crew is back to full speed, the right blades are on the saw and nobody’s scrambling."],
     ["Last time the blades didn’t work for my guys.", "Tell me what they were cutting and what was happening. A lot of times there’s a fixable reason. I may have sent the wrong bond for your job. Let me make it right. I don’t miss twice."],
@@ -255,7 +255,7 @@
       (f.tier ? '<span class="tier ' + f.tier + '">' + (o.ribbon ? tierTag(f).split(" · ").pop() : tierTag(f)) + "</span>" : "") + "<h3>" + esc(f.n) + "</h3>" +
       (r ? '<span class="rate">' + stars(r) + "<span>Our rating <b>" + r.toFixed(1) + "</b> on " + esc(o.mat.n) + "</span></span>" : "") + "</span></button>" +
       (f.hook ? '<p class="hook">' + esc(f.hook) + "</p>" : "") +
-      '<div class="buy">' + size + buyRow(first) + '<button class="more" data-open>Details, ratings and all ' + f.vars.length + (f.vars.length === 1 ? " size" : " sizes") + "</button>" + (f.cats.indexOf("equip") >= 0 ? '<button class="btn gold sm block" data-equip>Negotiate with your sales rep</button>' : "") + "</div></article>";
+      '<div class="buy">' + size + buyRow(first) + '<button class="learn" data-open><b>Learn more</b><span>Why it works · ' + f.vars.length + (f.vars.length === 1 ? " size" : " sizes") + "</span></button>" + (f.cats.indexOf("equip") >= 0 ? '<button class="btn gold sm block" data-equip>Negotiate with your sales rep</button>' : "") + "</div></article>";
   }
 
   /* ---------- picking blades ---------- */
@@ -317,6 +317,22 @@
       '<div class="mine-id"><b>' + esc(isBoss(r) ? "Big Frank" : r.name) + "</b><span>Your Blade Guy</span>" + (prettyPhone(cell) ? '<a class="mine-num" href="tel:' + esc(cell) + '">' + prettyPhone(cell) + "</a>" : "") + "<small>Text, email or call. A real person answers.</small></div>" +
       '<div class="mine-act">' + (cell ? '<a class="btn chrome sm" href="sms:' + esc(cell) + '">Text ' + esc(who) + "</a>" : "") + (mail ? '<a class="btn chrome sm" href="mailto:' + esc(mail) + '">Email ' + esc(who) + "</a>" : "") + (cell ? '<a class="btn chrome sm" href="tel:' + esc(cell) + '">Call ' + esc(who) + "</a>" : "") + '</div><button type="button" class="mine-x" data-norep>Not your rep? Tap here</button></div>';
   }
+  var LASTS = [["recent", "Within 18 months"], ["old", "Longer than that"], ["unsure", "Don’t remember"]];
+  function lastTxt(k) { return k === "recent" ? "within the past 18 months" : k === "old" ? "more than 18 months ago" : k === "unsure" ? "not sure" : ""; }
+  var acctEdit = false;
+  function acctBox() {
+    var i = me(), r = repBySlug(i.rep), done = i.acctSet && !acctEdit, kind = i.acct === "new" ? "new" : i.acctSet ? "yes" : "";
+    var fine = '<p class="acct-fine">Accounts with no order in 18 months are updated before reordering, and a new sales rep may be assigned.</p>';
+    if (done) return '<div class="acct done"><b>✓ ' + esc(i.acct === "new" ? "New to DBW. Welcome." : (i.company || "Your account")) + "</b><span>" + esc((r ? "Rep: " + r.name : "Rep: we’ll match you") + (i.acct !== "new" && lastTxt(i.last) ? " · Last order: " + lastTxt(i.last) : "")) + '</span><button type="button" class="link" data-acctedit>Change</button></div>';
+    return '<div class="acct" id="acctbox"><b class="acct-h">Already buy from us?</b><p class="acct-p">Tell us once, so your order lands with the right person.</p>' +
+      '<div class="acct-seg" role="group" aria-label="Are you on account">' + [["yes", "Yes, I’m on account"], ["new", "I’m new"], ["unsure", "Not sure"]].map(function (x) { return '<button type="button" data-acctkind="' + x[0] + '" aria-pressed="' + (kind === x[0]) + '">' + x[1] + "</button>"; }).join("") + "</div>" +
+      '<div class="acct-more" id="acctmore"' + (kind === "yes" ? "" : " hidden") + ">" +
+      '<label for="ac-co">What name is the account under?</label><input id="ac-co" autocomplete="organization" autocapitalize="words" placeholder="Company name" value="' + esc(i.company || "") + '">' +
+      '<label for="ac-rep">Who’s your rep?</label><select id="ac-rep"><option value="">Not sure</option>' + (W.reps || []).map(function (x) { var sl = slug(x.name); return '<option value="' + sl + '"' + (r && slug(r.name) === sl ? " selected" : "") + ">" + esc(x.name) + "</option>"; }).join("") + "</select>" +
+      '<label>When did you last buy from us?</label><div class="acct-seg three" role="group" aria-label="Last order">' + LASTS.map(function (x) { return '<button type="button" data-acctlast="' + x[0] + '" aria-pressed="' + (i.last === x[0]) + '">' + x[1] + "</button>"; }).join("") + "</div>" +
+      '<p class="acct-note">Don’t remember? No problem. We only ask because relationships are everything here. Like your salesperson? Keep buying from them.</p></div>' +
+      '<button type="button" class="btn gold sm acct-save" data-acctsave' + (kind ? "" : " hidden") + ">Save</button>" + fine + "</div>";
+  }
   var WHY = [
     ["Deep warehouse.", "Stock on the shelf means it ships same day or next. I’ll put our warehouse up against anybody’s."],
     ["We can get our hands on anything.", "If it cuts, cores or grinds, we either stock it or we know who does."],
@@ -347,7 +363,7 @@
     app.innerHTML =
       '<section class="hero"><div class="wrap"><div>' +
       (function () { var r = repBySlug(me().rep); var rf = store.get("ref", ""); return '<span class="pill"><i>★</i> ' + (r ? "Your salesman: " + esc(r.name) : rf ? "Referred by " + esc(rf) : "A division of Diamond Blade Warehouse, LLC") + " <i>★</i></span>"; })() +
-      (r0 ? mineCard(r0) : "") + '<span class="kick">Simplified reorder</span>' +
+      (r0 ? mineCard(r0) : "") + acctBox() + '<span class="kick">Simplified reorder</span>' +
       "<h1>The right blade. Right now.</h1>" +
       '<p class="sub">Tell us what you cut. We ship it anywhere in the USA, same day or next. <b>Your blades, your price, 60 seconds.</b></p>' +
       welcomeBack() + (!lastOrder() && !repBySlug(me().rep) ? '<div class="newhere"><b>New here?</b><span>Text a photo of your old blade, or tell us the size and how many. A real rep texts you back with your price.</span><div class="mine-act"><button class="btn gold sm" data-photo>Text a photo of my blade</button><button class="btn chrome sm" data-pricing>Get my price</button></div></div>' : "") +
@@ -371,11 +387,13 @@
       '<section class="sec deal"><div class="wrap narrow"><div class="sec-head"><h2>Need a saw?</h2><p>Bundle a saw with your blades. One package price, one invoice. Your rep builds it and confirms your total.</p></div><div class="center"><a class="btn chrome shine" href="#saw-deal">Build my saw package</a><a class="btn ghost" href="#cost">Renting? Run the math</a></div></div></section>' +
 
       (myRep() ? "" : bigFrank()) +
-      '<section class="sec alt" hidden><div class="wrap narrow"><div class="sec-head"><h2>People buy from people</h2><p>No robots. No phone mazes. Relationships matter.</p></div><ul class="ppl">' +
-      "<li><b>A real person on every order.</b> Someone who knows your account picks it up. Nothing here charges a card.</li>" +
-      "<li><b>One hand washes the other.</b> We sell blades to feed our families. You run them to feed yours.</li>" +
-      "<li><b>We obsess so you don’t have to.</b> You sweat behind the saw. We sweat the blades, the bonds and the freight.</li>" +
-      "<li><b>We remember who you are.</b> Tell your salesman your team. It has a way of showing up in the box.</li>" +
+      '<section class="sec alt"><div class="wrap narrow"><div class="sec-head"><h2>Real people. Real relationships.</h2><p>It matters more than anything else we do.</p></div><ul class="ppl">' +
+      "<li><b>Like your salesperson? Keep buying from them.</b> Your account stays with the person who earned it.</li>" +
+      "<li><b>Nobody here is a robot.</b> We don’t send our sales overseas. We don’t run auto-dialers. No AI bot is ever going to call you. When your phone rings, it’s one of us.</li>" +
+      "<li><b>We sell blades to put food on our families’ tables.</b> You run them to put food on yours.</li>" +
+      "<li><b>Our reps stay.</b> Every one of them has been here a long time. They’re trained to know the answer, and smart enough to go ask when they don’t.</li>" +
+      "<li><b>Once you buy from us, we work for you.</b> And you don’t even have to put us on payroll.</li>" +
+      "<li><b>We know we’re not the only game in town.</b> But if we’re not the best, we’re pretty damn close.</li>" +
       "</ul></div></section>" +
 
       (HIDE ? "" : '<section class="sec levels"><div class="wrap"><div class="sec-head"><h2>Your account has a level</h2><p>The site price is the price with no account behind it. Your real price depends on your account level.</p></div><div class="three swipe">' +
@@ -384,7 +402,7 @@
       '<div class="lvl top"><em>3</em><b>Account pricing</b><p>Every account has a level, and the price drops at each one. One quick text or email and we send back what your level gets you.</p><div class="lvls">' + (W.levels || ["Contractor", "Pro", "Gold", "Distributor", "Platinum"]).map(function (x, i, a) { return "<span" + (i === a.length - 1 ? ' class="top"' : "") + ">" + esc(x) + "</span>"; }).join("<i>›</i>") + "</div></div>" +
       '</div><div class="center"><button class="btn gold shine" data-account>Open a free account</button><button class="btn chrome" data-pricing>Check my account pricing</button><button class="btn ghost-d" data-terms>Apply for Net 30 terms</button></div></div></section>') +
 
-      '<section class="sec"><div class="wrap narrow"><div class="sec-head"><h2>Straight answers</h2><p>The questions we hear every day.</p></div><div class="qa">' + ANSWERS.filter(function (x, i) { return !HIDE || [0, 2, 3, 5].indexOf(i) >= 0; }).map(function (x) { return "<details><summary>" + esc(x[0]) + "</summary><p>" + esc(x[1]) + "</p></details>"; }).join("") + '</div><div class="promise"><b>Our word</b><span>We don’t build our blades down to a cost. We build them up to a standard. Got a problem with one? Call me direct.</span></div><div class="center"><a class="btn blue" href="#cost">Run the cost-per-cut math</a><a class="btn ghost-d" href="#fix">Blade giving you trouble?</a></div></div></section>' +
+      '<section class="sec"><div class="wrap narrow"><div class="sec-head"><h2>Straight answers</h2><p>The questions we hear every day.</p></div><div class="qa">' + ANSWERS.filter(function (x, i) { return !HIDE || [0, 2, 3, 5].indexOf(i) >= 0; }).map(function (x) { return "<details><summary>" + esc(x[0]) + "</summary><p>" + esc(x[1]) + "</p></details>"; }).join("") + '</div><div class="promise"><b>Our word</b><span>If my blades don’t do everything I said they would, and more, I’ll do whatever it takes to make it right.</span><small>We don’t build our blades down to a cost. We build them up to a standard.</small></div><div class="center"><a class="btn blue" href="#cost">Run the cost-per-cut math</a><a class="btn ghost-d" href="#fix">Blade giving you trouble?</a></div></div></section>' +
 
       (T.length ? '<section class="sec alt"><div class="wrap"><div class="sec-head"><h2>Straight from the jobsite</h2><p>Real customers. Their words.</p></div><div class="three">' + T.map(function (t) { return '<figure class="quote"><blockquote>' + esc(t.quote) + "</blockquote><figcaption>" + esc(t.who || "") + "</figcaption></figure>"; }).join("") + "</div></div></section>" : "") +
 
@@ -489,7 +507,7 @@
     return '<div class="qrows">' + fs.map(function (f) {
       var vs = f.vars, d = defVar(f, vs);
       return '<div class="qrow" data-f="' + f.id + '">' + pic(f) + '<div class="qmain"><b>' + esc(f.n) + "</b>" +
-        (vs.length > 1 ? '<select aria-label="Size" data-qsize>' + vs.map(function (v) { return '<option value="' + esc(vkey(v)) + '"' + (v === d ? " selected" : "") + ">" + esc(vlabel(v)) + "</option>"; }).join("") + "</select>" : '<span class="one">' + esc(vlabel(d)) + "</span>") + '<small class="qrng" data-qrng>' + (HIDE ? "Part # " + esc(d[0]) : rangeTxt(d) + " each") + "</small>" + (f.cats.indexOf("green") >= 0 ? '<a class="qmore" href="#early">Other colors and how to pick ›</a>' : "") +
+        (vs.length > 1 ? '<select aria-label="Size" data-qsize>' + vs.map(function (v) { return '<option value="' + esc(vkey(v)) + '"' + (v === d ? " selected" : "") + ">" + esc(vlabel(v)) + "</option>"; }).join("") + "</select>" : '<span class="one">' + esc(vlabel(d)) + "</span>") + '<small class="qrng" data-qrng>' + (HIDE ? "Part # " + esc(d[0]) : rangeTxt(d) + " each") + "</small>" + ((f.learn || []).length ? '<button type="button" class="qlearn" data-open>Learn more ›</button>' : "") + (f.cats.indexOf("green") >= 0 ? '<a class="qmore" href="#early">Other colors and how to pick ›</a>' : "") +
         '</div><div class="qhow"><span>How many?</span><div class="qchips" role="group" aria-label="How many to add">' + [1].concat(QUICK).map(function (q) { return '<button type="button" data-qadd="' + q + '" aria-label="Add ' + q + '">' + q + "</button>"; }).join("") + "</div></div></div>";
     }).join("") + "</div>";
   }
@@ -990,7 +1008,7 @@
     if (o.email) L.push("Email: " + o.email);
     var order = mode === "order" || mode === "saw", terms = mode === "terms";
     if (mode === "account") { L.push("Wants a new account set up."); if (o.addr || o.city || o.zip) L.push("Ship to: " + [o.addr, [o.city, o.state].filter(Boolean).join(", "), o.zip].filter(Boolean).join(" · ")); L.push("Salesman: " + (rep ? rep.name : "None yet")); }
-    if (order || terms) L.push("Account: " + (o.acct === "new" ? "NEW ACCOUNT" : "Existing customer"));
+    if (order || terms) L.push("Account: " + (o.acct === "new" ? "NEW ACCOUNT" : "Existing customer") + (o.acct !== "new" && lastTxt(me().last) ? " · last order " + lastTxt(me().last) : ""));
     if ((order || terms) && o.acct === "new" && (o.addr || o.city || o.zip)) L.push("Ship to: " + [o.addr, [o.city, o.state].filter(Boolean).join(", "), o.zip].filter(Boolean).join(" · "));
     if (order || terms || mode === "pricing") L.push("Salesman: " + (rep ? rep.name : (o.acct === "new" ? "None yet" : "Not sure")));
     if (order) { if (o.pay && o.pay !== PAY0) L.push("Pay by: " + o.pay); if (o.po) L.push("PO #: " + o.po); }
@@ -1090,7 +1108,7 @@
     var vurl = (W.videos || {})[f.id], mats = Object.keys(f.m).sort(function (a, b) { return f.m[b] - f.m[a]; }), cur = wiz.mat ? wiz.mat.keys : [];
     var h = '<div class="pd"><div>' + pic(f) + "</div><div>" + (f.tier ? '<span class="tier ' + f.tier + '">' + tierTag(f) + "</span>" : "") + "<h3>" + esc(f.n) + "</h3>" +
       (f.hook ? '<p class="lede">' + esc(f.hook) + "</p>" : "") +
-      (f.ben.length ? '<ul class="ben">' + f.ben.map(function (b) { return "<li>" + (b[0] ? "<b>" + esc(b[0]) + "</b>" : "") + esc(b[1]) + "</li>"; }).join("") + "</ul>" : (f.desc ? '<p class="note" style="font-size:15px;color:var(--ink)">' + esc(f.desc) + "</p>" : "")) + "</div></div>";
+      ((f.learn || []).length ? '<div class="learn-list"><h4>Why it works</h4>' + f.learn.map(function (x) { return '<div class="lq"><b>' + esc(x[0]) + "</b><p>" + esc(x[1]) + "</p></div>"; }).join("") + "</div>" : f.ben.length ? '<ul class="ben">' + f.ben.map(function (b) { return "<li>" + (b[0] ? "<b>" + esc(b[0]) + "</b>" : "") + esc(b[1]) + "</li>"; }).join("") + "</ul>" : (f.desc ? '<p class="note" style="font-size:15px;color:var(--ink)">' + esc(f.desc) + "</p>" : "")) + "</div></div>";
     var fly = (W.flyers || {})[f.id];
     if (fly) h += '<div class="center"><a class="btn gold" href="' + esc(fly) + '" target="_blank" rel="noopener">View the product flyer (PDF)</a></div>';
     if (TIERQUIP[f.tier]) h += says(TIERQUIP[f.tier]);
@@ -1146,6 +1164,15 @@
     if ((el = t.closest("[data-qadd]"))) { var qr = el.closest(".qrow"), qf = FAM[qr.dataset.f], qs = $("[data-qsize]", qr), qk = qs ? qs.value : vkey(defVar(qf, qf.vars)), qn = parseInt(el.dataset.qadd, 10), qv = findVar(qf, qk); addToCart(qf.id, qk, qn); flash(el, "✓"); toast(qn + " x " + qf.n + (ACCT ? " added to your order" : " added at " + money(eachAt(qv, qn)) + " each")); return; }
     if ((el = t.closest("[data-eqpick]"))) { var on = el.getAttribute("aria-pressed") !== "true"; el.setAttribute("aria-pressed", on); var ix2 = eqSel.indexOf(el.dataset.eqpick); if (on && ix2 < 0) eqSel.push(el.dataset.eqpick); if (!on && ix2 >= 0) eqSel.splice(ix2, 1); $$("[data-eqpick]").forEach(function (b) { b.setAttribute("aria-pressed", eqSel.indexOf(b.dataset.eqpick) >= 0); }); return; }
     if ((el = t.closest("[data-intent]"))) { setIntent(el.dataset.intent); return; }
+    if ((el = t.closest("[data-acctkind]"))) { var ak = el.dataset.acctkind; $$("[data-acctkind]").forEach(function (x) { x.setAttribute("aria-pressed", x === el); }); $("#acctmore").hidden = ak === "new"; $("[data-acctsave]").hidden = false; $("#acctbox").dataset.kind = ak; if (ak !== "new") $("#ac-co").focus(); return; }
+    if ((el = t.closest("[data-acctlast]"))) { $$("[data-acctlast]").forEach(function (x) { x.setAttribute("aria-pressed", x === el); }); return; }
+    if (t.closest("[data-acctedit]")) { acctEdit = true; go("#home"); return; }
+    if (t.closest("[data-acctsave]")) {
+      var ai = me(), kd = $("#acctbox").dataset.kind || (ai.acct === "new" ? "new" : "yes"), lp = $('[data-acctlast][aria-pressed="true"]');
+      ai.acct = kd === "new" ? "new" : "existing"; ai.acctSet = 1;
+      if (kd !== "new") { ai.company = clean($("#ac-co").value, 60); ai.last = lp ? lp.dataset.acctlast : (kd === "unsure" ? "unsure" : ai.last || ""); var pick = $("#ac-rep").value; if (pick !== (ai.rep || "")) { ai.rep = pick; store.set("replock", pick ? 1 : 0); } }
+      store.set("me", ai); acctEdit = false; contactWire(); go("#home"); toast(kd === "new" ? "Welcome. We’ll match you with a rep." : "Got it. Your orders go to the right person."); return;
+    }
     if (t.closest("[data-norep]")) { var nr = me(); nr.rep = ""; store.set("me", nr); store.set("replock", 0); contactWire(); go("#home"); toast("Okay. You’re on the main DBW WISCO page."); return; }
     if (t.closest("[data-repchange]")) { store.set("replock", 0); renderReps($("#f-rep").value); var rdc = $("#repd"); if (rdc) rdc.open = true; return; }
     if ((el = t.closest("[data-tag]"))) { shop.tag = shop.tag === el.dataset.tag ? "" : el.dataset.tag; shop.n = SHOPPAGE; shopScreen(); return; }
@@ -1177,7 +1204,7 @@
       if (fid) { addToCart(fid, key, qty); flash(el); }
       return;
     }
-    if ((el = t.closest("[data-open]"))) { openDetail(FAM[el.closest(".card").dataset.f]); return; }
+    if ((el = t.closest("[data-open]"))) { openDetail(FAM[el.closest("[data-f]").dataset.f]); return; }
     if (t.closest("[data-pricing]") || t.closest("[data-breaks]")) { e.preventDefault(); openSend("pricing"); return; }
     if (t.closest("[data-equip]")) { openSend("equip"); if (eqSel.length) { $("#f-msg").value = "Looking for: " + eqSel.join(", ") + ".\nMake / model / size / how soon: "; preview(); } return; }
     if (t.closest("[data-terms]")) { e.preventDefault(); openSend("terms"); return; }
@@ -1276,6 +1303,16 @@
   /* Any link somebody taps opens on the home page, even if it was copied from deep inside the site. */
   if (location.hash && location.hash !== "#home") { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) { location.hash = ""; } }
   contactWire();
+  (function fresh() {
+    if (isPreview || !window.WISCO_VER || !window.fetch) return;
+    try { if (P.get("_v")) { var q2 = new URLSearchParams(location.search); q2.delete("_v"); history.replaceState(null, "", location.pathname + (q2.toString() ? "?" + q2 : "") + location.hash); } } catch (e) {}
+    fetch("version.txt?" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.text() : ""; }).then(function (v) {
+      v = (v || "").trim(); if (!v || v === String(window.WISCO_VER)) return;
+      var seen = ""; try { seen = sessionStorage.getItem("wisco.fresh") || ""; } catch (e) {} if (seen === v) return;
+      try { sessionStorage.setItem("wisco.fresh", v); } catch (e) {}
+      var q3 = new URLSearchParams(location.search); q3.set("_v", v); location.replace(location.pathname + "?" + q3 + location.hash);
+    }).catch(function () {});
+  })();
   route(); badge();
   if (P.get("tools")) location.hash = "#team";   /* the rep tools are not linked anywhere on the site */
   bfOpen(store.get("bf", 0) === 1);

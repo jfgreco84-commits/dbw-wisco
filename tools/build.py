@@ -463,6 +463,13 @@ def main():
         d["ben"] = [[unbrand(a), unbrand(b)] for a, b in d.get("ben") or []]
         for v in d["vars"]: v[1], v[4] = unbrand(v[1]), unbrand(v[4])
         if "hay" in d: d["hay"] = re.sub(r"\s{2,}", " ", d["hay"].replace("stihl", ""))
+    # "Learn more": 3 to 5 problem / fix points per family, written from the product book, pitch books and site copy.
+    lp = os.path.join(HERE, "learn.json")
+    LEARN = json.load(open(lp, encoding="utf8")) if os.path.exists(lp) else {}
+    for d in out:
+        d["learn"] = [[unbrand(q), unbrand(a)] for q, a in LEARN.get(d["id"], [])]
+    missing = [d["id"] for d in out if not d["learn"]]
+    if LEARN and missing: print("no Learn more copy for:", ", ".join(missing))
     sawdeal = dict(totals=TOTALS, tiers=[[15, 0], [25, 0], [36, 0]],
                    saws=[dict(sku=k, n=unbrand(nice(sawrows[k]["desc"])) + ("" if "saw" in nice(sawrows[k]["desc"]).lower() else " Saw"), b=0) for k in SAWS if k in sawrows],
                    ref=DEAL_SAW if DEAL_MULT else "", pack=DEAL_PACK)
