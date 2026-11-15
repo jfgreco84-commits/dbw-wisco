@@ -668,3 +668,10 @@ table.cmp .add.pk { margin-left: 6px; background: var(--gold); color: var(--gold
 .learn-list { display: grid; gap: 10px; margin-top: 12px } .learn-list h4 { margin: 0; font: 900 12px var(--sans); letter-spacing: .16em; text-transform: uppercase; color: var(--red) }
 .lq { border-left: 5px solid #F7C948; background: #F6F8FF; border-radius: 0 12px 12px 0; padding: 10px 12px }
 .lq b { display: block; font: 900 16px/1.25 var(--sans); color: var(--navy-2) } .lq p { margin: 4px 0 0; font: 500 14.5px/1.5 var(--sans); color: var(--ink) }
+
+/* v32: early-entry line comparison */
+.eelines { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 12px 0 }
+.eelines div { background: #fff; border: 1px solid var(--line); border-top: 5px solid var(--royal); border-radius: 12px; padding: 10px }
+.eelines div:first-child { border-top-color: #F7C948 }
+.eelines b { display: block; font: 900 15px var(--sans); color: var(--navy-2); text-transform: uppercase; letter-spacing: .03em } .eelines span { font: 600 12.5px/1.35 var(--sans); color: var(--ink) }
+@media (max-width: 420px) { .eelines { grid-template-columns: 1fr } }
