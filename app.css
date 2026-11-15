@@ -105,7 +105,7 @@ img { max-width: 100% }
 .sec-head h2 { font: 400 clamp(26px, 4vw, 38px)/1.05 var(--slab); text-transform: uppercase; margin: 0 0 6px; color: var(--navy-2); text-wrap: balance }
 .sec.dark .sec-head h2 { background: var(--chrome-text); -webkit-background-clip: text; background-clip: text; color: transparent }
 .sec-head p { margin: 0; color: var(--muted); font-weight: 600 } .sec.dark .sec-head p { color: #DCE7FF }
-.sec-head h2::after { content: "★ ★ ★"; display: block; font: 400 13px var(--sans); letter-spacing: .5em; color: var(--red); margin-top: 8px; -webkit-text-fill-color: var(--red) }
+.sec-head h2::after { content: "★ ★ ★ ★ ★"; display: block; font: 400 13px var(--sans); letter-spacing: .5em; color: var(--red); margin-top: 8px; -webkit-text-fill-color: var(--red) }
 .three { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px }
 .point { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.22); border-radius: var(--radius); padding: 18px }
 .point b { font: 900 15px var(--sans); letter-spacing: .1em; text-transform: uppercase; display: block; margin-bottom: 6px } .point p { margin: 0; color: #DCE7FF; font-size: 15px }
