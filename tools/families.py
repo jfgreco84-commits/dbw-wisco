@@ -389,24 +389,24 @@ new("KMLB Low-HP Asphalt & Green", "wet", "premium", dict(a=4.5, g=4.5),
     [("Abrasive-material bond", "Hard bond that survives asphalt and green slabs."),
      ('14" to 36"', "Every diameter and width on one sheet."),
      ("Undercut protection", "Keeps the core alive in abrasive slurry.")], img="Americut Pro Series", saws=["walk"])
-# Dixie: the high-horsepower wet blades for big flat saws.
-new("Dixie Hard Rock", "wet", "supreme", dict(r=5, c=4.5),
+# Americut High-HP: the high-horsepower wet blades for big flat saws.
+new("Americut High-HP Hard Rock", "wet", "supreme", dict(r=5, c=4.5),
     "High-horsepower wet blade for cured concrete with hard rock aggregate. 65 to 110 HP flat saws.",
     [("65 to 110 HP", "Made for the big flat saws."), ("Hard rock aggregate", "Cured concrete with hard aggregate."), ('14" to 60"', "Every width we stock on one list.")],
     img="Americut SuperPro Series", saws=["walk"])
-new("Dixie Pro Concrete 65-110 HP", "wet", "pro", dict(c=5, r=4.5),
+new("Americut High-HP Pro Concrete 65-110 HP", "wet", "pro", dict(c=5, r=4.5),
     "High-horsepower wet blade for cured concrete. 65 to 110 HP flat saws.",
     [("65 to 110 HP", "Made for the big flat saws."), ("Cured concrete", "Bonded for your area and what you cut."), ('12" to 60"', "Every width we stock on one list.")],
     img="Americut SuperPro Series", saws=["walk"])
-new("Dixie Pro Concrete 35-60 HP", "wet", "pro", dict(c=5, r=4.5),
+new("Americut High-HP Pro Concrete 35-60 HP", "wet", "pro", dict(c=5, r=4.5),
     "Wet blade for cured concrete on 35 to 60 HP flat saws.",
     [("35 to 60 HP", "Matched to mid-size flat saws."), ("Cured concrete", "Bonded for your area and what you cut."), ('12" to 36"', "Every width we stock on one list.")],
     img="Americut Pro Series", saws=["walk"])
-new("Dixie Asphalt", "wet", "pro", dict(a=5),
+new("Americut High-HP Asphalt", "wet", "pro", dict(a=5),
     "High-horsepower wet blade for asphalt. 65 to 110 HP flat saws.",
     [("65 to 110 HP", "Made for the big flat saws."), ("Asphalt", "Bonded for abrasive material."), ('14" to 54"', "Every width we stock on one list.")],
     img="Americut Pro Series", saws=["walk"])
-new("Dixie Overlay", "wet", "pro", dict(a=4.5, c=4.5, r=3),
+new("Americut High-HP Overlay", "wet", "pro", dict(a=4.5, c=4.5, r=3),
     "High-horsepower wet blade for asphalt over concrete. 65 to 110 HP flat saws.",
     [("65 to 110 HP", "Made for the big flat saws."), ("Overlay", "Asphalt over concrete in one pass."), ('18" to 48"', "Every width we stock on one list.")],
     img="Americut Pro Series", saws=["walk"])

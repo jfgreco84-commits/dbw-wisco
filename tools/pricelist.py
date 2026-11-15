@@ -93,17 +93,17 @@ def load_master_extra(path):
         if not m: continue
         size = re.sub(r"\s*ARIX.*$", "", str(r[1]), flags=re.I).replace("x", " x ")
         rows.append(dict(sheet="MASTER", section="Arix Green Kut " + ZCOLOR[m.group(1)], sku=a.strip(), desc=str(r[1]), cost=r[2], price=None, basis="x", extra={"size": re.sub(r"\s+", " ", size)}))
-    # Dixie wet blades: the high-horsepower flat saw lines, only in the master book.
-    DIX = [("HARD ROCK", "Dixie Hard Rock"), ("PRO CONCRETE — 35-60", "Dixie Pro Concrete 35-60 HP"), ("PRO CONCRETE — 65-110", "Dixie Pro Concrete 65-110 HP"),
-           ("ASPHALT", "Dixie Asphalt"), ("OVERLAY", "Dixie Overlay")]
+    # Americut high-horsepower wet blades: the high-horsepower flat saw lines, only in the master book.
+    HIHP = [("HARD ROCK", "Americut High-HP Hard Rock"), ("PRO CONCRETE — 35-60", "Americut High-HP Pro Concrete 35-60 HP"), ("PRO CONCRETE — 65-110", "Americut High-HP Pro Concrete 65-110 HP"),
+           ("ASPHALT", "Americut High-HP Asphalt"), ("OVERLAY", "Americut High-HP Overlay")]
     on = False; fam = None
     for r in wb["Wet Blades"].iter_rows(values_only=True):
         r = list(r) + [None] * 8; a = r[0]
         if not isinstance(a, str): continue
         t = a.upper()
-        if "DIXIE WET BLADE REFERENCE" in t: on = True; continue
+        if "WET BLADE REFERENCE" in t: on = True; continue
         if not on: continue
-        if "▸" in a: fam = next((n for k, n in DIX if k in t), None); continue
+        if "▸" in a: fam = next((n for k, n in HIHP if k in t), None); continue
         m = re.match(r"^(\d+)\s*X\s*(\d{3})\b", a.strip(), flags=re.I)
         if not (fam and m and isinstance(r[2], str) and num(r[5]) and r[5] > 0): continue
         rows.append(dict(sheet="MASTER", section=fam, sku=r[2].strip(), desc=fam + " " + a.strip(), cost=r[5], price=None, basis="x", extra={"size": '%s" x .%s' % (m.group(1), m.group(2))}))
