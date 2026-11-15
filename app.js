@@ -195,7 +195,7 @@
   var isPreview = !/^https?:$/.test(location.protocol) || /claude|anthropic/.test(location.hostname);
   var wiz = { mode: "finder", mat: null, saw: null, want: null, all: false, hp: null };
   var LOWHP = W.lowHpMax || 20, WETLINE = "Our wet blades are specifically bonded for your area and what you are cutting, so you get optimal performance every time.";
-  var HPS = [{ k: "low", n: "Low horsepower", s: "Up to " + LOWHP + " HP. Push saws and small walk-behinds." }, { k: "high", n: "High horsepower", s: "Over " + LOWHP + " HP. Flat saws from 35 to 110 HP." }, { k: "any", n: "Not sure", s: "Show me what fits and I’ll ask." }];
+  var HPS = [{ k: "low", n: "Low horsepower", s: "Up to " + LOWHP + " HP. Push saws and small walk-behinds." }, { k: "high", n: "High horsepower", s: "Over " + LOWHP + " HP. Flat saws from 35 to 110 HP. Blades 14\" to 68\"." }, { k: "any", n: "Not sure", s: "Show me what fits and I’ll ask." }];
   var SHOPPAGE = 24, ordRef = "";
   var shop = { cat: "all", q: "", sort: "pop", n: SHOPPAGE, tag: "" };
   var deal = store.get("deal2", { saw: "", lines: [] });
@@ -456,7 +456,7 @@
         list = dl.length ? dl : list.filter(function (f) { return !lowFam(f); });
       }
       if (wiz.hp === "low") list = list.filter(lowFam).concat(list.filter(function (f) { return !lowFam(f) && !isDixie(f); }));
-      h += '<div class="frank wetbox"><b class="h">Wet blades, bonded for you</b><p>' + esc(WETLINE) + (wiz.hp === "high" ? " On a high-horsepower saw that means our Dixie wet blades, 35 to 110 HP. Tell us the saw, the horsepower and where you cut and we match the bond." : "") + '</p><div class="sendrow"><button class="btn gold sm" data-wetspec>Spec my wet blade</button></div></div>';
+      h += '<div class="frank wetbox"><b class="h">Wet blades, bonded for you</b><p>' + esc(WETLINE) + (wiz.hp === "high" ? " On a high-horsepower saw that means our Dixie wet blades, 14\" to 68\", for 35 to 110 HP saws. Don’t see your size below? Tell us the saw, the horsepower and where you cut and we match the blade." : "") + '</p><div class="sendrow"><button class="btn gold sm" data-wetspec>Spec my wet blade</button></div></div>';
     }
     if (!list.length) { app.innerHTML = shell(kick, 0, 0, h + "<h1>That one’s a phone call.</h1>" + '<div class="empty">Nothing on the shelf matches that combo. ' + esc(WHO()) + " will spec it for you.</div>" + frankBox("")); return; }
     if (ask) {
