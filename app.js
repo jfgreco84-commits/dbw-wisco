@@ -190,6 +190,8 @@
 
   function lastOrder() { var l = store.get("last", null); return l && Array.isArray(l.items) ? l : null; }
   var cart = store.get("cart", []);
+  /* A rep's own page lives one folder down (/adamwest/). ROOT is always the store's main address. */
+  var ROOT = location.origin + (window.WISCO_REP ? location.pathname.replace(/[^\/]+\/(index\.html)?$/, "") : location.pathname);
   var isPreview = !/^https?:$/.test(location.protocol) || /claude|anthropic/.test(location.hostname);
   var wiz = { mode: "finder", mat: null, saw: null, want: null, all: false, hp: null };
   var LOWHP = W.lowHpMax || 20, WETLINE = "Our wet blades are specifically bonded for your area and what you are cutting, so you get optimal performance every time.";
@@ -793,7 +795,7 @@
   }
 
   function repTools() {
-    var cur = me().rep || "", base = location.origin + location.pathname;
+    var cur = me().rep || "", base = ROOT;
     app.innerHTML = shell("For the sales team", 0, 0,
       "<h1>Your own link.</h1>" + '<p class="lead">Text customers a link with your name on it. When they order, it comes in marked as yours.</p>' +
       '<div class="frank"><b class="h">1. Pick your name</b><div class="reps" id="rtreps">' + (W.reps || []).map(function (r) { var sl = slug(r.name); return '<button type="button" class="rep' + (cur === sl ? " on" : "") + '" data-rtrep="' + sl + '"><span class="av">' + (r.photo ? '<img alt="" src="brand/reps/' + esc(r.photo) + '">' : esc(initials(r.name))) + "</span><b>" + esc(r.name) + "</b></button>"; }).join("") + "</div></div>" +
@@ -801,6 +803,7 @@
       '<div class="frank"><b class="h">3. Send a customer their usual order</b><p>Fill the cart with what they normally buy. Add their company and a one-line note if you want, then tap <b>Copy the reorder link</b> and text it. It opens with their blades and quantities already loaded. <b>No price rides in the link.</b> Put the price in your text, where it can’t be edited or passed around.</p>' +
       '<div class="field"><label for="rt-co">Customer or company (optional)</label><input id="rt-co" maxlength="60" autocapitalize="words" placeholder="Acme Concrete"></div><div class="field"><label for="rt-note">One-line note they’ll see (optional)</label><input id="rt-note" maxlength="140" placeholder="Dragons are back in stock."></div>' +
       '<div class="sendrow"><a class="btn blue sm" href="#reorder">Build a cart</a><button class="btn chrome sm" data-rtshare>Copy the reorder link</button></div></div>' +
+      '<div class="frank"><b class="h">Put a rep’s page on your phone</b><p>Each rep’s page can sit on your home screen with their face and name on it. Open one, then in Safari tap <b>Share</b> (the square with the arrow), scroll down, tap <b>Add to Home Screen</b>, then <b>Add</b>. On Android: Chrome menu, then <b>Add to Home screen</b>.</p><div class="replinks">' + (W.reps || []).map(function (r) { var nick = (r.aka || [])[0]; return nick ? '<a href="' + esc(/\/$/.test(ROOT) ? ROOT + nick + "/" : ROOT + "?rep=" + nick) + '" data-ext>' + (r.photo ? '<img alt="" src="brand/reps/' + esc(r.photo) + '">' : '<span class="av">' + esc(initials(r.name)) + "</span>") + "<b>" + esc(r.name) + "</b><span>Open ›</span></a>" : ""; }).join("") + "</div></div>" +
       '<div class="frank"><b class="h">Texts that work</b><p class="tpl">Running low on blades? Reorder in 60 seconds, no phone tag: [your link]</p><p class="tpl">I loaded your usual order. Change the quantities if you need to and hit send: [reorder link]</p><p class="tpl">Not sure what to run on that job? Tap Ask Frank. Three questions and you get good, better and best: [your link]</p></div>');
     setNav("");
   }
@@ -815,7 +818,9 @@
   /* Tapping a button for the page you are already on still takes you to its top. */
   document.addEventListener("click", function (e) {
     var a = e.target.closest && e.target.closest('a[href^="#"]'); if (!a) return;
-    var h = a.getAttribute("href"); if (!h || h.length < 2 || h.indexOf("#blade-") === 0) return;
+    var h = a.getAttribute("href");
+    if (window.WISCO_REP) { e.preventDefault(); if (!h || h.length < 2) return; if (h === (location.hash || "#home")) route(); else location.hash = h; return; }   /* on a rep page links must not fall back to the main address */
+    if (!h || h.length < 2 || h.indexOf("#blade-") === 0) return;
     if (h === (location.hash || "#home")) { e.preventDefault(); route(); }
   });
   function route() {
@@ -995,7 +1000,7 @@
   function remind() {
     var d = new Date(Date.now() + 30 * 864e5), p = function (n) { return ("0" + n).slice(-2); }, day = d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate());
     var last = lastOrder(), items = last && last.items ? last.items.map(function (c) { var v = FAM[c.f] && findVar(FAM[c.f], c.v); return v ? encodeURIComponent(v[0]) + "*" + c.q : ""; }).filter(Boolean) : [];
-    var link = location.origin + location.pathname + (items.length ? "?cart=" + items.join(",") : "") + (me().rep ? (items.length ? "&" : "?") + "rep=" + me().rep : "");
+    var link = ROOT + (items.length ? "?cart=" + items.join(",") : "") + (me().rep ? (items.length ? "&" : "?") + "rep=" + me().rep : "");
     var ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//DBW WISCO//Reorder//EN", "BEGIN:VEVENT", "UID:" + Date.now() + "@dbwwisco", "DTSTAMP:" + new Date().toISOString().replace(/[-:]|\.\d+/g, ""), "DTSTART:" + day + "T090000", "DTEND:" + day + "T091500", "SUMMARY:Reorder blades from DBW WISCO", "DESCRIPTION:Running low? Your last order is one tap away: " + link.replace(/,/g, "\\,") + "\\nOr text " + FRANK + ": " + (W.textDisplay || W.phone || ""), "URL:" + link, "BEGIN:VALARM", "TRIGGER:PT0M", "ACTION:DISPLAY", "DESCRIPTION:Reorder blades from DBW WISCO", "END:VALARM", "END:VEVENT", "END:VCALENDAR"].join("\r\n");
     var a = document.createElement("a"); a.href = "data:text/calendar;charset=utf-8," + encodeURIComponent(ics); a.download = "reorder-dbw-wisco.ics"; document.body.appendChild(a); a.click(); a.remove();
     toast("Reminder made for " + d.toLocaleDateString("en-US", { month: "short", day: "numeric" }) + ". Add it to your calendar.");
@@ -1055,7 +1060,7 @@
     if (mode === "order" && t.lines.length) m.innerHTML += '<div class="aftersend"><span>Don’t run out mid-job.</span><button type="button" class="btn ghost-d sm" data-remind>Remind me to reorder in 30 days</button></div>';
     m.scrollIntoView({ block: "nearest" });
   }
-  function friendLink() { var o = formData(), who = (o.company || o.name || "").slice(0, 60); return location.origin + location.pathname + "?ref=" + encodeURIComponent(who); }
+  function friendLink() { var o = formData(), who = (o.company || o.name || "").slice(0, 60); return ROOT + "?ref=" + encodeURIComponent(who); }
   function needName(how) {
     var f = $("#sendform"), M = MODES[mode];
     if (M.msg && !f.elements.msg.value.trim()) { f.elements.msg.focus(); toast("Tell us a little so we know what to chase"); return true; }
@@ -1098,7 +1103,7 @@
     var fb = function () { toast("Couldn’t copy automatically. Press and hold the text to copy."); };
     try { navigator.clipboard.writeText(txt).then(function () { done && done(); }, fb); } catch (e) { fb(); }
   }
-  function shareLink() { var o = formData(); return location.origin + location.pathname + "?cart=" + cartLines().map(function (l) { return encodeURIComponent(l.v[0]) + "*" + l.c.q; }).join(",") + (o.rep ? "&rep=" + o.rep : "") + linkExtras(); }
+  function shareLink() { var o = formData(); return ROOT + "?cart=" + cartLines().map(function (l) { return encodeURIComponent(l.v[0]) + "*" + l.c.q; }).join(",") + (o.rep ? "&rep=" + o.rep : "") + linkExtras(); }
   function repMode() { return false; }   /* price entry on the site is gone: a price typed here could be edited or forwarded */
   var linkFor = "", linkNote = "";
   function clean(x, n) { return String(x || "").replace(/[<>]/g, "").replace(/\s+/g, " ").trim().slice(0, n); }
@@ -1137,7 +1142,7 @@
     if (t.closest("[data-bfhide]")) { bfOpen(false); return; }
     if (t.closest("[data-bfnext]")) { bfI++; bfShow(); return; }
     if ((el = t.closest("[data-rtrep]"))) { var inf = me(); inf.rep = el.dataset.rtrep; store.set("me", inf); repTools(); return; }
-    if (t.closest("[data-rtshare]")) { if (!cartLines().length) { toast("Build the cart first, then copy the link"); return; } if (!me().rep) { toast("Pick your name first"); return; } var rl = location.origin + location.pathname + "?cart=" + cartLines().map(function (l) { return encodeURIComponent(l.v[0]) + "*" + l.c.q; }).join(",") + "&rep=" + me().rep + linkExtras(); copyText(rl, function () { toast("Reorder link copied. Text it with your price."); }); return; }
+    if (t.closest("[data-rtshare]")) { if (!cartLines().length) { toast("Build the cart first, then copy the link"); return; } if (!me().rep) { toast("Pick your name first"); return; } var rl = ROOT + "?cart=" + cartLines().map(function (l) { return encodeURIComponent(l.v[0]) + "*" + l.c.q; }).join(",") + "&rep=" + me().rep + linkExtras(); copyText(rl, function () { toast("Reorder link copied. Text it with your price."); }); return; }
     if (t.closest("[data-rtcopy]")) { var lk = $("#rtlink").textContent; if (/^http|^file/.test(lk)) copyText(lk, function () { toast("Link copied. Text it to a customer."); }); else toast("Pick your name first"); return; }
     if ((el = t.closest("[data-starter]"))) { var st = byK(STARTERS, el.dataset.starter); starterLines(st).forEach(function (l) { addToCart(l.f.id, vkey(l.v), l.q); }); renderCart(); $("#cart").showModal(); return; }
     if (t.closest("[data-photo]")) { var pr = route2(me().rep); sms("Hey " + pr.who + ", here’s a picture of my blade. I need more of these. Name / company: ", pr.cell); return; }
@@ -1174,7 +1179,7 @@
       if (kd !== "new") { ai.company = clean($("#ac-co").value, 60); ai.last = lp ? lp.dataset.acctlast : (kd === "unsure" ? "unsure" : ai.last || ""); var pick = $("#ac-rep").value; if (pick !== (ai.rep || "")) { ai.rep = pick; store.set("replock", pick ? 1 : 0); } }
       store.set("me", ai); acctEdit = false; contactWire(); go("#home"); toast(kd === "new" ? "Welcome. We’ll match you with a rep." : "Got it. Your orders go to the right person."); return;
     }
-    if (t.closest("[data-norep]")) { var nr = me(); nr.rep = ""; store.set("me", nr); store.set("replock", 0); contactWire(); go("#home"); toast("Okay. You’re on the main DBW WISCO page."); return; }
+    if (t.closest("[data-norep]")) { var nr = me(); nr.rep = ""; store.set("me", nr); store.set("replock", 0); if (window.WISCO_REP) { location.href = ROOT; return; } contactWire(); go("#home"); toast("Okay. You’re on the main DBW WISCO page."); return; }
     if (t.closest("[data-repchange]")) { store.set("replock", 0); renderReps($("#f-rep").value); var rdc = $("#repd"); if (rdc) rdc.open = true; return; }
     if ((el = t.closest("[data-tag]"))) { shop.tag = shop.tag === el.dataset.tag ? "" : el.dataset.tag; shop.n = SHOPPAGE; shopScreen(); return; }
     if ((el = t.closest("[data-agg]"))) { earlyPick(el.dataset.agg); return; }
@@ -1290,7 +1295,8 @@
   $$("[data-oemail]").forEach(function (a) { a.textContent = W.orderEmail || ""; });
   $$("[data-pl]").forEach(function (a) { a.textContent = C.priceList || "current"; });
   var P = new URLSearchParams(location.search);
-  if (P.get("rep")) { var info = me(), rr = repBySlug(slug(P.get("rep"))); if (rr) { info.rep = slug(rr.name); store.set("me", info); store.set("replock", 1); } }
+  var REPQ = window.WISCO_REP || P.get("rep");   /* a rep's own page always belongs to that rep */
+  if (REPQ) { var info = me(), rr = repBySlug(slug(REPQ)); if (rr) { info.rep = slug(rr.name); store.set("me", info); store.set("replock", 1); } }
   if (P.get("ref")) store.set("ref", P.get("ref").replace(/[<>]/g, "").slice(0, 60));
   if (P.get("cart")) {
     cart = [];

@@ -1,0 +1,21 @@
+{
+ "name": "T.J. Sutton · DBW WISCO",
+ "short_name": "T.J. Sutton",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "background_color": "#071433",
+ "theme_color": "#071433",
+ "icons": [
+  {
+   "src": "../brand/repicon/tjsutton-180.png",
+   "sizes": "180x180",
+   "type": "image/png"
+  },
+  {
+   "src": "../brand/repicon/tjsutton-512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  }
+ ]
+}
