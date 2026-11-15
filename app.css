@@ -695,3 +695,15 @@ table.cmp .add.pk { margin-left: 6px; background: var(--gold); color: var(--gold
 .dealtotal strong + span { display: block; margin-top: 4px; font: 600 13.5px/1.4 var(--sans) }
 @media (min-width: 720px) { .pkgs { grid-template-columns: repeat(4, minmax(0, 1fr)) } }
 .dealtotal strong + span { text-transform: none; letter-spacing: 0; color: var(--ink); text-align: center }
+
+/* v35: Fast Reorder picker: blade, size, how many */
+.pick3 { display: grid; gap: 12px; margin-top: 14px; background: rgba(7,20,51,.62); border: 1px solid rgba(255,255,255,.45); border-radius: 16px; padding: 14px }
+.p3s { display: grid; gap: 8px } .p3h { display: flex; align-items: center; gap: 8px; font: 900 15px var(--sans); letter-spacing: .06em; text-transform: uppercase; color: #fff }
+.p3h i { font-style: normal; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: #F7C948; color: #3A2800; font: 900 14px var(--sans) }
+.p3chips { display: flex; flex-wrap: wrap; gap: 8px }
+.p3chips button { min-height: 44px; padding: 8px 14px; border-radius: 999px; border: 1.5px solid #E0A313; background: var(--gold); color: var(--gold-ink); font: 800 13.5px var(--sans); cursor: pointer }
+.p3chips.sizes button { background: #fff; border-color: #fff; color: var(--navy-2); border-radius: 12px }
+.p3chips button[aria-pressed="true"] { background: var(--navy-2); color: #fff; border-color: #fff; box-shadow: 0 0 0 3px #F7C948 }
+.p3more { align-self: center; padding: 8px 6px; font: 800 13.5px var(--sans); color: #fff; text-decoration: underline }
+.p3q { grid-column: auto; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px } .p3q button { height: 48px; border-radius: 999px; font-size: 17px }
+.p3part { font: 600 12.5px var(--sans); color: #c9d5ff }

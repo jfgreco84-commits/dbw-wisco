@@ -518,12 +518,22 @@
     { n: "Hardscape crew", s: "Pavers, block, retaining wall", mat: "bp" }, { n: "Utility crew", s: "Ductile, pipe, reinforced", mat: "x" },
     { n: "Masonry crew", s: "Brick, block, mortar joints", mat: "m" }, { n: "Demolition crew", s: "Rebar and hard aggregate", mat: "r" }
   ];
+  /* Fast Reorder picker: blade, then size, then how many. Every size of every blade, not just 14 inch. */
+  var p3 = { f: "", v: "" };
+  function pickFams() { return C.families.filter(function (f) { return f.rank < 99 && f.id.indexOf("eagle") !== 0; }).slice(0, 14); }
+  function pick3HTML() {
+    var f = FAM[p3.f], v = f && p3.v ? findVar(f, p3.v) : null;
+    return '<div class="p3s"><b class="p3h"><i>1</i> Pick your blade</b><div class="p3chips">' + pickFams().map(function (x) { return '<button type="button" data-pf="' + x.id + '" aria-pressed="' + (p3.f === x.id) + '">' + esc(x.n) + "</button>"; }).join("") + '<a class="p3more" href="#shop">More blades ›</a></div></div>' +
+      (f ? '<div class="p3s" id="p3size"><b class="p3h"><i>2</i> Pick the size</b><div class="p3chips sizes">' + f.vars.map(function (x) { return '<button type="button" data-pv="' + esc(vkey(x)) + '" aria-pressed="' + (p3.v === vkey(x)) + '">' + esc(vlabel(x)) + "</button>"; }).join("") + "</div></div>" : "") +
+      (v ? '<div class="p3s" id="p3qty"><b class="p3h"><i>3</i> How many?</b><div class="qchips p3q" role="group" aria-label="How many to add">' + [1].concat(QUICK).map(function (q) { return '<button type="button" data-pq="' + q + '" aria-label="Add ' + q + '">' + q + "</button>"; }).join("") + '</div><small class="p3part">' + esc(f.n) + " · " + esc(vlabel(v)) + " · Part # " + esc(v[0]) + "</small></div>" : "");
+  }
+  function pick3Draw(focusId) { var b = $("#pick3"); if (!b) return; b.innerHTML = pick3HTML(); var t = focusId && $("#" + focusId); if (t && t.scrollIntoView) t.scrollIntoView({ block: "nearest", behavior: "smooth" }); }
   function reorder() {
     var last = lastOrder(), n = last && last.items ? last.items.length : 0;
     app.innerHTML = shell("Fast Reorder", 0, 0,
       "<h1>Know what you run?</h1>" +
       '<input class="search-big" id="rq" type="search" placeholder="Search: Dragon 14 or AES14SGC1" autocomplete="off" aria-label="Search by blade, size or part number">' +
-      '<div class="hintchips gold" id="rhints">' + ["Dragon 14", "Superblade Extreme 14", "Super G 14", "T-Rex 14", "Viper 14", "Blue Tornado 7"].map(function (x) { return '<button data-hint="' + esc(x) + '">' + esc(x) + "</button>"; }).join("") + "</div>" +
+      '<div id="rhints"><div class="pick3" id="pick3">' + pick3HTML() + "</div></div>" +
       '<div class="hits" id="rhits"></div>' +
       '<div class="pkgbox"><b class="pkg-h">Saw Packages</b><p>Bundle a saw with your blades. One price, one invoice. Tap one to build it.</p>' + pkgButtons(0) + "</div>" +
       (n ? '<div class="last"><div><b>Same as last time?</b><span>' + n + (n === 1 ? " line" : " lines") + " from " + esc(last.date) + '</span></div><button class="btn red sm" data-reorder>Reorder it</button></div>' : "") +
@@ -1204,6 +1214,9 @@
     if (t.closest("[data-shopmore]")) { shop.n += SHOPPAGE; shopScreen(); return; }
     if (t.closest("[data-remind]")) { remind(); return; }
     if ((el = t.closest("[data-hint]"))) { $("#rq").value = el.dataset.hint; runSearch(el.dataset.hint); return; }
+    if ((el = t.closest("[data-pf]"))) { var pf = FAM[el.dataset.pf]; p3.f = pf.id; p3.v = pf.vars.length === 1 ? vkey(pf.vars[0]) : ""; pick3Draw(p3.v ? "p3qty" : "p3size"); return; }
+    if ((el = t.closest("[data-pv]"))) { p3.v = el.dataset.pv; pick3Draw("p3qty"); return; }
+    if ((el = t.closest("[data-pq]"))) { var kf = FAM[p3.f], kv = kf && findVar(kf, p3.v), kq = parseInt(el.dataset.pq, 10); if (!kv) return; addToCart(kf.id, p3.v, kq); flash(el, "✓"); toast(kq + " x " + kf.n + " " + vlabel(kv) + " added to your order"); return; }
     if ((el = t.closest("[data-q]"))) { var inp = $("input", el.parentNode); inp.value = Math.max(1, (parseInt(inp.value, 10) || 1) + parseInt(el.dataset.q, 10)); inp.dispatchEvent(new Event("change", { bubbles: true })); return; }
     if ((el = t.closest("[data-dealadd]"))) {
       var q = Math.max(1, parseInt($(".dealadd .qty input").value, 10) || 1), fid2 = $("#dfam").value, key2 = $("#dvar").value;
