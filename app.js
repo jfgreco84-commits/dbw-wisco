@@ -310,11 +310,12 @@
   /* A rep's own page: their face, their name, their phone. */
   function isBoss(r) { return (r.aka || []).indexOf("frank") >= 0; }
   function repFirst(r) { return isBoss(r) ? "Big Frank" : r.nick ? r.nick : r.name.replace(/[“"].*?[”"]\s*/, "").split(" ")[0]; }
+  function prettyPhone(c) { var d = String(c || "").replace(/\D/g, "").slice(-10); return d.length === 10 ? "(" + d.slice(0, 3) + ") " + d.slice(3, 6) + "-" + d.slice(6) : ""; }
   function mineCard(r) {
-    var cell = r.cell || W.textNumber || "", who = repFirst(r);
+    var cell = r.cell || W.textNumber || "", mail = r.email || W.orderEmail || "", who = isBoss(r) ? FRANK : repFirst(r);
     return '<div class="mine">' + (r.photo ? '<img alt="" src="brand/reps/' + esc(r.photo) + '">' : '<span class="av">' + esc(initials(r.name)) + "</span>") +
-      "<div><b>" + esc(isBoss(r) ? "Big Frank" : r.name) + "</b><span>Your Blade Guy</span></div>" +
-      (cell ? '<div class="mine-act"><a class="btn chrome sm" href="sms:' + esc(cell) + '">Text ' + esc(who) + '</a><a class="btn ghost sm" href="tel:' + esc(cell) + '">Call</a></div>' : "") + "</div>";
+      '<div class="mine-id"><b>' + esc(isBoss(r) ? "Big Frank" : r.name) + "</b><span>Your Blade Guy</span>" + (prettyPhone(cell) ? '<a class="mine-num" href="tel:' + esc(cell) + '">' + prettyPhone(cell) + "</a>" : "") + "<small>Text, email or call. A real person answers.</small></div>" +
+      '<div class="mine-act">' + (cell ? '<a class="btn chrome sm" href="sms:' + esc(cell) + '">Text ' + esc(who) + "</a>" : "") + (mail ? '<a class="btn chrome sm" href="mailto:' + esc(mail) + '">Email ' + esc(who) + "</a>" : "") + (cell ? '<a class="btn chrome sm" href="tel:' + esc(cell) + '">Call ' + esc(who) + "</a>" : "") + "</div></div>";
   }
   var WHY = [
     ["Deep warehouse.", "Stock on the shelf means it ships same day or next. I’ll put our warehouse up against anybody’s."],

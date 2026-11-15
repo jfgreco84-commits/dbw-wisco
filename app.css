@@ -622,3 +622,13 @@ table.cmp .add.pk { margin-left: 6px; background: var(--gold); color: var(--gold
 /* v27: no price slot when prices are private */
 .partno { font: 700 12.5px var(--sans); letter-spacing: .04em; color: var(--muted, #5b6785) }
 .qrng { color: var(--muted, #5b6785); font-weight: 700 }
+
+/* v28: rep card fills its box: number, a line, and three equal buttons */
+.mine { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 12px 14px; align-items: center; padding: 14px; max-width: 560px }
+.mine img, .mine .av { width: 76px; height: 76px }
+.mine .mine-id { min-width: 0 } .mine .mine-id b { font-size: 21px }
+.mine .mine-num { display: block; margin-top: 4px; font: 900 18px var(--sans); letter-spacing: .02em; color: #fff; text-decoration: none }
+.mine .mine-id small { display: block; margin-top: 2px; font: 600 12.5px/1.35 var(--sans); color: #c9d5ff; letter-spacing: 0; text-transform: none }
+.mine .mine-act { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px }
+.mine .mine-act .btn { min-width: 0; padding-inline: 4px; text-align: center; justify-content: center; white-space: nowrap; font-size: 12.5px; letter-spacing: .06em }
+@media (max-width: 360px) { .mine .mine-act .btn { font-size: 11.5px; letter-spacing: .02em } }
