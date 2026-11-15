@@ -20,7 +20,7 @@ def roster():
     out = []
     for m in re.finditer(r'\{\s*name:\s*"([^"]+)",[^{}]*?photo:\s*"([^"]*)".*?aka:\s*\[([^\]]*)\]', block):
         aka = re.findall(r'"([^"]+)"', m.group(3))
-        if aka and aka[0] not in RESERVED: out.append(dict(name=m.group(1), photo=m.group(2), slug=aka[0]))
+        if aka and aka[0] not in RESERVED: out.append(dict(name=m.group(1), photo=m.group(2), slug=aka[0], also=[x for x in aka[1:] if x not in RESERVED]))
     return out
 
 
@@ -78,8 +78,10 @@ def build(site_url):
 <a style="color:#fff" href="../?rep={r['slug']}">Open DBW WISCO with {name}</a>
 </body></html>
 """
-        d = os.path.join(SITE, r["slug"]); os.makedirs(d, exist_ok=True)
-        open(os.path.join(d, "index.html"), "w", encoding="utf8").write(page)
+        # the rep's main address, plus every other name they go by, all land on the same page
+        for nm in [r["slug"]] + r.get("also", []):
+            d = os.path.join(SITE, nm); os.makedirs(d, exist_ok=True)
+            open(os.path.join(d, "index.html"), "w", encoding="utf8").write(page)
         made.append(r["slug"])
     # The rep tools are not linked anywhere on the site. Reps reach them at <site>/team/.
     d = os.path.join(SITE, "team"); os.makedirs(d, exist_ok=True)
