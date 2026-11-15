@@ -641,3 +641,5 @@ table.cmp .add.pk { margin-left: 6px; background: var(--gold); color: var(--gold
 @media (min-width: 760px) { .qhow { grid-column: auto; border-top: 0; padding-top: 0; margin-top: 0 } .qhow .qchips { grid-template-columns: repeat(5, 54px) } }
 
 .qmore { font: 800 12.5px var(--sans); color: var(--royal); text-decoration: underline; margin-top: 2px }
+
+.mine .mine-x { grid-column: 1 / -1; justify-self: start; background: none; border: 0; padding: 2px 0; font: 700 12.5px var(--sans); color: #c9d5ff; text-decoration: underline; cursor: pointer }
