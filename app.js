@@ -330,7 +330,7 @@
     return '<section class="sec bfsec"><div class="wrap narrow"><div class="bfhero"><img alt="Big Frank" loading="lazy" src="brand/frank-cool.webp"><div>' +
       '<span class="kick">30 years in the business</span><h2>Big Frank, Your Blade Guy!</h2>' +
       '<p class="bfline">“Selling blades ain’t glamorous, but someone has to do it. I’m your guy.”</p>' +
-      "<p>I’ve been selling blades since I was a kid. I know a lot. I also know enough to know when I don’t know something, and I know the right people to get the right answer. That’s how I dial you into the best savings, the best quality, the most bang for your buck, and service that’s second to none.</p>" +
+      "<p>I’ve been in the blade business for 30 years. I started as a kid and never left.</p><p>Thirty years teaches you two things: what works, and who to call when you’re not sure. So tell me what you’re cutting and you’ll get a straight answer. If it’s a job I haven’t seen before, I know exactly who has, and I’ll get you the answer.</p><p>Either way you end up with the right blade at a fair price, from a guy who picks up when you call.</p>" +
       (cell ? '<div class="mine-act"><a class="btn gold shine" href="sms:' + esc(cell) + '">Text Big Frank</a><a class="btn chrome" href="tel:' + esc(cell) + '">Call ' + esc(W.textDisplay || "") + "</a></div>" : "") +
       '</div></div><ul class="why">' + WHY.map(function (x) { return "<li><b>" + x[0] + "</b> " + x[1] + "</li>"; }).join("") + "</ul></div></section>";
   }
