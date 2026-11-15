@@ -618,3 +618,7 @@ table.cmp .add.pk { margin-left: 6px; background: var(--gold); color: var(--gold
 .bf-av img.repface { height: 100%; object-fit: cover; margin-top: -4px }
 .bfs img[src*="brand/reps/"], .door.withav img[src*="brand/reps/"], .frankme img[src*="brand/reps/"] { border-radius: 50%; aspect-ratio: 1; object-fit: cover; height: auto }
 .tsc.r { box-shadow: 14px 0 0 #0B1D4A } .tsc.l { box-shadow: -14px 0 0 #0B1D4A }
+
+/* v27: no price slot when prices are private */
+.partno { font: 700 12.5px var(--sans); letter-spacing: .04em; color: var(--muted, #5b6785) }
+.qrng { color: var(--muted, #5b6785); font-weight: 700 }

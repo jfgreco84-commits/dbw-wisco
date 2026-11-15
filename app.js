@@ -224,9 +224,10 @@
   var BRK = [12, 24, 36, 50, 100];
   function tiered(v) { return v && Array.isArray(v[6]); }
   function eachAt(v, q) { if (!tiered(v)) return v[3]; var i = 0; BRK.forEach(function (b, k) { if (q >= b) i = k + 1; }); return i ? v[6][i - 1] : v[3]; }
-  function rangeTxt(v) { if (HIDE) return "Your price"; return tiered(v) ? money(v[6][4]) + " to " + money(v[3]) : ranged(v) ? money(lowOf(v)) + " to " + money(v[3]) : money(v[3]); }
+  function rangeTxt(v) { if (HIDE) return ""; return tiered(v) ? money(v[6][4]) + " to " + money(v[3]) : ranged(v) ? money(lowOf(v)) + " to " + money(v[3]) : money(v[3]); }
   function totTxt(t) { if (HIDE && !t.quoted) return "Priced by your rep"; return RNG && !t.quoted && t.low < t.total - 0.005 ? money(t.low) + " to " + money(t.total) : money(t.total); }
-  function buyRow(v) { return '<div class="buy-row" data-row><div class="price' + (tiered(v) || ranged(v) ? " rng" : "") + '">' + rangeTxt(v) + "<small>" + (HIDE ? "confirmed by your rep before it ships · " : tiered(v) ? "each, by quantity · " : ranged(v) ? "each · your rep sets your price · " : RNG ? "each · " : ACCT ? "list price · " : "") + esc(v[0]) + '</small></div><div class="act">' + qtyHTML(1) + '<button class="add" data-add>Add to order</button></div></div>'; }
+  function buyRow(v) { if (HIDE) return '<div class="buy-row" data-row><div class="partno">Part # ' + esc(v[0]) + '</div><div class="act">' + qtyHTML(1) + '<button class="add" data-add>Add to order</button></div></div>';
+    return '<div class="buy-row" data-row><div class="price' + (tiered(v) || ranged(v) ? " rng" : "") + '">' + rangeTxt(v) + "<small>" + (HIDE ? "confirmed by your rep before it ships · " : tiered(v) ? "each, by quantity · " : ranged(v) ? "each · your rep sets your price · " : RNG ? "each · " : ACCT ? "list price · " : "") + esc(v[0]) + '</small></div><div class="act">' + qtyHTML(1) + '<button class="add" data-add>Add to order</button></div></div>'; }
   var MIXM = W.mixMonths || [3, 5, 8, 10], ONEMIN = W.singleItemMin || 24, QUICK = W.quickQty || [12, 24, 36, 50, 100], MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   function mixOn() { return MIXM.indexOf(new Date().getMonth() + 1) >= 0; }
   function breakList() { return BREAKS.slice(0, -1).join(", ") + " and " + BREAKS[BREAKS.length - 1]; }
@@ -461,7 +462,7 @@
   }
 
   function hitHTML(f, v) {
-    return '<div class="hit" data-f="' + f.id + '" data-v="' + esc(vkey(v)) + '">' + pic(f) + "<div><h4>" + esc(f.n) + '</h4><div class="meta">' + esc(vlabel(v)) + "<br>" + esc(v[0]) + '</div></div><div class="r"><span class="p">' + rangeTxt(v) + '</span><span class="act">' + qtyHTML(1) + '<button class="add" data-add>Add</button></span></div></div>';
+    return '<div class="hit" data-f="' + f.id + '" data-v="' + esc(vkey(v)) + '">' + pic(f) + "<div><h4>" + esc(f.n) + '</h4><div class="meta">' + esc(vlabel(v)) + "<br>" + esc(v[0]) + '</div></div><div class="r">' + (HIDE ? "" : '<span class="p">' + rangeTxt(v) + "</span>") + '<span class="act">' + qtyHTML(1) + '<button class="add" data-add>Add</button></span></div></div>';
   }
   function searchVars(q, limit, fuzzy) {
     var t = q.toLowerCase().replace(/["”]/g, "").split(/\s+/).filter(Boolean), out = [];
@@ -487,7 +488,7 @@
     return '<div class="qrows">' + fs.map(function (f) {
       var vs = f.vars, d = defVar(f, vs);
       return '<div class="qrow" data-f="' + f.id + '">' + pic(f) + '<div class="qmain"><b>' + esc(f.n) + "</b>" +
-        (vs.length > 1 ? '<select aria-label="Size" data-qsize>' + vs.map(function (v) { return '<option value="' + esc(vkey(v)) + '"' + (v === d ? " selected" : "") + ">" + esc(vlabel(v)) + "</option>"; }).join("") + "</select>" : '<span class="one">' + esc(vlabel(d)) + "</span>") + '<small class="qrng" data-qrng>' + rangeTxt(d) + " each</small>" +
+        (vs.length > 1 ? '<select aria-label="Size" data-qsize>' + vs.map(function (v) { return '<option value="' + esc(vkey(v)) + '"' + (v === d ? " selected" : "") + ">" + esc(vlabel(v)) + "</option>"; }).join("") + "</select>" : '<span class="one">' + esc(vlabel(d)) + "</span>") + '<small class="qrng" data-qrng>' + (HIDE ? "Part # " + esc(d[0]) : rangeTxt(d) + " each") + "</small>" +
         '</div><div class="qchips" role="group" aria-label="Quantity">' + [1].concat(QUICK).map(function (q) { return '<button type="button" data-qadd="' + q + '">' + (q === 1 ? "1–11" : q) + "</button>"; }).join("") + "</div></div>";
     }).join("") + "</div>";
   }
@@ -1080,7 +1081,7 @@
     if (fly) h += '<div class="center"><a class="btn gold" href="' + esc(fly) + '" target="_blank" rel="noopener">View the product flyer (PDF)</a></div>';
     if (TIERQUIP[f.tier]) h += says(TIERQUIP[f.tier]);
     h += '<div class="blk"><h4>Pick your size</h4><div class="sizes">' + f.vars.map(function (v) {
-      return '<div class="sz' + (inSaw(v, wiz.saw) ? "" : " dim") + '" data-v="' + esc(vkey(v)) + '"><div><b>' + esc(vlabel(v)) + "</b><small>" + esc(v[0]) + (depthFor(f, v) ? " · cuts about " + depthFor(f, v) + " deep" : "") + '</small></div><div class="r"><span class="p">' + rangeTxt(v) + "</span>" + qtyHTML(1) + '<button class="add" data-add>Add</button></div></div>';
+      return '<div class="sz' + (inSaw(v, wiz.saw) ? "" : " dim") + '" data-v="' + esc(vkey(v)) + '"><div><b>' + esc(vlabel(v)) + "</b><small>" + esc(v[0]) + (depthFor(f, v) ? " · cuts about " + depthFor(f, v) + " deep" : "") + '</small></div><div class="r">' + (HIDE ? "" : '<span class="p">' + rangeTxt(v) + "</span>") + qtyHTML(1) + '<button class="add" data-add>Add</button></div></div>';
     }).join("") + "</div></div>";
     var tv = defVar(f, f.vars);
     if (tiered(tv)) h += '<div class="blk"><h4>The more you buy, the better the price</h4><div class="tiers">' + ["1 to 11", "12+", "24+", "36+", "50+", "100+"].map(function (lab, i) { return "<div><span>" + lab + "</span><b>" + money(i ? tv[6][i - 1] : tv[3]) + "</b></div>"; }).join("") + '</div><p class="note">Each, for the ' + esc(vlabel(tv)) + ". " + esc(mixLine()) + " Your account may do better.</p></div>";
@@ -1199,7 +1200,7 @@
   });
   document.addEventListener("change", function (e) {
     if (e.target.matches && e.target.matches("[data-rp]")) { var li = parseInt(e.target.closest(".line").dataset.i, 10), pv = parseFloat(e.target.value); if (cart[li]) { if (pv > 0) cart[li].p = Math.round(pv * 100) / 100; else delete cart[li].p; saveCart(); renderCart(); } return; }
-    if (e.target.matches && e.target.matches("[data-qsize]")) { var qr2 = e.target.closest(".qrow"), qv2 = findVar(FAM[qr2.dataset.f], e.target.value); if (qv2) $("[data-qrng]", qr2).textContent = rangeTxt(qv2) + " each"; }
+    if (e.target.matches && e.target.matches("[data-qsize]")) { var qr2 = e.target.closest(".qrow"), qv2 = findVar(FAM[qr2.dataset.f], e.target.value); if (qv2) $("[data-qrng]", qr2).textContent = HIDE ? "Part # " + qv2[0] : rangeTxt(qv2) + " each"; }
     var t = e.target, card = t.closest(".card"), line = t.closest(".line");
     if (t.matches("[data-size]") && card) { var f = FAM[card.dataset.f], keep = $(".qty input", card).value; $("[data-row]", card).outerHTML = buyRow(findVar(f, t.value)); $(".qty input", card).value = keep; }
     if (line && t.matches(".qty input")) { cart[parseInt(line.dataset.i, 10)].q = Math.max(1, parseInt(t.value, 10) || 1); saveCart(); renderCart(); }
