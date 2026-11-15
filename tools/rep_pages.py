@@ -5,7 +5,7 @@
 
 Reads the roster from config.js. Run by assemble.py; safe to run by hand.
 """
-import os, re, html
+import os, re, html, json
 from PIL import Image, ImageDraw, ImageFont
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -55,34 +55,67 @@ def share_image(rep, dest):
     base.save(dest, quality=84)
 
 
-def build(site_url):
+def short_name(name):
+    """What shows under the icon on a phone's home screen: first and last name, no nickname in quotes."""
+    n = re.sub(r'[“"].*?[”"]\s*', "", name).strip()
+    return "Big Frank" if n.startswith("Big Frank") else n
+
+
+def home_icons(rep):
+    """Square icons for 'Add to Home Screen', made from the rep's picture."""
+    d = os.path.join(SITE, "brand", "repicon"); os.makedirs(d, exist_ok=True)
+    pic = os.path.join(SITE, "brand", "reps", rep["photo"]) if rep["photo"] else ""
+    for size in (180, 512):
+        if pic and os.path.exists(pic):
+            im = Image.open(pic).convert("RGB").resize((size, size), Image.LANCZOS)
+        else:
+            im = Image.new("RGB", (size, size), (9, 22, 58)); dr = ImageDraw.Draw(im)
+            dr.text((size // 2, size // 2), "".join(w[0] for w in rep["name"].split()[:2]).upper(), fill="white", font=font(size // 2), anchor="mm")
+        im.save(os.path.join(d, "%s-%d.png" % (rep["slug"], size)))
+
+
+def build(site_url, full=None):
+    """full = the finished index.html. Each rep gets a real copy of the store at /<phone-name>/ with their own
+    title, thumbnail, home-screen icon and name, so it can be saved to a phone and always opens as theirs."""
     made = []
     for r in roster():
-        share_image(r, os.path.join(SITE, "brand", "share", r["slug"] + ".jpg"))
-        name = html.escape(r["name"], quote=True)
-        page = f"""<!doctype html>
-<html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{name}, your blade guy at DBW WISCO</title>
-<meta name="description" content="Reorder diamond blades in 60 seconds. Your order goes straight to {name}.">
-<meta property="og:title" content="{name}, your blade guy at DBW WISCO">
-<meta property="og:description" content="Reorder diamond blades in 60 seconds. Your order goes straight to {name}.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="{site_url}{r['slug']}/">
-<meta property="og:image" content="{site_url}brand/share/{r['slug']}.jpg">
-<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image">
-<meta http-equiv="refresh" content="0; url=../?rep={r['slug']}">
-<script>location.replace("../?rep={r['slug']}" + location.hash);</script>
-</head><body style="font:16px system-ui;background:#071433;color:#fff;padding:24px">
-<a style="color:#fff" href="../?rep={r['slug']}">Open DBW WISCO with {name}</a>
-</body></html>
-"""
-        # the rep's main address, plus every other name they go by, all land on the same page
-        for nm in [r["slug"]] + r.get("also", []):
-            d = os.path.join(SITE, nm); os.makedirs(d, exist_ok=True)
-            open(os.path.join(d, "index.html"), "w", encoding="utf8").write(page)
-        made.append(r["slug"])
+        slug = r["slug"]
+        share_image(r, os.path.join(SITE, "brand", "share", slug + ".jpg")); home_icons(r)
+        name = html.escape(r["name"], quote=True); short = html.escape(short_name(r["name"]), quote=True)
+        d = os.path.join(SITE, slug); os.makedirs(d, exist_ok=True)
+        json.dump({"name": short_name(r["name"]) + " · DBW WISCO", "short_name": short_name(r["name"]), "start_url": "./", "scope": "./", "display": "standalone",
+                   "background_color": "#071433", "theme_color": "#071433",
+                   "icons": [{"src": "../brand/repicon/%s-%d.png" % (slug, z), "sizes": "%dx%d" % (z, z), "type": "image/png"} for z in (180, 512)]},
+                  open(os.path.join(d, "manifest.webmanifest"), "w", encoding="utf8"), ensure_ascii=False, indent=1)
+        page = full
+        def sub(pattern, repl):
+            nonlocal page
+            page, n = re.subn(pattern, lambda m: repl, page, count=1); assert n == 1, pattern
+        sub(r"<head>", '<head>\n<base href="../">')
+        sub(r"<title>.*?</title>", "<title>%s, your blade guy at DBW WISCO</title>" % name)
+        sub(r'<meta name="description" content="[^"]*">', '<meta name="description" content="Reorder diamond blades in 60 seconds. Your order goes straight to %s.">' % name)
+        sub(r'<meta property="og:title" content="[^"]*">', '<meta property="og:title" content="%s, your blade guy at DBW WISCO">' % name)
+        sub(r'<meta property="og:description" content="[^"]*">', '<meta property="og:description" content="Reorder diamond blades in 60 seconds. Your order goes straight to %s.">' % name)
+        sub(r'<meta property="og:url" content="[^"]*">', '<meta property="og:url" content="%s%s/">' % (site_url, slug))
+        sub(r'<meta property="og:image" content="[^"]*">', '<meta property="og:image" content="%sbrand/share/%s.jpg">' % (site_url, slug))
+        sub(r'<link rel="icon" href="[^"]*">', '<link rel="icon" href="brand/repicon/%s-180.png">' % slug)
+        sub(r'<link rel="apple-touch-icon" href="[^"]*">', '<link rel="apple-touch-icon" href="brand/repicon/%s-180.png">' % slug)
+        sub(r'<link rel="manifest" href="[^"]*">', '<link rel="manifest" href="%s/manifest.webmanifest">' % slug)
+        sub(r'<meta name="apple-mobile-web-app-title" content="[^"]*">', '<meta name="apple-mobile-web-app-title" content="%s">' % short)
+        sub(r'<script>window\.WISCO_VER=', '<script>window.WISCO_REP="%s";</script>\n<script>window.WISCO_VER=' % slug)
+        open(os.path.join(d, "index.html"), "w", encoding="utf8").write(page)
+        # every other name they go by forwards to their page
+        for nm in r.get("also", []):
+            ad = os.path.join(SITE, nm); os.makedirs(ad, exist_ok=True)
+            open(os.path.join(ad, "index.html"), "w", encoding="utf8").write(
+                '<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
+                '<title>%s, your blade guy at DBW WISCO</title><meta property="og:title" content="%s, your blade guy at DBW WISCO">'
+                '<meta property="og:image" content="%sbrand/share/%s.jpg"><meta name="twitter:card" content="summary_large_image">'
+                '<link rel="canonical" href="%s%s/"><meta http-equiv="refresh" content="0; url=../%s/">'
+                '<script>location.replace("../%s/" + location.search);</script></head>'
+                '<body style="font:16px system-ui;background:#071433;color:#fff;padding:24px"><a style="color:#fff" href="../%s/">Open DBW WISCO with %s</a></body></html>\n'
+                % (name, name, site_url, slug, site_url, slug, slug, slug, slug, name))
+        made.append(slug)
     # The rep tools are not linked anywhere on the site. Reps reach them at <site>/team/.
     d = os.path.join(SITE, "team"); os.makedirs(d, exist_ok=True)
     open(os.path.join(d, "index.html"), "w", encoding="utf8").write(

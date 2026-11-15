@@ -1,0 +1,21 @@
+{
+ "name": "Joey Deruki · DBW WISCO",
+ "short_name": "Joey Deruki",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "background_color": "#071433",
+ "theme_color": "#071433",
+ "icons": [
+  {
+   "src": "../brand/repicon/joeyderuki-180.png",
+   "sizes": "180x180",
+   "type": "image/png"
+  },
+  {
+   "src": "../brand/repicon/joeyderuki-512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  }
+ ]
+}

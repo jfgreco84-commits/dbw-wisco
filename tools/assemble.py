@@ -49,7 +49,7 @@ open(os.path.join(SITE, "index.html"), "w", encoding="utf8").write(full)
 open(os.path.join(SITE, "version.txt"), "w", encoding="utf8").write(ver + "\n")   # lets an open phone notice a newer build
 print("wrote index.html")
 import rep_pages
-print("rep pages:", ", ".join(rep_pages.build(SITE_URL)))
+print("rep pages:", ", ".join(rep_pages.build(SITE_URL, full)))
 
 if "--preview" in sys.argv:
     out = sys.argv[sys.argv.index("--preview") + 1]
