@@ -355,7 +355,7 @@
   ];
   function bigFrank() {
     var cell = W.textNumber || "";
-    return '<section class="sec bfsec"><div class="wrap narrow"><div class="bfhero"><img alt="Big Frank" loading="lazy" src="brand/frank-cool.webp"><div>' +
+    return '<section class="sec bfsec"><div class="wrap narrow"><div class="bfhero"><img alt="Big Frank" loading="lazy" src="brand/reps/' + BOSSPIC + '"><div>' +
       '<span class="kick">30 years in the business</span><h2>Big Frank, Your Blade Guy!</h2>' +
       '<p class="bfline">“Selling blades ain’t glamorous, but someone has to do it. I’m your guy.”</p>' +
       "<p>I’ve been in the blade business for 30 years. I started as a kid and never left.</p><p>Thirty years teaches you two things: what works, and who to call when you’re not sure. So tell me what you’re cutting and you’ll get a straight answer. If it’s a job I haven’t seen before, I know exactly who has, and I’ll get you the answer.</p><p>Either way you end up with the right blade at a fair price, from a guy who picks up when you call.</p>" +
@@ -932,7 +932,7 @@
   }
   function saveCart() { store.set("cart", cart); badge(); bfI = 0; bfShow(); }
   function badge() {
-    var t = totals(); $("#cartn").textContent = t.units; $("#dock").hidden = !t.units;
+    var t = totals(); $("#cartn").textContent = t.units; $("#dock").hidden = !t.units; setTimeout(dockLift, 0);
     if (t.units) $("#dockinfo").innerHTML = "<b>" + t.units + (t.units === 1 ? " item" : " items") + (HIDE && !t.quoted ? "" : " · " + totTxt(t)) + "</b><span>" + (t.quoted ? "Your price, from your rep." : HIDE ? "In your cart. " + WHO() + " calls you back with your price." : RNG ? "Your rep sets the price." : ACCT ? "List total. You pay your account price." : "Priced by quantity. Your account may do better.") + "</span>";
   }
   function renderCart() {
@@ -991,9 +991,10 @@
   function myRep() { var r = repBySlug(me().rep); return r && !isBoss(r) ? r : null; }
   function cellShow() { var r = myRep(); return (r && r.cell && prettyPhone(r.cell)) || W.textDisplay || ""; }
   function mailShow() { var r = myRep(); return (r && r.email) || W.orderEmail || ""; }
+  var BOSSPIC = ((W.reps || []).filter(function (x) { return /frank/i.test(x.name) && x.photo; })[0] || {}).photo || "frank.webp";
   function WHO() { var r = myRep(); return r ? repFirst(r) : FRANK; }
   function SAYER() { var r = myRep(); return r ? repFirst(r) : "Big " + FRANK; }
-  function askImg(big) { var r = myRep(); return r && r.photo ? "brand/reps/" + r.photo : "brand/frank-cool" + (big ? "" : "-sm") + ".webp"; }
+  function askImg(big) { var r = myRep(); return "brand/reps/" + (r && r.photo ? r.photo : BOSSPIC); }   /* one face per person, the same one everywhere */
   function isPackage(t) { var saw = false, blade = false; t.lines.forEach(function (l) { if (l.f.cats.indexOf("equip") >= 0) saw = true; else blade = true; }); return saw && blade; }
   /* The order text for someone whose name this phone already knows: no form. */
   function quickOrder() { var i = me(); return { name: i.name || "", company: i.company || "", phone: i.phone || "", email: i.email || "", po: "", notes: "", rep: repBySlug(i.rep) ? i.rep : "", pay: i.pay || PAY0, feedback: "", msg: "", acct: i.acct || "existing", addr: i.addr || "", city: i.city || "", state: i.state || "", zip: i.zip || "", ref: "", limit: "", r1: "", r1p: "", r2: "", r2p: "", r3: "", r3p: "", stars: "", review: "", fname: "", fco: "", intent: "buy", pub: false, disc: [] }; }
@@ -1348,6 +1349,9 @@
   window.addEventListener("hashchange", route);
 
   /* ---------- boot ---------- */
+  /* The floating Ask button always sits above the cart bar, however tall the bar is. */
+  function dockLift() { var d = $("#dock"), h = d && !d.hidden ? d.offsetHeight : 0; document.documentElement.style.setProperty("--dockh", h + "px"); }
+  window.addEventListener("resize", dockLift);
   function contactWire() {
     var r = myRep(), cell = (r && r.cell) || W.textNumber || "", mail = (r && r.email) || W.orderEmail || "", who = r ? repFirst(r) : FRANK;
     $$("[data-text-btn]").forEach(function (a) { a.href = "sms:" + cell; if (a.closest(".footact")) a.textContent = "Text " + who; });
@@ -1355,7 +1359,7 @@
     $$("[data-mail-btn]").forEach(function (a) { a.href = "mailto:" + mail; a.textContent = "Email " + who; });
     $$("[data-askname]").forEach(function (a) { a.textContent = "Ask " + who; });
     $$("[data-sayname]").forEach(function (a) { a.textContent = (r ? who : "Big " + FRANK) + " says"; });
-    $$("[data-askimg]").forEach(function (a) { a.src = askImg(); a.classList.toggle("repface", !!(r && r.photo)); });
+    $$("[data-askimg]").forEach(function (a) { a.src = askImg(); a.classList.add("repface"); });
     var bfa = $("#bf"); if (bfa) bfa.setAttribute("aria-label", (r ? who : "Big " + FRANK) + " says");
     $$("[data-mgr]").forEach(function (a) { a.textContent = r ? r.name + ", your rep" : (W.managerName || "Frank") + ", " + (W.managerTitle || ""); });
     $$("[data-text]").forEach(function (a) { a.textContent = cellShow(); a.href = "sms:" + cell; });
