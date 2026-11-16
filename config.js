@@ -52,7 +52,7 @@ window.WISCO = {
     { name: "John Anthony", photo: "johnanthony.webp", email: "janthony@diamondbladewarehouse.com", cell: "+14143630323", manager: "", aka: ["johnanthony", "ronny", "ronny-b", "john-anthony"] },
     { name: "Adam West", photo: "adamwest.webp", email: "awest@diamondbladewarehouse.com", cell: "+14143665237", manager: "", aka: ["adamwest", "batman", "adam-west"] },
     { name: "Adam Misurek", photo: "adammisurek.webp", email: "amisurek@diamondbladewarehouse.com", cell: "+14145207257", manager: "", aka: ["adammisurek", "miz"] },
-    { name: "Joey “The Stinger” Deruki", photo: "joeyderuki.webp", email: "jderuki@diamondbladewarehouse.com", cell: "+12629579839", manager: "", aka: ["joeyderuki", "snacks", "joey-deruki", "joey-the-stinger-deruki"] },
+    { name: "Joe Deruki", photo: "joederuki.webp", email: "jderuki@diamondbladewarehouse.com", cell: "+12629579839", manager: "", aka: ["joederuki", "joeyderuki", "joe-deruki", "snacks", "joey-deruki", "joey-the-stinger-deruki"] },
     { name: "T.J. Sutton", photo: "tjsutton.webp", email: "tsutton@diamondbladewarehouse.com", cell: "+12624200326", manager: "", aka: ["tjsutton", "tj"] },
     { name: "JB Baemert", photo: "jbbaemert.webp", email: "jbaemert@diamondbladewarehouse.com", cell: "+14149168672", manager: "", aka: ["jbbaemert", "jb", "jb-bammert", "jb-baemmert"] },
     { name: "Robert Redman", photo: "robertredman.webp", email: "rredman@diamondbladewarehouse.com", cell: "+14145731192", manager: "", aka: ["robertredman", "cutty", "rob-redman", "robert-redman"] },
