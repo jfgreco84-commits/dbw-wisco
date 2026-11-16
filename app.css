@@ -789,3 +789,12 @@ body:has(#dock:not([hidden])) .bf { bottom: calc(var(--dockh, 110px) + 26px) !im
 
 /* v44: rep card buttons fit a long first name on a phone */
 @media (max-width: 480px) { .mine .mine-act .btn { font-size: 11.5px; letter-spacing: .01em; padding-inline: 2px } .mine .mine-act { gap: 6px } }
+
+/* v45: gold means "do this next". First phone screen leads with the rep, the headline and two buttons. */
+.btn.gold:not(.qgo):not(.herogo):not([data-checkout]):not([data-quicksms]):not([data-dealsend]) { background: #fff; color: var(--navy-2); border: 2px solid var(--navy-2); box-shadow: none; text-shadow: none }
+.btn.gold:not(.qgo):not(.herogo):not([data-checkout]):not([data-quicksms]):not([data-dealsend]):hover { background: #EEF2FB }
+.add, #textbtn { background: var(--gold); color: var(--gold-ink); border-color: #E0A313; box-shadow: 0 2px 0 rgba(0,0,0,.14) }
+.pkg { background: #fff; border-color: var(--navy-2); color: var(--navy-2); box-shadow: none } .pkg.on { background: var(--navy-2); border-color: var(--navy-2); color: #fff; box-shadow: 0 0 0 3px #F7C948 } .pkg.on b::before { content: "✓ " }
+.herocta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0 16px } .herocta .btn { min-height: 54px; justify-content: center; text-align: center; padding-inline: 8px }
+@media (max-width: 860px) { .hero .art { order: 1 } .hero .art .logo { display: none } .hero .mine { margin-top: 6px } }
+.tools::after { display: none }
