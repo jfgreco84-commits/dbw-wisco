@@ -752,3 +752,9 @@ table.cmp .add.pk { margin-left: 6px; background: var(--gold); color: var(--gold
 .qbrk button { flex: 1 1 0; min-width: 0 }
 .pick3 .qhow2 .qty input { color: var(--navy-2); background: #fff }
 .pick3 .qhow2 .qbrknote { color: #5b6785 }
+
+/* v39: one face for Big Frank everywhere, and the Ask button clears the cart bar */
+.bfhero img[src*="brand/reps/"] { border-radius: 50%; aspect-ratio: 1; object-fit: cover; border: 4px solid #fff }
+.bfs img[src*="brand/reps/"] { align-self: center }
+body:has(#dock:not([hidden])) .bf { bottom: calc(var(--dockh, 110px) + 26px) !important }
+@media (max-width: 860px) { .bf.away:not(.open) { transform: translateY(10px) } }
