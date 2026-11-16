@@ -374,7 +374,7 @@
       '<div class="doors">' +
       '<a class="door d1 shine" href="#finder"><div><b>Blade Finder</b><span>Two taps. We line up the right blade.</span></div><em>→</em></a>' +
       '<a class="door d2" href="#reorder"><div><b>Fast Reorder</b><span>Know what you run? Punch it in and go.</span></div><em>→</em></a>' +
-      '<a class="door d3 withav" href="#ask-frank"><img alt="" src="' + askImg() + '"><div><b>Ask ' + esc(WHO()) + "</b><span>Not sure? Get " + esc(SAYER()) + "’s pick in 3 taps.</span></div><em>→</em></a>" +
+      '<a class="door d3 withav" href="#ask"><img alt="" src="' + askImg() + '"><div><b>Ask ' + esc(WHO()) + "</b><span>Not sure? Get " + esc(SAYER()) + "’s pick in 3 taps.</span></div><em>→</em></a>" +
       "</div>" +
       '</div><div class="art"><img class="logo" src="brand/logo.webp" alt="DBW WISCO, a division of Diamond Blade Warehouse" width="430" height="458">' +
       '<div class="stage"><div class="lineup">' + line.map(function (n) { return '<img alt="" src="brand/lineup/' + n + '.webp">'; }).join("") + "</div></div></div></div></section>" +
@@ -475,7 +475,7 @@
       var rest = rank(list, wiz.mat, wiz.saw).filter(function (f) { return !shown[f.id]; });
       h += "<h1>Here’s your lineup.</h1>" + says(((bigSaw(wiz.saw) && MATQUIP[wiz.mat.k]) || "Start at the top and work down.") + " " + list.length + (list.length === 1 ? " blade fits." : " fit, best first.")) +
         '<div class="results">' + picks.map(function (p, i) { return cardHTML(p.f, { mat: wiz.mat, saw: wiz.saw, pick: i === 0, ribbon: p.label, rc: p.rc }); }).join("") + rest.map(function (f) { return cardHTML(f, o); }).join("") + "</div>" +
-        '<div class="center"><a class="btn gold" href="#ask-frank" data-keep>Still not sure? Ask ' + esc(WHO()) + "</a></div>";
+        '<div class="center"><a class="btn gold" href="#ask" data-keep>Still not sure? Ask ' + esc(WHO()) + "</a></div>";
     }
     app.innerHTML = shell(kick, 0, 0, h);
   }
@@ -484,10 +484,11 @@
   }
   function frankBox(pickName) {
     return '<div class="frank" data-frank="' + esc(pickName) + '"><div class="frankme"><img alt="' + esc(SAYER()) + '" src="' + askImg(1) + '" width="96" height="104" loading="lazy"><div><b class="h">Talk it through with me.</b>' +
-      "<p>I’ve got 25 years in this industry. I’m not always right, but I’m not wrong very often either. Send over your question and your setup, and tell me what you’re looking to accomplish. I’ll get you set up right. I can promise you that.</p>" +
-      '<span class="sig">' + esc(W.managerName || "Frank") + ", " + esc(W.managerTitle || "") + "</span></div></div>" +
+      (myRep() ? "<p>Send over your question and your setup, and tell me what you’re looking to accomplish. I’ll get you set up right.</p>" + '<span class="sig">' + esc(myRep().name) + ", your rep at DBW WISCO</span></div></div>"
+        : "<p>I’ve got 25 years in this industry. I’m not always right, but I’m not wrong very often either. Send over your question and your setup, and tell me what you’re looking to accomplish. I’ll get you set up right. I can promise you that.</p>" +
+      '<span class="sig">' + esc(W.managerName || "Frank") + ", " + esc(W.managerTitle || "") + "</span></div></div>") +
       '<div class="sendrow">' + (W.textNumber ? '<button class="btn gold sm" data-fsms>Text ' + esc(WHO()) + "</button>" : "") + '<button class="btn gold sm" data-femail>Email ' + esc(WHO()) + '</button><button class="btn ghost-d sm" data-fcopy>Copy my question</button></div>' +
-      '<p class="note">' + (W.textDisplay ? "Text: <b style=\"user-select:all\">" + esc(W.textDisplay) + "</b> · " : "") + 'Email: <b style="user-select:all">' + esc(W.orderEmail || "") + "</b></p></div>";
+      '<p class="note">' + (cellShow() ? "Text: <b style=\"user-select:all\">" + esc(cellShow()) + "</b> · " : "") + 'Email: <b style="user-select:all">' + esc(mailShow()) + "</b></p></div>";
   }
 
   function hitHTML(f, v) {
@@ -553,7 +554,7 @@
       (n ? '<div class="last"><div><b>Same as last time?</b><span>' + n + (n === 1 ? " line" : " lines") + " from " + esc(last.date) + '</span></div><button class="btn red sm" data-reorder>Reorder it</button></div>' : "") +
       '<h2 class="wiz-h2">Tap a quantity</h2><p class="lead sm">Our most common blades. ' + (HIDE ? "Bigger quantities get better pricing. Your rep confirms the number. " : RNG ? "The more you buy, the closer you land to the low end of the range. " : "The price drops at every button. ") + esc(mixLine()) + "</p>" + quickRows() +
       '<div class="center"><a class="btn gold" href="#shop">Browse our full catalog</a><button class="btn gold" data-pricing>Ask ' + esc(WHO()) + " about pricing" + "</button></div>" +
-      (W.textNumber ? '<div class="frank photo"><b class="h">Easiest reorder there is</b><p>Snap a picture of your old blade and send it to ' + esc(WHO()) + '. We’ll read the label and write it up.</p><a class="bignum" href="#" data-photo>' + esc(W.textDisplay || "") + '</a><div class="sendrow"><button class="btn gold" data-photo>Text ' + esc(WHO()) + ' a photo</button><button class="btn blue" data-photomail>Email a photo</button></div></div>' : "") +
+      (W.textNumber ? '<div class="frank photo"><b class="h">Easiest reorder there is</b><p>Snap a picture of your old blade and send it to ' + esc(WHO()) + '. We’ll read the label and write it up.</p><a class="bignum" href="#" data-photo>' + esc(cellShow()) + '</a><div class="sendrow"><button class="btn gold" data-photo>Text ' + esc(WHO()) + ' a photo</button><button class="btn blue" data-photomail>Email a photo</button></div></div>' : "") +
       '<h2 class="wiz-h2">Not sure what to reorder?</h2><p class="lead sm">Pick your crew and we walk you to the right blade.</p><div class="tiles">' + CREWS.map(function (c) { return '<button class="tile" data-crew="' + c.mat + '"><b>' + esc(c.n) + "</b><span>" + esc(c.s) + "</span></button>"; }).join("") + "</div>" +
       '<div class="frank"><b class="h">Your rep can build your list for you</b><p>Ask your rep to text you a reorder link. It opens with your usual blades already in the cart. You can change anything before you send it.</p></div>');
     $("#rq").addEventListener("input", function (e) { runSearch(e.target.value); });
@@ -867,7 +868,8 @@
     var h = location.hash || "#home"; document.body.dataset.r = h.slice(1).split("-")[0];
     if (h.indexOf("#blade-") === 0) { var f = FAM[h.slice(7)]; if (!app.innerHTML) home(); if (f) openDetail(f); return; }
     toTop();
-    if (h === "#finder" || h === "#ask-frank") {
+    if (h === "#ask-frank") { try { history.replaceState(null, "", location.pathname + location.search + "#ask"); } catch (e) {} h = "#ask"; }
+    if (h === "#finder" || h === "#ask") {
       var mode = h === "#finder" ? "finder" : "ask";
       if (!wiz.keep) { wiz.mat = wiz.saw = null; } wiz.hp = null; wiz.hpn = null;
       wiz.keep = false; wiz.mode = mode; wiz.want = null; wiz.all = false; wizard(); setNav(h); bfShow("mat");
@@ -895,7 +897,7 @@
     return a;
   }
   var HOMEQ = QUIP.home.slice().sort(function () { return Math.random() - 0.5; });
-  function bfShow(ctx) { if (ctx) { bfCtx = ctx; bfI = 0; } var a = bfLines(); a = a.concat(HOMEQ.filter(function (q) { return a.indexOf(q) < 0; })); $("#bfp").textContent = a[bfI % a.length]; }
+  function bfShow(ctx) { if (ctx) { bfCtx = ctx; bfI = 0; } var a = bfLines(); a = a.concat(HOMEQ.filter(function (q) { return a.indexOf(q) < 0 && !(myRep() && /25 years/.test(q)); })); $("#bfp").textContent = a[bfI % a.length]; }
   var lastY = 0; window.addEventListener("scroll", function () { var y = window.scrollY, el = $("#bf"); if (Math.abs(y - lastY) < 12) return; el.classList.toggle("away", y > lastY && y > 160); lastY = y; }, { passive: true });
   function bfOpen(open) { $("#bf").classList.toggle("open", open); store.set("bf", open ? 1 : 0); }
 
@@ -964,12 +966,14 @@
     pricing: { title: "Get my price breaks", intro: "Tell us which pricing to check. Your rep comes back with your real numbers.", head: "DBW WISCO PRICING REQUEST", subj: "Pricing request" },
     saw: { title: "Send my saw package", intro: "Your rep confirms the package, freight and ship date, then it’s yours.", head: "DBW WISCO SAW PACKAGE", subj: "Saw package request" },
     equip: { title: "Find me equipment", intro: "Give us as much as you can: make, model, size, new or used, how soon.", head: "DBW WISCO EQUIPMENT REQUEST", subj: "Equipment request", msg: "What are you looking for? Make, model, anything you know" },
-    feedback: { title: "How’d we do?", intro: "Tell us what worked and what didn’t. " + FRANK + " reads every one.", head: "DBW WISCO FEEDBACK", subj: "Feedback", msg: "Tell us how we did" },
+    feedback: { title: "How’d we do?", intro: "Tell us what worked and what didn’t. We read every one.", head: "DBW WISCO FEEDBACK", subj: "Feedback", msg: "Tell us how we did" },
     review: { title: "Leave a review", intro: "An honest review, good or bad, earns you " + RW.review + ". Your rep applies it.", head: "DBW WISCO REVIEW", subj: "Review" },
     refer: { title: "Refer a contractor", intro: "Send a contractor our way. When they place their first order and name you, you get " + (RW.referrerYou || RW.referrer) + ".", head: "DBW WISCO REFERRAL", subj: "Referral" }
   };
   function me() { return store.get("me", {}); }
   function myRep() { var r = repBySlug(me().rep); return r && !isBoss(r) ? r : null; }
+  function cellShow() { var r = myRep(); return (r && r.cell && prettyPhone(r.cell)) || W.textDisplay || ""; }
+  function mailShow() { var r = myRep(); return (r && r.email) || W.orderEmail || ""; }
   function WHO() { var r = myRep(); return r ? repFirst(r) : FRANK; }
   function SAYER() { var r = myRep(); return r ? repFirst(r) : "Big " + FRANK; }
   function askImg(big) { var r = myRep(); return r && r.photo ? "brand/reps/" + r.photo : "brand/frank-cool" + (big ? "" : "-sm") + ".webp"; }
@@ -1041,7 +1045,7 @@
     var d = new Date(Date.now() + 30 * 864e5), p = function (n) { return ("0" + n).slice(-2); }, day = d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate());
     var last = lastOrder(), items = last && last.items ? last.items.map(function (c) { var v = FAM[c.f] && findVar(FAM[c.f], c.v); return v ? encodeURIComponent(v[0]) + "*" + c.q : ""; }).filter(Boolean) : [];
     var link = ROOT + (items.length ? "?cart=" + items.join(",") : "") + (me().rep ? (items.length ? "&" : "?") + "rep=" + me().rep : "");
-    var ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//DBW WISCO//Reorder//EN", "BEGIN:VEVENT", "UID:" + Date.now() + "@dbwwisco", "DTSTAMP:" + new Date().toISOString().replace(/[-:]|\.\d+/g, ""), "DTSTART:" + day + "T090000", "DTEND:" + day + "T091500", "SUMMARY:Reorder blades from DBW WISCO", "DESCRIPTION:Running low? Your last order is one tap away: " + link.replace(/,/g, "\\,") + "\\nOr text " + FRANK + ": " + (W.textDisplay || W.phone || ""), "URL:" + link, "BEGIN:VALARM", "TRIGGER:PT0M", "ACTION:DISPLAY", "DESCRIPTION:Reorder blades from DBW WISCO", "END:VALARM", "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+    var ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//DBW WISCO//Reorder//EN", "BEGIN:VEVENT", "UID:" + Date.now() + "@dbwwisco", "DTSTAMP:" + new Date().toISOString().replace(/[-:]|\.\d+/g, ""), "DTSTART:" + day + "T090000", "DTEND:" + day + "T091500", "SUMMARY:Reorder blades from DBW WISCO", "DESCRIPTION:Running low? Your last order is one tap away: " + link.replace(/,/g, "\\,") + "\\nOr text " + WHO() + ": " + cellShow(), "URL:" + link, "BEGIN:VALARM", "TRIGGER:PT0M", "ACTION:DISPLAY", "DESCRIPTION:Reorder blades from DBW WISCO", "END:VALARM", "END:VEVENT", "END:VCALENDAR"].join("\r\n");
     var a = document.createElement("a"); a.href = "data:text/calendar;charset=utf-8," + encodeURIComponent(ics); a.download = "reorder-dbw-wisco.ics"; document.body.appendChild(a); a.click(); a.remove();
     toast("Reminder made for " + d.toLocaleDateString("en-US", { month: "short", day: "numeric" }) + ". Add it to your calendar.");
   }
@@ -1095,7 +1099,7 @@
     var m = $("#sentmsg"); m.hidden = false; var refLine = ordRef && (mode === "order" || mode === "saw" || mode === "pricing") ? " <span class=\"bigref\">Reference <b class=\"sel\">" + ordRef + "</b> · screenshot this</span>" : "";
     m.innerHTML = how === "posted" ? "<b>Sent.</b><span>A real person has it. Expect a call or text back." + refLine + "</span>"
       : how === "copied" ? "<b>Copied.</b><span>Paste it into a text or email to " + esc(WHO()) + "." + refLine + "</span>"
-        : "<b>Order prepared. It is not sent yet.</b><span>Hit Send in your " + (how === "sms" ? "messages" : "email") + " app. It’s already written for you. If nothing opened, tap Copy and paste it to " + esc(how === "sms" ? (W.textDisplay || "") : (W.orderEmail || "")) + "." + refLine + "</span>";
+        : "<b>Order prepared. It is not sent yet.</b><span>Hit Send in your " + (how === "sms" ? "messages" : "email") + " app. It’s already written for you. If nothing opened, tap Copy and paste it to " + esc(how === "sms" ? cellShow() : mailShow()) + "." + refLine + "</span>";
     if (mode === "order" || mode === "saw") m.innerHTML += '<div class="aftersend"><span>Want ' + esc(RW.review) + '?</span><button type="button" class="btn blue sm" data-review>Leave a review</button><button type="button" class="btn ghost-d sm" data-refer>Refer a contractor</button></div>';
     if (mode === "order" && t.lines.length) m.innerHTML += '<div class="aftersend"><span>Don’t run out mid-job.</span><button type="button" class="btn ghost-d sm" data-remind>Remind me to reorder in 30 days</button></div>';
     m.scrollIntoView({ block: "nearest" });
@@ -1196,7 +1200,7 @@
     if (t.closest("[data-keep]")) { wiz.keep = true; return; }
     if (t.closest("[data-back]")) {
       var h = location.hash;
-      if (h === "#finder" || h === "#ask-frank") { if (wiz.want) wiz.want = null; else if (wiz.hp) { wiz.hp = null; wiz.hpn = null; } else if (wiz.saw) { wiz.saw = null; wiz.all = false; } else if (wiz.mat) wiz.mat = null; else return go("#home"); wizard(); return; }
+      if (h === "#finder" || h === "#ask" || h === "#ask-frank") { if (wiz.want) wiz.want = null; else if (wiz.hp) { wiz.hp = null; wiz.hpn = null; } else if (wiz.saw) { wiz.saw = null; wiz.all = false; } else if (wiz.mat) wiz.mat = null; else return go("#home"); wizard(); return; }
       if (h === "#fix" && fixSel) { fixSel = ""; fixScreen(); return; }
       return go("#home");
     }
@@ -1287,7 +1291,7 @@
     if (t.closest("[data-share]")) { copyText(shareLink(), function () { toast("Reorder link copied. Text it to anyone."); }); return; }
     if ((el = t.closest("[data-fsms]"))) { sms(frankMsg(el.closest("[data-frank]").dataset.frank), route2(repBySlug(me().rep) ? me().rep : "").cell); return; }
     if ((el = t.closest("[data-femail]"))) { var fq = route2(repBySlug(me().rep) ? me().rep : ""); mailto(fq.to, "Blade question from the DBW WISCO site", frankMsg(el.closest("[data-frank]").dataset.frank), fq.cc); return; }
-    if ((el = t.closest("[data-fcopy]"))) { copyText(frankMsg(el.closest("[data-frank]").dataset.frank), function () { toast("Copied. Paste it in a text to " + FRANK + "."); }); return; }
+    if ((el = t.closest("[data-fcopy]"))) { copyText(frankMsg(el.closest("[data-frank]").dataset.frank), function () { toast("Copied. Paste it in a text to " + WHO() + "."); }); return; }
     if (t.closest("[data-emptycart]")) { cart = []; saveCart(); renderCart(); return; }
     if (t.tagName === "DIALOG") t.close();
   });
@@ -1333,6 +1337,11 @@
     $$("[data-askimg]").forEach(function (a) { a.src = askImg(); a.classList.toggle("repface", !!(r && r.photo)); });
     var bfa = $("#bf"); if (bfa) bfa.setAttribute("aria-label", (r ? who : "Big " + FRANK) + " says");
     $$("[data-mgr]").forEach(function (a) { a.textContent = r ? r.name + ", your rep" : (W.managerName || "Frank") + ", " + (W.managerTitle || ""); });
+    $$("[data-text]").forEach(function (a) { a.textContent = cellShow(); a.href = "sms:" + cell; });
+    $$("[data-oemail-link]").forEach(function (a) { a.textContent = mail; a.href = "mailto:" + mail; });
+    $$("[data-oemail]").forEach(function (a) { a.textContent = mail; });
+    $$("[data-bftoggle]").forEach(function (a) { a.setAttribute("aria-label", (r ? who : "Big " + FRANK) + " says"); });
+    $$("[data-bfhide]").forEach(function (a) { a.setAttribute("aria-label", "Hide " + (r ? who : "Big " + FRANK)); });
   }
   $$("[data-oemail-link]").forEach(function (a) { a.textContent = W.orderEmail || ""; a.href = "mailto:" + (W.orderEmail || ""); });
   $$("[data-mgr]").forEach(function (a) { a.textContent = (W.managerName || "Frank") + ", " + (W.managerTitle || ""); });
