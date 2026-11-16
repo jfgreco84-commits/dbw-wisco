@@ -786,3 +786,6 @@ body:has(#dock:not([hidden])) .bf { bottom: calc(var(--dockh, 110px) + 26px) !im
 .learn:hover { background: #17389B }
 .qlearn { display: inline-flex; align-items: center; min-height: 40px; margin-top: 6px; padding: 0 16px; border-radius: 999px; background: var(--royal); color: #fff; font: 900 13px var(--sans); letter-spacing: .06em; text-transform: uppercase; text-decoration: none; box-shadow: 0 3px 0 rgba(7,20,51,.3) }
 .qlearn:hover { background: #17389B }
+
+/* v44: rep card buttons fit a long first name on a phone */
+@media (max-width: 480px) { .mine .mine-act .btn { font-size: 11.5px; letter-spacing: .01em; padding-inline: 2px } .mine .mine-act { gap: 6px } }
