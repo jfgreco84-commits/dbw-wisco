@@ -44,7 +44,7 @@
   var SAWS = [
     { k: "grinder", n: "Angle Grinder", s: '4" to 9"', keys: ["grinder", "circ"] },
     { k: "cutoff", n: "Cut-Off Saw", s: 'Hand-held 12" to 16"', keys: ["cutoff"] },
-    { k: "walk", n: "Walk-Behind Saw", s: "Pro 65 horsepower down to low horsepower", keys: ["walk"] },
+    { k: "walk", n: "Walk-Behind Saw", s: "Push saws up to big flat saws", keys: ["walk"] },
     { k: "early", n: "Early-Entry Saw", s: "Soff-Cut style or Gorilla style", keys: ["early"] },
     { k: "table", n: "Tile / Masonry Saw", s: "Table and block saws", keys: ["table"], only: ["bp", "s", "t"] },
     { k: "wall", n: "Wall, Ring & Chain Saw", s: "Hydraulic, deep cut, diamond chain", keys: ["wall", "ring", "chain"] },
@@ -269,6 +269,7 @@
   }
 
   /* ---------- picking blades ---------- */
+  function isDragon(f) { return f.id === "dragon-supreme" || f.id === "dragon"; }
   function isHiHp(f) { return f.id.indexOf("americut-high-hp") === 0; }
   function hpClass(f) { return /35-60/.test(f.id) ? "35 to 60 HP saws" : "65 to 110 HP saws"; }
   function candidates(mat, saw) {
@@ -305,8 +306,8 @@
     });
     a.forEach(function (f) { if (out.length < 3 && !used[f.id]) { used[f.id] = 1; out.push(f); } });
     out.sort(function (x, y) { return TR[y.tier] - TR[x.tier]; });
-    var lab = [["★ Best", ""], ["Better", "b"], ["Good", "g"]];
-    return out.map(function (f, i) { return { f: f, label: lab[Math.min(i, 2)][0], rc: lab[Math.min(i, 2)][1] }; });
+    var lab = [["★ Top pick", ""], ["Better", "b"], ["Good", "g"]];
+    return out.map(function (f, i) { return { f: f, label: i === 0 && isDragon(f) ? "★ Best" : lab[Math.min(i, 2)][0], rc: lab[Math.min(i, 2)][1] }; });
   }
 
   /* ---------- screens ---------- */
@@ -421,7 +422,7 @@
       '<section class="sec dark"><div class="wrap"><div class="sec-head"><h2>Two ways to save</h2><p>No points, no fine print. Your rep applies it to your next order.</p></div><div class="three swipe">' +
       '<div class="point"><b>Leave a review</b><p>Tell us how the blades held up, good or bad. An honest review earns you ' + esc(RW.review) + '.</p><button class="btn chrome sm" data-review style="margin-top:12px">Leave a review</button></div>' +
       '<div class="point"><b>Refer a contractor</b><p>Send someone our way. When they place a first order and name you, you get ' + esc(RW.referrer) + '.</p><button class="btn chrome sm" data-refer style="margin-top:12px">Refer a contractor</button></div>' +
-      '<div class="point"><b>Just tell us</b><p>Something off with an order, a blade or a rep? ' + esc(WHO()) + ' reads every note.</p><button class="btn ghost sm" data-feedback style="margin-top:12px">Send ' + esc(WHO()) + " a note</button></div>" +
+      '<div class="point"><b>Just tell us</b><p>Something off with an order, a blade or a rep? ' + (myRep() ? esc(WHO()) + " and " + FRANK + " read" : esc(WHO()) + " reads") + ' every note.</p><button class="btn ghost sm" data-feedback style="margin-top:12px">Send ' + esc(WHO()) + " a note</button></div>" +
       "</div></div></section>";
     setNav("#home");
   }
@@ -461,7 +462,7 @@
       if (wiz.hp === "high") {
         var dl = list.filter(isHiHp);
         if (wiz.hpn) { var mid = wiz.hpn <= 60, cls = dl.filter(function (f) { return /35-60/.test(f.id) === mid; }); if (cls.length) dl = cls; }
-        list = dl.length ? dl : list.filter(function (f) { return !lowFam(f); });
+        list = dl;
       }
       if (wiz.hp === "low") list = list.filter(lowFam).concat(list.filter(function (f) { return !lowFam(f) && !isHiHp(f); }));
       h += '<div class="frank wetbox"><b class="h">Wet blades, bonded for you</b><p>' + esc(WETLINE) + (wiz.hp === "high" ? " On a high-horsepower saw that means our Americut wet blades, 14\" to 68\", for 35 to 110 HP saws. Don’t see your size below? Tell us the saw, the horsepower and where you cut and we match the blade." : "") + '</p><div class="sendrow"><button class="btn gold sm" data-wetspec>Spec my wet blade</button></div></div>';
@@ -470,7 +471,7 @@
     if (ask) {
       var r = rank(list, wiz.mat, wiz.saw, wiz.want.k), ladA = rungs(ladder(list)), picksA = ladA.length >= 3 ? ladA : bestBetterGood(list, wiz.mat, wiz.saw);
       var top = r.filter(function (f) { return picksA.some(function (p) { return p.f === f; }); })[0] || r[0];
-      if (!picksA.some(function (p) { return p.f === top; })) picksA = [{ f: top, label: "Best", rc: "b" }].concat(picksA).slice(0, 4);
+      if (!picksA.some(function (p) { return p.f === top; })) picksA = [{ f: top, label: isDragon(top) ? "Best" : "Top pick", rc: "b" }].concat(picksA).slice(0, 4);
       var why = { speed: "it’s the fastest of the three for that job", life: "it’ll outlast the others on that saw", price: "it’s the lowest cost-in that still does the job right", frank: "it’s what I’d put on my own saw" }[wiz.want.k];
       h += says("Good, better, best. My pick is the " + top.n + ". For " + wiz.mat.n.toLowerCase() + (/^[aeiou]/i.test(wiz.saw.n) ? " on an " : " on a ") + wiz.saw.n.toLowerCase() + ", " + why + ".", true) +
         '<div class="results">' + picksA.map(function (p) { var mine = p.f === top; return cardHTML(p.f, { mat: wiz.mat, saw: wiz.saw, pick: mine, ribbon: p.label, ribbon2: mine ? "★ " + esc(WHO()) + "’s Pick" : "", rc: p.rc }); }).join("") + "</div>" + frankBox(top.n);
@@ -481,7 +482,7 @@
       if (wiz.saw.k === "walk" && wiz.hp === "high" && list.every(isHiHp)) picks = rank(list, wiz.mat, wiz.saw).map(function (f) { return { f: f, label: hpClass(f), rc: "" }; });
       picks.forEach(function (p) { shown[p.f.id] = 1; });
       var rest = rank(list, wiz.mat, wiz.saw).filter(function (f) { return !shown[f.id]; });
-      h += "<h1>Here’s your lineup.</h1>" + says((wiz.saw.k === "walk" && wiz.hp === "high" && list.every(isHiHp) ? "For this setup, run an Americut high-horsepower wet blade. Tell me the saw, the horsepower and where you cut and I’ll confirm the bond." : (bigSaw(wiz.saw) && MATQUIP[wiz.mat.k]) || "Start at the top and work down.") + " " + list.length + (list.length === 1 ? " blade fits." : " fit, best first.")) +
+      h += "<h1>Here’s your lineup.</h1>" + says((wiz.saw.k === "walk" && wiz.hp === "high" && list.every(isHiHp) ? "For this setup, run an Americut high-horsepower wet blade. Tell me the saw, the horsepower and where you cut and I’ll confirm the bond." : wiz.saw.k === "walk" && pre.length ? "On a low-horsepower walk-behind, start with the " + pre[0].n + ". It’s bonded for your saw." : wiz.saw.k === "walk" ? "Start at the top and work down." : (bigSaw(wiz.saw) && MATQUIP[wiz.mat.k]) || "Start at the top and work down.") + " " + list.length + (list.length === 1 ? " blade fits." : " fit, best first.")) +
         '<div class="results">' + picks.map(function (p, i) { return cardHTML(p.f, { mat: wiz.mat, saw: wiz.saw, pick: i === 0, ribbon: p.label, rc: p.rc }); }).join("") + rest.map(function (f) { return cardHTML(f, o); }).join("") + "</div>" +
         '<div class="center"><a class="btn gold" href="#ask" data-keep>Still not sure? Ask ' + esc(WHO()) + "</a></div>";
     }
@@ -679,7 +680,7 @@
   function pkgFor(n) { var p = null; PKGS.forEach(function (x) { if (n >= x[0]) p = x; }); return p; }
   function sawsTxt(k) { return k + (k === 1 ? " saw" : " saws"); }
   function pkgButtons(cur) {
-    return '<div class="pkgs" role="group" aria-label="Saw packages">' + PKGS.map(function (x) { return '<button type="button" class="pkg' + (cur === x[0] ? " on" : "") + '" data-pkgq="' + x[0] + '"><b>' + x[0] + " blades</b><span>+ " + sawsTxt(x[1]) + "</span>" + (x[2] ? "<em>Better price per blade</em>" : "") + "</button>"; }).join("") + "</div>";
+    return '<div class="pkgs" role="group" aria-label="Saw packages">' + PKGS.map(function (x) { return '<button type="button" class="pkg' + (cur === x[0] ? " on" : "") + '" data-pkgq="' + x[0] + '"><b>' + x[0] + " blades</b><span>" + sawsTxt(x[1]) + " in the package</span>" + (x[2] ? "<em>Better price per blade</em>" : "") + "</button>"; }).join("") + "</div>";
   }
   function pkgLine(n) {
     var p = pkgFor(n); if (!p) return "Add " + (PKGS[0][0] - n) + " more to make a " + PKGS[0][0] + "-blade package.";
@@ -717,6 +718,7 @@
     $("#dqout").textContent = q + (q === 1 ? " blade" : " blades"); if (document.activeElement !== $("#dqn")) $("#dqn").value = q; if (document.activeElement !== $("#dqty")) $("#dqty").value = Math.min(50, q);
     $("#deallines").innerHTML = d.lines.length ? d.lines.map(function (x) { return '<div class="dl" data-i="' + deal.lines.indexOf(x.l) + '"><span><b>' + x.l.q + " x " + esc(x.f.n) + "</b><small>" + esc(vlabel(x.v)) + (HIDE ? "" : " · " + money(x.each) + " each") + '</small></span><button class="link" data-dealrm>Remove</button></div>'; }).join("") : "";
     $("#dealout").innerHTML = !saw ? '<div class="dealtotal off"><span>Pick a saw to see your package</span></div>' :
+      HIDE && !d.n ? '<div class="dealtotal off"><span>Pick how many blades to start.</span></div>' :
       HIDE ? '<div class="dealtotal"><span>Your package</span><div class="drow"><i>' + d.n + (d.n === 1 ? " blade" : " blades") + '</i><b>✓</b></div><div class="drow"><i>' + (pkgFor(d.n) ? pkgFor(d.n)[1] + " x " : "") + esc(saw.n) + "</i><b>" + (pkgFor(d.n) ? "✓" : "") + '</b></div><strong>' + esc(pkgLine(d.n)) + "</strong>" + (pkgFor(d.n) ? "<span>One package price. Send it and " + esc(WHO()) + " " + backV() + " with your total.</span>" : "") + '<small>Nothing is charged on this site.</small></div>' :
       '<div class="dealtotal"><span>Your package</span>' +
       '<div class="drow"><i>' + d.n + (d.n === 1 ? " blade" : " blades") + "</i><b>" + money(d.blades) + "</b></div>" +
@@ -945,7 +947,7 @@
     t.lines.forEach(function (l) { have[l.f.id] = 1; units += l.c.q; l.f.cats.forEach(function (c) { cats[c] = 1; }); });
     var take = function (f, tag) { if (f && !have[f.id] && !seen[f.id] && f.cats.indexOf("equip") < 0 && picks.length < 6) { seen[f.id] = 1; picks.push([f, tag]); } };
     SUGCATS.forEach(function (c) { if (!cats[c[0]]) take(p3List(c[0])[0], c[1]); });
-    pickFams().forEach(function (f) { take(f, "Best seller"); });
+    pickFams().forEach(function (f) { take(f, "Popular"); });
     if (!picks.length) return "";
     var nb = QUICK.filter(function (q) { return q > units; })[0];
     return '<div class="csug"><b>Add to your cart?</b><small>Ships with this order, on the same freight bill.</small>' + (nb ? '<p class="cbrk">Add <b>' + (nb - units) + " more</b> and you’re at the <b>" + nb + "</b> price break.</p>" : "") +
@@ -1065,10 +1067,11 @@
     ["po", "notes", "msg", "review", "stars", "fname", "fco", "limit", "r1", "r1p", "r2", "r2p", "r3", "r3p"].forEach(function (k) { f.elements[k].value = ""; });
     if (m === "order") f.elements.notes.value = store.get("cnote", "") || "";
     f.elements.ref.value = store.get("ref", "") || "";
-    $("#refhint").textContent = "They earn " + RW.referrer + " when you order.";
+    $("#refhint").textContent = m === "saw" ? "" : "They earn " + RW.referrer + " when you order.";
+    var pl = $('label[for="f-phone"]'); if (pl) pl.textContent = m === "review" || m === "refer" || m === "feedback" ? "Cell (optional)" : "Cell (so your rep can text your price)";
     $$("#starpick button").forEach(function (x) { x.classList.remove("on"); });
     $("#creditwrap").open = terms;
-    f.elements.pay.innerHTML = [PAY0].concat(W.payments || []).map(function (p) { return "<option>" + esc(p) + "</option>"; }).join("");
+    f.elements.pay.innerHTML = [PAY0].concat((W.payments || []).filter(function (p) { return p !== PAY0; })).map(function (p) { return "<option>" + esc(p) + "</option>"; }).join("");
     var mw = $("#morewrap"); if (mw) { mw.hidden = !(order || terms || m === "pricing"); mw.open = terms || (replyHow() === "email" && (order || m === "pricing")); }
     if (info.pay) f.elements.pay.value = info.pay;
     renderReps(repBySlug(info.rep) ? info.rep : "");

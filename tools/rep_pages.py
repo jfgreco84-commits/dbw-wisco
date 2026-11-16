@@ -20,7 +20,8 @@ def roster():
     out = []
     for m in re.finditer(r'\{\s*name:\s*"([^"]+)",[^{}]*?photo:\s*"([^"]*)".*?aka:\s*\[([^\]]*)\]', block):
         aka = re.findall(r'"([^"]+)"', m.group(3))
-        if aka and aka[0] not in RESERVED: out.append(dict(name=m.group(1), photo=m.group(2), slug=aka[0], also=[x for x in aka[1:] if x not in RESERVED]))
+        em = re.search(r'email:\s*"([^"]*)"', m.group(0)); ce = re.search(r'cell:\s*"([^"]*)"', m.group(0))
+        if aka and aka[0] not in RESERVED: out.append(dict(name=m.group(1), photo=m.group(2), slug=aka[0], also=[x for x in aka[1:] if x not in RESERVED], email=em.group(1) if em else "", cell=ce.group(1) if ce else ""))
     return out
 
 
@@ -92,6 +93,14 @@ def build(site_url, full=None):
             nonlocal page
             page, n = re.subn(pattern, lambda m: repl, page, count=1); assert n == 1, pattern
         sub(r"<head>", '<head>\n<base href="../">')
+        # Before the script runs (or where it never does), the page already names the rep, not the owner.
+        digits = re.sub(r"\D", "", r.get("cell", ""))[-10:]
+        if r.get("email") and len(digits) == 10 and "frank" not in slug:
+            pretty = "(%s) %s-%s" % (digits[:3], digits[3:6], digits[6:]); first = html.escape(short_name(r["name"]).split(" ")[0], quote=True)
+            page = page.replace("text (414) 213-0084 or email fgreco@diamondbladewarehouse.com", "text %s or email %s" % (pretty, html.escape(r["email"])))
+            for a, b in (("Text Frank", "Text " + first), ("Call Frank", "Call " + first), ("Email Frank", "Email " + first), ("Ask Frank", "Ask " + first), ("Big Frank says", first + " says"), ("Hide Big Frank", "Hide " + first)):
+                page = page.replace(">" + a + "<", ">" + b + "<").replace('"' + a + '"', '"' + b + '"')
+            if r.get("photo"): page = page.replace('src="brand/reps/frank.webp" alt="" width="64" height="64" class="repface" data-askimg', 'src="brand/reps/%s" alt="" width="64" height="64" class="repface" data-askimg' % r["photo"])
         sub(r"<title>.*?</title>", "<title>%s, your blade guy at DBW WISCO</title>" % name)
         sub(r'<meta name="description" content="[^"]*">', '<meta name="description" content="Reorder diamond blades in 60 seconds. Your order goes straight to %s.">' % name)
         sub(r'<meta property="og:title" content="[^"]*">', '<meta property="og:title" content="%s, your blade guy at DBW WISCO">' % name)

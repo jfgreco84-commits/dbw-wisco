@@ -483,6 +483,10 @@ def main():
             if v[0] in LABELFIX:
                 v[1], v[4] = LABELFIX[v[0]]
                 if v[0] != "GK65100DD-P": v[2] = None
+    for d in out:
+        for v in d["vars"]:
+            if isinstance(v[1], str): v[1] = v[1].replace(" X ", " x ")
+            if isinstance(v[4], str) and re.search(r"\bB\d\d\b|\bS\d\d\b", v[4]) and d["id"].endswith(("low-hp-concrete", "low-hp-asphalt-green")): v[4] = ""
     assert not any("stihl" in (d["id"] + " " + " ".join(str(v[0]) for v in d["vars"])).lower() for d in out), "saw maker name left in the catalog"
     missing = [d["id"] for d in out if not d["learn"]]
     if LEARN and missing: print("no Learn more copy for:", ", ".join(missing))

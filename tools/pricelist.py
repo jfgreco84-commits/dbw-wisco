@@ -60,8 +60,7 @@ FOURCORE = {"BLACKCAT": "Blackcat", "PUNISHER": "Punisher", "SABERTOOTH": "Saber
 ZCOLOR = {"G": "Green", "O": "Orange", "P": "Purple", "R": "Red", "Y": "Yellow"}
 def load_master_extra(path):
     """Lines the monthly list leaves out: 4-Core Pro Series core bits, Zenesis Green Kut and Arix Green Kut.
-    Core bits are priced 3.0 x cost (same as the monthly list's core bit sheet).
-    Zenesis uses the book's own top column (2.2M), which sits just above standard Green Kut MSRP."""
+    How each line is priced is set when the build is run. Nothing about cost or markup is written here."""
     wb = openpyxl.load_workbook(path, data_only=True); rows = []
     num = lambda x: isinstance(x, (int, float)) and not isinstance(x, bool)
     fam = None; on = False

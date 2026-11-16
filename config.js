@@ -49,16 +49,16 @@ window.WISCO = {
   // aka     = old nicknames, so links already texted out keep working.
   reps: [
     { name: "Big Frank Greco", photo: "frank.webp", email: "", cell: "", manager: "", aka: ["frankgreco", "frank", "bigfrank"] },
-    { name: "John Anthony", photo: "john-anthony.webp", email: "janthony@diamondbladewarehouse.com", cell: "+14143630323", manager: "", aka: ["johnanthony", "ronny", "ronny-b", "john-anthony"] },
-    { name: "Adam West", photo: "batman.webp", email: "awest@diamondbladewarehouse.com", cell: "+14143665237", manager: "", aka: ["adamwest", "batman", "adam-west"] },
-    { name: "Adam Misurek", photo: "miz.webp", email: "amisurek@diamondbladewarehouse.com", cell: "+14145207257", manager: "", aka: ["adammisurek", "miz"] },
-    { name: "Joey “The Stinger” Deruki", photo: "snacks.webp", email: "jderuki@diamondbladewarehouse.com", cell: "+12629579839", manager: "", aka: ["joeyderuki", "snacks", "joey-deruki", "joey-the-stinger-deruki"] },
-    { name: "T.J. Sutton", photo: "tj.webp", email: "tsutton@diamondbladewarehouse.com", cell: "+12624200326", manager: "", aka: ["tjsutton", "tj"] },
-    { name: "JB Baemert", photo: "jb.webp", email: "jbaemert@diamondbladewarehouse.com", cell: "+14149168672", manager: "", aka: ["jbbaemert", "jb", "jb-bammert", "jb-baemmert"] },
-    { name: "Robert Redman", photo: "cutty.webp", email: "rredman@diamondbladewarehouse.com", cell: "+14145731192", manager: "", aka: ["robertredman", "cutty", "rob-redman", "robert-redman"] },
-    { name: "Kerry Smith", photo: "kerry.webp", email: "ksmith@diamondbladewarehouse.com", cell: "+14144037004", manager: "", aka: ["kerrysmith", "kerry"] },
-    { name: "Geoff Nurse", photo: "geoff.webp", email: "gnurse@diamondbladewarehouse.com", cell: "+14142544197", manager: "", aka: ["geoffnurse", "geoff", "jeff"] },
-    { name: "Joyner Lucas", photo: "joyner.webp", email: "lmillan@diamondbladewarehouse.com", cell: "+14142161941", manager: "", aka: ["joynerlucas", "joyner", "joyner-lucas", "luismillan", "luis", "luis-milan"] },
+    { name: "John Anthony", photo: "johnanthony.webp", email: "janthony@diamondbladewarehouse.com", cell: "+14143630323", manager: "", aka: ["johnanthony", "ronny", "ronny-b", "john-anthony"] },
+    { name: "Adam West", photo: "adamwest.webp", email: "awest@diamondbladewarehouse.com", cell: "+14143665237", manager: "", aka: ["adamwest", "batman", "adam-west"] },
+    { name: "Adam Misurek", photo: "adammisurek.webp", email: "amisurek@diamondbladewarehouse.com", cell: "+14145207257", manager: "", aka: ["adammisurek", "miz"] },
+    { name: "Joey “The Stinger” Deruki", photo: "joeyderuki.webp", email: "jderuki@diamondbladewarehouse.com", cell: "+12629579839", manager: "", aka: ["joeyderuki", "snacks", "joey-deruki", "joey-the-stinger-deruki"] },
+    { name: "T.J. Sutton", photo: "tjsutton.webp", email: "tsutton@diamondbladewarehouse.com", cell: "+12624200326", manager: "", aka: ["tjsutton", "tj"] },
+    { name: "JB Baemert", photo: "jbbaemert.webp", email: "jbaemert@diamondbladewarehouse.com", cell: "+14149168672", manager: "", aka: ["jbbaemert", "jb", "jb-bammert", "jb-baemmert"] },
+    { name: "Robert Redman", photo: "robertredman.webp", email: "rredman@diamondbladewarehouse.com", cell: "+14145731192", manager: "", aka: ["robertredman", "cutty", "rob-redman", "robert-redman"] },
+    { name: "Kerry Smith", photo: "kerrysmith.webp", email: "ksmith@diamondbladewarehouse.com", cell: "+14144037004", manager: "", aka: ["kerrysmith", "kerry"] },
+    { name: "Geoff Nurse", photo: "geoffnurse.webp", email: "gnurse@diamondbladewarehouse.com", cell: "+14142544197", manager: "", aka: ["geoffnurse", "geoff", "jeff"] },
+    { name: "Joyner Lucas", photo: "joynerlucas.webp", email: "lmillan@diamondbladewarehouse.com", cell: "+14142161941", manager: "", aka: ["joynerlucas", "joyner", "joyner-lucas", "luismillan", "luis", "luis-milan"] },
     { name: "Les", photo: "les.webp", email: "lkubeny@diamondbladewarehouse.com", cell: "+14142072487", manager: "", aka: ["les"] }
   ],
 
