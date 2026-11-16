@@ -713,3 +713,24 @@ table.cmp .add.pk { margin-left: 6px; background: var(--gold); color: var(--gold
 .p3tabs button { min-height: 40px; padding: 6px 12px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,.55); background: transparent; color: #fff; font: 800 12.5px var(--sans); letter-spacing: .02em; white-space: nowrap; cursor: pointer }
 .p3tabs button[aria-pressed="true"] { background: #fff; color: var(--navy-2); border-color: #fff }
 #p3blades { border-top: 1px solid rgba(255,255,255,.25); padding-top: 10px }
+
+/* v37: the blade is the button, and a cart that says what happens next */
+.btiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px }
+@media (min-width: 620px) { .btiles { grid-template-columns: repeat(5, minmax(0, 1fr)) } } @media (min-width: 980px) { .btiles { grid-template-columns: repeat(7, minmax(0, 1fr)) } }
+.btile { display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: 112px; padding: 10px 6px 8px; border-radius: 14px; border: 2px solid transparent; background: #fff; color: var(--navy-2); font: 800 12px/1.2 var(--sans); text-align: center; cursor: pointer; overflow-wrap: anywhere }
+.btile img, .btile .noimg { width: 64px; height: 64px; object-fit: contain; flex: none } .btile .noimg { border-radius: 50%; background: repeating-conic-gradient(#d8deee 0 12deg, #eef1f8 12deg 24deg) }
+.btile[aria-pressed="true"] { border-color: #F7C948; box-shadow: 0 0 0 3px #F7C948; background: #FFF9E6 }
+.btiles.light .btile { background: #F3F6FC; border-color: #DCE3F2 } .btiles.light .btile[aria-pressed="true"] { border-color: #F7C948; background: #FFF9E6 }
+.btiles.light { margin: 10px 0 }
+.p3type { display: flex; align-items: center; gap: 10px; font: 800 13px var(--sans); color: #fff; letter-spacing: .04em; text-transform: uppercase }
+.p3type select { flex: 1; min-width: 0; height: 46px; border-radius: 12px; border: 1.5px solid rgba(255,255,255,.6); background: #fff; color: var(--navy-2); font: 800 15px var(--sans); padding: 0 12px; text-transform: none; letter-spacing: 0 }
+.bsel { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 76px; padding: 8px 12px; border-radius: 14px; border: 2px solid #DCE3F2; background: #fff; text-align: left; cursor: pointer; color: var(--navy-2); margin-bottom: 8px }
+.bsel img { width: 58px; height: 58px; object-fit: contain; flex: none } .bsel span { flex: 1; min-width: 0; display: grid } .bsel small { font: 700 11px var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--muted) } .bsel b { font: 900 17px/1.2 var(--sans) } .bsel em { font: 800 13px var(--sans); font-style: normal; color: var(--blue, #1C3FAA); text-decoration: underline; white-space: nowrap }
+.vh { position: absolute !important; width: 1px !important; height: 1px !important; opacity: 0; pointer-events: none; margin: 0 !important; padding: 0 !important; border: 0 !important }
+.dealadd.two:has(> select.vh) { grid-template-columns: 1fr }
+.csteps { list-style: none; margin: 0 0 14px; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px }
+.csteps li { display: flex; flex-direction: column; align-items: center; gap: 5px; text-align: center; padding: 10px 4px; border-radius: 12px; background: #F1F4FB; font: 800 11.5px/1.25 var(--sans); color: var(--navy-2) }
+.csteps li i { font-style: normal; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: #C9D2E8; color: var(--navy-2); font: 900 14px var(--sans) }
+.csteps li.on { background: #FFF4CC } .csteps li.on i { background: #F7C948; color: #3A2800 }
+.line.haspic { grid-template-columns: 56px 1fr auto } .line.haspic > .pic { grid-row: span 2; width: 56px; height: 56px; align-self: start } .line.haspic > .pic img { width: 100%; height: 100%; object-fit: contain }
+.note.next { display: block; margin: 8px 0 10px; padding: 10px 12px; border-radius: 12px; background: #FFF4CC; color: #3A2800; font: 600 13.5px/1.4 var(--sans) } .note.next b { font-weight: 900 }
