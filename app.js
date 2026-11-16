@@ -212,6 +212,14 @@
   function defVar(f, vs) { var pref = f.cats.indexOf("highspeed") >= 0 ? 14 : (f.cats.indexOf("small") >= 0 ? 4.5 : null); for (var i = 0; i < vs.length; i++) if (pref && vs[i][2] === pref) return vs[i]; return vs[0]; }
   function stars(r) { return '<span class="stars" style="--p:' + (r / 5 * 100) + '%" role="img" aria-label="' + r + ' out of 5"></span>'; }
   function pic(f) { return '<span class="pic ' + (f.img ? "" : "none") + '">' + (f.img ? '<img loading="lazy" alt="" src="img/' + esc(f.img) + '">' : "") + "</span>"; }
+  /* Any number goes in the box. The buttons under it name the price breaks and set the box. One button adds to the cart. */
+  function howMany(setAttr, goAttr) {
+    return '<div class="qhow2"><div class="qadd">' + qtyHTML(1) + '<button type="button" class="btn gold qgo" ' + goAttr + '>Add to cart</button></div>' +
+      '<div class="qbrk" role="group" aria-label="Price breaks"><span>Better price at</span>' + QUICK.map(function (q) { return '<button type="button" ' + setAttr + '="' + q + '" aria-label="Set quantity to ' + q + '">' + q + "</button>"; }).join("") + "</div>" +
+      '<small class="qbrknote">Any number works. The more you buy, the better the price.</small></div>';
+  }
+  function howSet(el, n) { var box = el.closest(".qhow2"), inp = $(".qty input", box); inp.value = n; $$(".qbrk button", box).forEach(function (b) { b.classList.toggle("on", b === el); }); var g = $(".qgo", box); g.textContent = "Add " + n + " to cart"; }
+  function howQty(el) { return Math.max(1, parseInt($(".qty input", el.closest(".qhow2")).value, 10) || 1); }
   function qtyHTML(n) { return '<span class="qty"><button type="button" data-q="-1" aria-label="Fewer">−</button><input type="number" inputmode="numeric" min="1" max="9999" value="' + n + '" aria-label="Quantity"><button type="button" data-q="1" aria-label="More">+</button></span>'; }
   function toast(msg) { var t = document.createElement("div"); t.className = "toast"; t.textContent = msg; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 2400); }
   var PROMO = (W.promos || {}).cardFreeBlade || {}, PROMO_ON = !!PROMO.on;
@@ -228,7 +236,7 @@
   function eachAt(v, q) { if (!tiered(v)) return v[3]; var i = 0; BRK.forEach(function (b, k) { if (q >= b) i = k + 1; }); return i ? v[6][i - 1] : v[3]; }
   function rangeTxt(v) { if (HIDE) return ""; return tiered(v) ? money(v[6][4]) + " to " + money(v[3]) : ranged(v) ? money(lowOf(v)) + " to " + money(v[3]) : money(v[3]); }
   function totTxt(t) { if (HIDE && !t.quoted) return "Priced by your rep"; return RNG && !t.quoted && t.low < t.total - 0.005 ? money(t.low) + " to " + money(t.total) : money(t.total); }
-  function buyRow(v) { if (HIDE) return '<div class="buy-row" data-row><div class="partno">Part # ' + esc(v[0]) + '</div><div class="act">' + qtyHTML(1) + '<button class="add" data-add>Add to order</button></div></div>';
+  function buyRow(v) { if (HIDE) return '<div class="buy-row" data-row><div class="partno">Part # ' + esc(v[0]) + '</div><div class="act">' + qtyHTML(1) + '<button class="add" data-add>Add to cart</button></div></div>';
     return '<div class="buy-row" data-row><div class="price' + (tiered(v) || ranged(v) ? " rng" : "") + '">' + rangeTxt(v) + "<small>" + (HIDE ? "confirmed by your rep before it ships · " : tiered(v) ? "each, by quantity · " : ranged(v) ? "each · your rep sets your price · " : RNG ? "each · " : ACCT ? "list price · " : "") + esc(v[0]) + '</small></div><div class="act">' + qtyHTML(1) + '<button class="add" data-add>Add to order</button></div></div>'; }
   var MIXM = W.mixMonths || [3, 5, 8, 10], ONEMIN = W.singleItemMin || 24, QUICK = W.quickQty || [12, 24, 36, 50], MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   function mixOn() { return MIXM.indexOf(new Date().getMonth() + 1) >= 0; }
@@ -519,7 +527,7 @@
       var vs = f.vars, d = defVar(f, vs);
       return '<div class="qrow" data-f="' + f.id + '">' + pic(f) + '<div class="qmain"><b>' + esc(f.n) + "</b>" +
         (vs.length > 1 ? '<select aria-label="Size" data-qsize>' + vs.map(function (v) { return '<option value="' + esc(vkey(v)) + '"' + (v === d ? " selected" : "") + ">" + esc(vlabel(v)) + "</option>"; }).join("") + "</select>" : '<span class="one">' + esc(vlabel(d)) + "</span>") + '<small class="qrng" data-qrng>' + (HIDE ? "Part # " + esc(d[0]) : rangeTxt(d) + " each") + "</small>" + ((f.learn || []).length ? '<button type="button" class="qlearn" data-open>Learn more ›</button>' : "") + (f.cats.indexOf("green") >= 0 ? '<a class="qmore" href="#early">Other colors and how to pick ›</a>' : "") +
-        '</div><div class="qhow"><span>How many?</span><div class="qchips" role="group" aria-label="How many to add">' + [1].concat(QUICK).map(function (q) { return '<button type="button" data-qadd="' + q + '" aria-label="Add ' + q + '">' + q + "</button>"; }).join("") + "</div></div></div>";
+        '</div>' + howMany("data-qadd", "data-qgo") + "</div>";
     }).join("") + "</div>";
   }
   var CREWS = [
@@ -542,7 +550,7 @@
     var f = FAM[p3.f], v = f && p3.v ? findVar(f, p3.v) : null;
     return '<div class="p3s"><b class="p3h"><i>1</i> Pick your blade</b><label class="p3type"><span>Show me</span><select id="p3tab" aria-label="Type of blade">' + P3TABS.filter(function (x) { return x[0] === "top" || p3List(x[0]).length; }).map(function (x) { return '<option value="' + x[0] + '"' + (p3.tab === x[0] ? " selected" : "") + ">" + esc(x[1]) + "</option>"; }).join("") + '</select></label><div class="btiles" id="p3blades">' + p3List(p3.tab).map(function (x) { return btile(x, "data-pf", p3.f === x.id); }).join("") + "</div></div>" +
       (f ? '<div class="p3s" id="p3size"><b class="p3h"><i>2</i> Pick the size</b><div class="p3chips sizes">' + f.vars.map(function (x) { return '<button type="button" data-pv="' + esc(vkey(x)) + '" aria-pressed="' + (p3.v === vkey(x)) + '">' + esc(vlabel(x)) + "</button>"; }).join("") + "</div></div>" : "") +
-      (v ? '<div class="p3s" id="p3qty"><b class="p3h"><i>3</i> How many?</b><div class="qchips p3q" role="group" aria-label="How many to add">' + [1].concat(QUICK).map(function (q) { return '<button type="button" data-pq="' + q + '" aria-label="Add ' + q + '">' + q + "</button>"; }).join("") + '</div><small class="p3part">' + esc(f.n) + " · " + esc(vlabel(v)) + " · Part # " + esc(v[0]) + "</small></div>" : "");
+      (v ? '<div class="p3s" id="p3qty"><b class="p3h"><i>3</i> How many?</b>' + howMany("data-pq", "data-pgo") + '<small class="p3part">' + esc(f.n) + " · " + esc(vlabel(v)) + " · Part # " + esc(v[0]) + "</small></div>" : "");
   }
   function pick3Draw(focusId) { var b = $("#pick3"); if (!b) return; b.innerHTML = pick3HTML(); var t = focusId && $("#" + focusId); if (t && t.scrollIntoView) t.scrollIntoView({ block: "nearest", behavior: "smooth" }); }
   function reorder() {
@@ -708,7 +716,7 @@
     $("#dqout").textContent = q + (q === 1 ? " blade" : " blades"); if (document.activeElement !== $("#dqn")) $("#dqn").value = q; if (document.activeElement !== $("#dqty")) $("#dqty").value = Math.min(50, q);
     $("#deallines").innerHTML = d.lines.length ? d.lines.map(function (x) { return '<div class="dl" data-i="' + deal.lines.indexOf(x.l) + '"><span><b>' + x.l.q + " x " + esc(x.f.n) + "</b><small>" + esc(vlabel(x.v)) + (HIDE ? "" : " · " + money(x.each) + " each") + '</small></span><button class="link" data-dealrm>Remove</button></div>'; }).join("") : "";
     $("#dealout").innerHTML = !saw ? '<div class="dealtotal off"><span>Pick a saw to see your package</span></div>' :
-      HIDE ? '<div class="dealtotal"><span>Your package</span><div class="drow"><i>' + d.n + (d.n === 1 ? " blade" : " blades") + '</i><b>✓</b></div><div class="drow"><i>' + (pkgFor(d.n) ? pkgFor(d.n)[1] + " x " : "") + esc(saw.n) + "</i><b>" + (pkgFor(d.n) ? "✓" : "") + '</b></div><strong>' + esc(pkgLine(d.n)) + "</strong>" + (pkgFor(d.n) ? "<span>One package price. Send it and your rep comes back with your total.</span>" : "") + '<small>Nothing is charged on this site.</small></div>' :
+      HIDE ? '<div class="dealtotal"><span>Your package</span><div class="drow"><i>' + d.n + (d.n === 1 ? " blade" : " blades") + '</i><b>✓</b></div><div class="drow"><i>' + (pkgFor(d.n) ? pkgFor(d.n)[1] + " x " : "") + esc(saw.n) + "</i><b>" + (pkgFor(d.n) ? "✓" : "") + '</b></div><strong>' + esc(pkgLine(d.n)) + "</strong>" + (pkgFor(d.n) ? "<span>One package price. Send it and " + esc(WHO()) + " calls you back with your total.</span>" : "") + '<small>Nothing is charged on this site.</small></div>' :
       '<div class="dealtotal"><span>Your package</span>' +
       '<div class="drow"><i>' + d.n + (d.n === 1 ? " blade" : " blades") + "</i><b>" + money(d.blades) + "</b></div>" +
       (d.save > 0.005 ? '<div class="drow good"><i>Quantity pricing took off</i><b>− ' + money(d.save) + "</b></div>" : "") +
@@ -723,16 +731,19 @@
   function sawDeal() {
     var fams = dealBlades();
     if (!deal.saw && SD.saws.some(function (x) { return x.sku === "TS420"; })) deal.saw = "TS420";
-    var h = "<h1>Build your saw package.</h1>" + says(HIDE ? "Bundle a saw with your blades. One package price. Saw included. Your rep confirms your total." : "The more you buy, the better the price. Every blade you add lowers the price of the package.") +
-      '<div class="frank"><b class="h">1. Pick your saw</b><select id="dsaw" class="bigsel" aria-label="Saw"><option value="">Choose a saw…</option>' + SD.saws.map(function (x) { return '<option value="' + esc(x.sku) + '"' + (x.sku === deal.saw ? " selected" : "") + ">" + esc(x.n) + "</option>"; }).join("") + "</select></div>" +
-      '<div class="frank"><b class="h">2. Stack your blades</b><button type="button" class="bsel" data-dfamopen aria-expanded="false" aria-controls="dfamgrid"></button><div class="btiles light" id="dfamgrid" hidden>' + fams.map(function (f) { return btile(f, "data-dfam", f.id === "superblade-extreme"); }).join("") + '</div><div class="dealadd two"><select id="dfam" class="vh" aria-label="Blade" tabindex="-1">' + fams.map(function (f) { return '<option value="' + f.id + '"' + (f.id === "superblade-extreme" ? " selected" : "") + ">" + esc(f.n) + "</option>"; }).join("") + '</select><select id="dvar" aria-label="Size"></select></div>' +
-      '<p class="note" style="margin-top:10px">Pick a package, or set your own number below.</p><div id="pkgwrap">' + pkgButtons(0) + "</div>" +
-      '<div class="slide"><div class="slidetop"><b id="dqout">0 blades</b><span>Slide it, or type a number</span></div><input id="dqty" type="range" min="0" max="50" step="1" value="0" aria-label="How many blades"><div class="ticks"><i>0</i><i>12</i><i>24</i><i>36</i><i>50+</i></div>' +
-      '<div class="slidenum"><button type="button" class="stp" data-dstep="-1" aria-label="One fewer">−</button><input id="dqn" type="number" inputmode="numeric" min="0" max="9999" value="0" aria-label="Number of blades"><button type="button" class="stp" data-dstep="1" aria-label="One more">+</button></div></div>' +
-      '<p class="note">' + (HIDE ? "Most crews package 15, 25, 36, 50 or 100 blades with a saw. " : "Pricing gets better at 12, 24, 36, 50 and 100 blades. Most crews package 15, 25, 36, 50 or 100. ") + esc(mixLine()) + '</p><div class="deallines" id="deallines"></div></div>' +
+    var sawCard = '<div class="frank"><b class="h">3. Which saw?</b><select id="dsaw" class="bigsel" aria-label="Saw"><option value="">Choose a saw…</option>' + SD.saws.map(function (x) { return '<option value="' + esc(x.sku) + '"' + (x.sku === deal.saw ? " selected" : "") + ">" + esc(x.n) + "</option>"; }).join("") + "</select></div>";
+    var h = "<h1>Saw packages.</h1>" + '<p class="lead">' + (HIDE ? "Buy your blades as a package and the saw comes with them. One price for all of it." : "The more you buy, the better the price. Every blade you add lowers the price of the package.") + "</p>" +
+      '<ol class="csteps dark" aria-label="How a saw package works"><li class="on"><i>1</i><span>Pick how many blades</span></li><li><i>2</i><span>Pick your blade and saw</span></li><li><i>3</i><span>' + esc(WHO()) + " calls you back with one price</span></li></ol>" +
+      '<div class="frank"><b class="h">1. How many blades?</b><div id="pkgwrap">' + pkgButtons(0) + "</div>" +
+      '<div class="ownnum"><span>Or your own number</span><div class="slidenum"><button type="button" class="stp" data-dstep="-1" aria-label="One fewer">−</button><input id="dqn" type="number" inputmode="numeric" min="0" max="9999" value="0" aria-label="Number of blades"><button type="button" class="stp" data-dstep="1" aria-label="One more">+</button></div></div>' +
+      '<div hidden><b id="dqout">0 blades</b><input id="dqty" type="range" min="0" max="50" step="1" value="0" aria-label="How many blades" tabindex="-1"></div></div>' +
+      '<div class="frank"><b class="h">2. Which blade?</b><button type="button" class="bsel" data-dfamopen aria-expanded="false" aria-controls="dfamgrid"></button><div class="btiles light" id="dfamgrid" hidden>' + fams.map(function (f) { return btile(f, "data-dfam", f.id === "superblade-extreme"); }).join("") + '</div><div class="dealadd two"><select id="dfam" class="vh" aria-label="Blade" tabindex="-1">' + fams.map(function (f) { return '<option value="' + f.id + '"' + (f.id === "superblade-extreme" ? " selected" : "") + ">" + esc(f.n) + "</option>"; }).join("") + '</select><select id="dvar" aria-label="Size"></select></div>' +
+      (HIDE ? "" : '<p class="note">Pricing gets better at 12, 24, 36, 50 and 100 blades. ' + esc(mixLine()) + "</p>") + '<div class="deallines" id="deallines"></div></div>' +
+      sawCard +
       '<div id="dealout"></div>' +
-      '<div class="center"><button class="btn gold shine" data-dealsend disabled>Send this saw package to my rep</button><button class="btn ghost" data-dealclear>Start over</button></div>' +
-      rentBox() +
+      '<div class="center"><button class="btn gold shine" data-dealsend disabled>Send my package to ' + esc(WHO()) + '</button><button class="btn ghost" data-dealclear>Start over</button></div>' +
+      '<p class="note light">' + esc(WHO()) + " calls or texts you back with one package price. Nothing is charged on this site.</p>" +
+      '<details class="rentd"><summary>Renting saws now? See what it costs you</summary>' + rentBox() + "</details>" +
       '<p class="note light">Want a saw that isn’t listed, or a bigger stack? Your rep can build any package. That’s where the real deals are.</p>';
     app.innerHTML = shell("Build your own saw package", 0, 0, h);
     fillDealVars(); dfamDraw(); if (dealPreset) { deal.lines = []; dealSetQty(dealPreset); dealPreset = 0; } dealSync(); dealRefresh(); setNav("#saw-deal");
@@ -1217,7 +1228,7 @@
     if (t.closest("[data-account]")) { openSend("account"); return; }
     if ((el = t.closest("[data-stonepick]"))) { var on3 = el.getAttribute("aria-pressed") !== "true"; el.setAttribute("aria-pressed", on3); var ix3 = stSel.indexOf(el.dataset.stonepick); if (on3 && ix3 < 0) stSel.push(el.dataset.stonepick); if (!on3 && ix3 >= 0) stSel.splice(ix3, 1); return; }
     if (t.closest("[data-stone]")) { openSend("stone"); if (stSel.length) { $("#f-msg").value = "Helix products I need: " + stSel.join(", ") + ".\nMaterial (granite, marble, quartzite, engineered stone, porcelain, glass): \nMachine or tool: "; preview(); } return; }
-    if ((el = t.closest("[data-qadd]"))) { var qr = el.closest(".qrow"), qf = FAM[qr.dataset.f], qs = $("[data-qsize]", qr), qk = qs ? qs.value : vkey(defVar(qf, qf.vars)), qn = parseInt(el.dataset.qadd, 10), qv = findVar(qf, qk); addToCart(qf.id, qk, qn); flash(el, "✓"); toast(qn + " x " + qf.n + (ACCT ? " added to your cart" : " added at " + money(eachAt(qv, qn)) + " each")); return; }
+    if ((el = t.closest("[data-qadd], [data-qgo]"))) { var qr = el.closest(".qrow"), qf = FAM[qr.dataset.f], qs = $("[data-qsize]", qr), qk = qs ? qs.value : vkey(defVar(qf, qf.vars)), qn, qv = findVar(qf, qk); if (el.matches("[data-qadd]")) { howSet(el, parseInt(el.dataset.qadd, 10)); return; } qn = howQty(el); addToCart(qf.id, qk, qn); flash(el, "✓ In your cart"); toast(qn + " x " + qf.n + (ACCT ? " added to your cart" : " added at " + money(eachAt(qv, qn)) + " each")); return; }
     if ((el = t.closest("[data-eqpick]"))) { var on = el.getAttribute("aria-pressed") !== "true"; el.setAttribute("aria-pressed", on); var ix2 = eqSel.indexOf(el.dataset.eqpick); if (on && ix2 < 0) eqSel.push(el.dataset.eqpick); if (!on && ix2 >= 0) eqSel.splice(ix2, 1); $$("[data-eqpick]").forEach(function (b) { b.setAttribute("aria-pressed", eqSel.indexOf(b.dataset.eqpick) >= 0); }); return; }
     if ((el = t.closest("[data-intent]"))) { setIntent(el.dataset.intent); return; }
     if ((el = t.closest("[data-acctkind]"))) { var ak = el.dataset.acctkind; $$("[data-acctkind]").forEach(function (x) { x.setAttribute("aria-pressed", x === el); }); $("#acctmore").hidden = ak === "new"; $("[data-acctsave]").hidden = false; $("#acctbox").dataset.kind = ak; if (ak !== "new") $("#ac-co").focus(); return; }
@@ -1242,7 +1253,8 @@
     if ((el = t.closest("[data-dfam]"))) { $("#dfam").value = el.dataset.dfam; fillDealVars(); dealSync(); dealRefresh(); dfamDraw(); $("#dfamgrid").hidden = true; var db = $("[data-dfamopen]"); db.setAttribute("aria-expanded", "false"); db.scrollIntoView({ block: "nearest" }); return; }
     if ((el = t.closest("[data-pf]"))) { var pf = FAM[el.dataset.pf]; p3.f = pf.id; p3.v = pf.vars.length === 1 ? vkey(pf.vars[0]) : ""; pick3Draw(p3.v ? "p3qty" : "p3size"); return; }
     if ((el = t.closest("[data-pv]"))) { p3.v = el.dataset.pv; pick3Draw("p3qty"); return; }
-    if ((el = t.closest("[data-pq]"))) { var kf = FAM[p3.f], kv = kf && findVar(kf, p3.v), kq = parseInt(el.dataset.pq, 10); if (!kv) return; addToCart(kf.id, p3.v, kq); flash(el, "✓"); toast(kq + " x " + kf.n + " " + vlabel(kv) + " added to your cart"); return; }
+    if ((el = t.closest("[data-pq]"))) { howSet(el, parseInt(el.dataset.pq, 10)); return; }
+    if ((el = t.closest("[data-pgo]"))) { var kf = FAM[p3.f], kv = kf && findVar(kf, p3.v), kq = howQty(el); if (!kv) return; addToCart(kf.id, p3.v, kq); flash(el, "✓ In your cart"); toast(kq + " x " + kf.n + " " + vlabel(kv) + " added to your cart"); return; }
     if ((el = t.closest("[data-q]"))) { var inp = $("input", el.parentNode); inp.value = Math.max(1, (parseInt(inp.value, 10) || 1) + parseInt(el.dataset.q, 10)); inp.dispatchEvent(new Event("change", { bubbles: true })); return; }
     if ((el = t.closest("[data-dealadd]"))) {
       var q = Math.max(1, parseInt($(".dealadd .qty input").value, 10) || 1), fid2 = $("#dfam").value, key2 = $("#dvar").value;
@@ -1307,6 +1319,7 @@
     if (e.target.matches && e.target.matches("[data-qsize]")) { var qr2 = e.target.closest(".qrow"), qv2 = findVar(FAM[qr2.dataset.f], e.target.value); if (qv2) $("[data-qrng]", qr2).textContent = HIDE ? "Part # " + qv2[0] : rangeTxt(qv2) + " each"; }
     var t = e.target, card = t.closest(".card"), line = t.closest(".line");
     if (t.matches("[data-size]") && card) { var f = FAM[card.dataset.f], keep = $(".qty input", card).value; $("[data-row]", card).outerHTML = buyRow(findVar(f, t.value)); $(".qty input", card).value = keep; }
+    if (t.matches(".qhow2 .qty input")) { var hb = t.closest(".qhow2"), hn = Math.max(1, parseInt(t.value, 10) || 1); $(".qgo", hb).textContent = hn > 1 ? "Add " + hn + " to cart" : "Add to cart"; $$(".qbrk button", hb).forEach(function (x) { x.classList.toggle("on", parseInt(x.textContent, 10) === hn); }); }
     if (line && t.matches(".qty input")) { cart[parseInt(line.dataset.i, 10)].q = Math.max(1, parseInt(t.value, 10) || 1); saveCart(); renderCart(); }
     if (t.id === "dsaw") { deal.saw = t.value; store.set("deal2", deal); dealRefresh(); }
     if (t.id === "dvar") dealSync(), dealRefresh();
