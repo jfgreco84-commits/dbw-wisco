@@ -470,6 +470,20 @@ def main():
     LEARN = json.load(open(lp, encoding="utf8")) if os.path.exists(lp) else {}
     for d in out:
         d["learn"] = [[unbrand(q), unbrand(a)] for q, a in LEARN.get(d["id"], [])]
+    # The saw maker's name stays out of addresses and part numbers too. Model numbers only.
+    SKUFIX = {"STIHL-AL300": "AL300", "STIHL-AP300S": "AP300S", "STIHL-GS461": "GS461", "STIHL-SPROCKET": "GS461-SPROCKET", "STIHL1464GC": "1464GC"}
+    IDFIX = {"stihl-cutquik-saws": "gas-cut-off-saws", "stihl-gs-461-rock-boss-system": "gs-461-rock-boss-system"}
+    # Labels the price list mangles: a voltage or a minute count read as a blade size.
+    LABELFIX = {"AL300": ("", "25 Minute Battery Charger"), "DK17-115V": ("", "115V Single Phase 3 Speed Gear"), "DK17-230V": ("", "230V Single Phase 3 Speed Gear"),
+                "DK32": ("", "110V Single Phase 3 Speed Gear, Mounted"), "GK65100DD-P": ('6.5" x .100', "")}
+    for d in out:
+        d["id"] = IDFIX.get(d["id"], d["id"])
+        for v in d["vars"]:
+            v[0] = SKUFIX.get(v[0], v[0])
+            if v[0] in LABELFIX:
+                v[1], v[4] = LABELFIX[v[0]]
+                if v[0] != "GK65100DD-P": v[2] = None
+    assert not any("stihl" in (d["id"] + " " + " ".join(str(v[0]) for v in d["vars"])).lower() for d in out), "saw maker name left in the catalog"
     missing = [d["id"] for d in out if not d["learn"]]
     if LEARN and missing: print("no Learn more copy for:", ", ".join(missing))
     sawdeal = dict(totals=TOTALS, tiers=[[15, 0], [25, 0], [36, 0]],
