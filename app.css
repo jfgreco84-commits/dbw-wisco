@@ -758,3 +758,10 @@ table.cmp .add.pk { margin-left: 6px; background: var(--gold); color: var(--gold
 .bfs img[src*="brand/reps/"] { align-self: center }
 body:has(#dock:not([hidden])) .bf { bottom: calc(var(--dockh, 110px) + 26px) !important }
 @media (max-width: 860px) { .bf.away:not(.open) { transform: translateY(10px) } }
+
+/* v40: call, text or email */
+.rpick { margin: 0 0 16px; padding: 12px; border-radius: 14px; background: #F1F4FB; display: grid; gap: 8px } .rpick > b { font: 900 14px var(--sans); color: var(--navy-2) }
+.rpick > div { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px }
+.rpick button { min-height: 46px; border-radius: 12px; border: 2px solid #C9D2E8; background: #fff; color: var(--navy-2); font: 800 14px var(--sans); cursor: pointer }
+.rpick button[aria-pressed="true"] { background: var(--navy-2); border-color: var(--navy-2); color: #fff }
+.center + .note.light + .rpick, #dealback + .rpick { max-width: 520px; margin: 10px auto 0 }
