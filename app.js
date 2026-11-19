@@ -1079,7 +1079,7 @@
     if (info.pay) f.elements.pay.value = info.pay;
     renderReps(repBySlug(info.rep) ? info.rep : "");
     $("#discs").innerHTML = (W.discounts || []).map(function (d, i) { return '<label><input type="checkbox" name="disc" value="' + esc(d) + '"' + (i < 2 ? " checked" : "") + "> " + esc(d) + "</label>"; }).join("");
-    $("#textbtn").hidden = !W.textNumber; $("#textbtn").textContent = "Text it to " + route2(repBySlug(info.rep) ? info.rep : "").who; $("#sentmsg").hidden = true;
+    $("#textbtn").hidden = !W.textNumber; sendLabels(repBySlug(info.rep) ? info.rep : ""); $("#sentmsg").hidden = true;
     $("#sharebtn").hidden = !(m === "order"); $("#friendbtn").hidden = m !== "refer";
     setAcct(m === "account" ? "new" : info.acct === "new" && !info.sent ? "new" : (info.sent ? "existing" : (info.acct || "existing")));
     if (m === "account") { $("#newwrap").hidden = false; $("#orderwrap").hidden = false; }
@@ -1176,6 +1176,8 @@
     var first = function (n) { return (n || "").replace(/^Big /, "").split(" ")[0]; };
     return { to: to, cc: cc, cell: cells.join(","), who: both && cells.length > 1 ? first(r.name) + " and " + FRANK : repText || (toRep && r.email) ? r.name : FRANK };
   }
+  function mailWho(slugv) { var r = repBySlug(slugv), rt = route2(slugv), f1 = function (n) { return (n || "").replace(/^Big /, "").split(" ")[0]; }; return r && r.email && rt.to.toLowerCase().indexOf(r.email.toLowerCase()) >= 0 && !isBoss(r) ? f1(r.name) + " and " + FRANK : FRANK; }
+  function sendLabels(slugv) { $("#textbtn").textContent = "Text it to " + route2(slugv).who; var eb = $("[data-email]"); if (eb) eb.textContent = "Email it to " + mailWho(slugv); }
   function mailto(to, subj, body, cc) { location.href = "mailto:" + (to || "").split(",").map(encodeURIComponent).join(",") + "?" + (cc && cc.length ? "cc=" + encodeURIComponent(cc.join(",")) + "&" : "") + "subject=" + encodeURIComponent(subj) + "&body=" + encodeURIComponent(body); }
   function sms(body, cell) {
     cell = cell || W.textNumber; var many = cell.indexOf(",") > 0, ios = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (/Mac/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
@@ -1339,7 +1341,7 @@
     if (t.closest("[data-backcart]")) { $("#extras").close(); renderCart(); $("#cart").showModal(); return; }
     if ((el = t.closest("[data-xbreak]"))) { var qn = parseInt(el.dataset.xbreak, 10), ix = extras.breaks.indexOf(qn); if (ix >= 0) extras.breaks.splice(ix, 1); else extras.breaks.push(qn); extras.breaks.sort(function (a, b) { return a - b; }); el.setAttribute("aria-pressed", ix < 0); return; }
     if ((el = t.closest("[data-xcat]"))) { $("#extras").close(); shop.cat = el.dataset.xcat; shop.q = ""; shop.n = SHOPPAGE; app.innerHTML = ""; go("#shop"); return; }
-    if ((el = t.closest("[data-rep]"))) { renderReps(el.dataset.rep); $("#textbtn").textContent = "Text it to " + route2(el.dataset.rep).who; preview(); return; }
+    if ((el = t.closest("[data-rep]"))) { renderReps(el.dataset.rep); sendLabels(el.dataset.rep); preview(); return; }
     if ((el = t.closest("[data-close]"))) { el.closest("dialog").close(); return; }
     if ((el = t.closest("[data-rm]"))) { cart.splice(parseInt(el.closest(".line").dataset.i, 10), 1); saveCart(); renderCart(); return; }
     if (t.closest("[data-reorder]")) { var last = lastOrder(); if (last) { last.items.forEach(function (c) { if (FAM[c.f] && findVar(FAM[c.f], c.v)) addToCart(c.f, c.v, c.q); }); renderCart(); $("#cart").showModal(); } return; }
