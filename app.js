@@ -336,6 +336,8 @@
   function acctBox() {
     var i = me(), r = repBySlug(i.rep), done = i.acctSet && !acctEdit, kind = i.acct === "new" ? "new" : i.acctSet ? "yes" : "";
     var fine = '<p class="acct-fine">Accounts with no order in 18 months are updated before reordering, and a new sales rep may be assigned.</p>';
+    if (done && i.acct === "new" && !i.newSent) return '<div class="acct done newlead"><b>✓ New to DBW. Welcome.</b><span>One more tap and ' + esc(WHO()) + " sets you up. It opens a text that is already written. Nothing goes out until you hit Send.</span>" +
+      '<button type="button" class="btn gold herogo block" data-newtext>Text ' + esc(WHO()) + ' so he can set me up</button><button type="button" class="link" data-acctedit>Change</button></div>';
     if (done) return '<div class="acct done"><b>✓ ' + esc(i.acct === "new" ? "New to DBW. Welcome." : (i.company || "Your account")) + "</b><span>" + esc((r ? "Rep: " + r.name : "Rep: we’ll match you") + (i.acct !== "new" && lastTxt(i.last) ? " · Last order: " + lastTxt(i.last) : "")) + '</span><button type="button" class="link" data-acctedit>Change</button></div>';
     return '<div class="acct" id="acctbox"><b class="acct-h">Already buy from us?</b><p class="acct-p">Tell us once, so your order lands with the right person.</p>' +
       '<div class="acct-seg" role="group" aria-label="Are you on account">' + [["yes", "Yes, I’m on account"], ["new", "I’m new"], ["unsure", "Not sure"]].map(function (x) { return '<button type="button" data-acctkind="' + x[0] + '" aria-pressed="' + (kind === x[0]) + '">' + x[1] + "</button>"; }).join("") + "</div>" +
@@ -1263,6 +1265,9 @@
     if ((el = t.closest("[data-intent]"))) { setIntent(el.dataset.intent); return; }
     if (t.closest("[data-rentgo]")) rentGo = 1;
     if ((el = t.closest("[data-sug]"))) { var sf = FAM[el.dataset.sug]; if (!sf) return; addToCart(sf.id, vkey(defVar(sf, sf.vars)), 1); renderCart(); toast("1 x " + sf.n + " added to your cart. Change the number or size right here."); return; }
+    if (t.closest("[data-newtext]")) { var nm = me(), nr2 = route2(repBySlug(nm.rep) ? nm.rep : "");
+      sms("Hey " + nr2.who + ", I’m a new customer from the DBW WISCO site. Please set me up.\nName: " + (nm.name || "") + "\nCompany: " + (nm.company || "") + "\nWhat I cut: \nBest number to reach me: " + (nm.phone || ""), nr2.cell);
+      nm.newSent = 1; store.set("me", nm); if ((location.hash || "#home") === "#home") { var ny = window.scrollY; home(); window.scrollTo(0, ny); } toast("Your text is ready. Hit Send in your messages app."); return; }
     if ((el = t.closest("[data-reply]"))) { var rm = me(); rm.reply = rm.reply === el.dataset.reply ? "" : el.dataset.reply; store.set("me", rm); badge(); if ($("#cart").open) renderCart(); $$("[data-reply]").forEach(function (x) { x.setAttribute("aria-pressed", x.dataset.reply === rm.reply); });
       var db2 = $("#dealback"); if (db2) { db2.textContent = WHO() + " " + backV(1) + " with one package price. Nothing is charged on this site."; $("#dealstep3").textContent = WHO() + " " + backV() + " with one price"; dealRefresh(); } return; }
     if ((el = t.closest("[data-acctkind]"))) { var ak = el.dataset.acctkind; $$("[data-acctkind]").forEach(function (x) { x.setAttribute("aria-pressed", x === el); }); $("#acctmore").hidden = ak === "new"; $("[data-acctsave]").hidden = false; $("#acctbox").dataset.kind = ak; if (ak !== "new") $("#ac-co").focus(); return; }
@@ -1272,7 +1277,7 @@
       var ai = me(), kd = $("#acctbox").dataset.kind || (ai.acct === "new" ? "new" : "yes"), lp = $('[data-acctlast][aria-pressed="true"]');
       ai.acct = kd === "new" ? "new" : "existing"; ai.acctSet = 1;
       if (kd !== "new") { ai.company = clean($("#ac-co").value, 60); ai.last = lp ? lp.dataset.acctlast : (kd === "unsure" ? "unsure" : ai.last || ""); var pick = $("#ac-rep").value; if (pick !== (ai.rep || "")) { ai.rep = pick; store.set("replock", pick ? 1 : 0); } }
-      store.set("me", ai); acctEdit = false; contactWire(); go("#home"); toast(kd === "new" ? "Welcome. We’ll match you with a rep." : "Got it. Your orders go to the right person."); return;
+      store.set("me", ai); acctEdit = false; contactWire(); go("#home"); toast(kd === "new" ? "Welcome. One more tap and " + WHO() + " sets you up." : "Got it. Your orders go to the right person."); return;
     }
     if (t.closest("[data-norep]")) { var nr = me(); nr.rep = ""; store.set("me", nr); store.set("replock", 0); if (window.WISCO_REP) { location.href = ROOT; return; } contactWire(); go("#home"); toast("Okay. You’re on the main DBW WISCO page."); return; }
     if (t.closest("[data-repchange]")) { store.set("replock", 0); renderReps($("#f-rep").value); var rdc = $("#repd"); if (rdc) rdc.open = true; return; }

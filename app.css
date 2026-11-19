@@ -798,3 +798,8 @@ body:has(#dock:not([hidden])) .bf { bottom: calc(var(--dockh, 110px) + 26px) !im
 .herocta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0 16px } .herocta .btn { min-height: 54px; justify-content: center; text-align: center; padding-inline: 8px }
 @media (max-width: 860px) { .hero .art { order: 1 } .hero .art .logo { display: none } .hero .mine { margin-top: 6px } }
 .tools::after { display: none }
+
+/* v46: a new customer gets one clear next step */
+.acct.done.newlead { display: grid; gap: 8px } .acct.done.newlead .btn { min-height: 52px; justify-content: center; text-align: center; white-space: normal; line-height: 1.2 } .acct.done.newlead .link { justify-self: start }
+.acct.done.newlead { grid-template-columns: 1fr } .acct.done.newlead > * { grid-column: 1 / -1 }
+.acct.done.newlead > b { order: 1; grid-row: auto } .acct.done.newlead > span { order: 2; grid-row: auto } .acct.done.newlead > .btn { order: 3; grid-row: auto } .acct.done.newlead > .link { order: 4; grid-row: auto; grid-column: 1 / -1 }
