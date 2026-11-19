@@ -325,7 +325,7 @@
   function repFirst(r) { return isBoss(r) ? "Big Frank" : r.nick ? r.nick : r.name.replace(/[“"].*?[”"]\s*/, "").split(" ")[0]; }
   function prettyPhone(c) { var d = String(c || "").replace(/\D/g, "").slice(-10); return d.length === 10 ? "(" + d.slice(0, 3) + ") " + d.slice(3, 6) + "-" + d.slice(6) : ""; }
   function mineCard(r) {
-    var cell = r.cell || W.textNumber || "", mail = r.email || W.orderEmail || "", who = isBoss(r) ? FRANK : repFirst(r);
+    var cell = r.cell || W.textNumber || "", mail = r.email || (isBoss(r) ? W.orderEmail || "" : ""), who = isBoss(r) ? FRANK : repFirst(r);
     return '<div class="mine">' + (r.photo ? '<img alt="" src="brand/reps/' + esc(r.photo) + '">' : '<span class="av">' + esc(initials(r.name)) + "</span>") +
       '<div class="mine-id"><b>' + esc(isBoss(r) ? "Big Frank" : r.name) + "</b><span>Your Blade Guy</span>" + (prettyPhone(cell) ? '<a class="mine-num" href="tel:' + esc(cell) + '">' + prettyPhone(cell) + "</a>" : "") + "<small>Goes straight to " + esc(String(who).replace(/\.$/, "")) + (isBoss(r) ? " himself" : "") + ". Nothing automated. No AI bots.</small>" + (isBoss(r) ? '<small class="mine-247">My phone is on 24/7. Need bailing out past midnight? I’ll expect a big order in the morning.</small>' : "") + "</div>" +
       '<div class="mine-act">' + (cell ? '<a class="btn chrome sm" href="sms:' + esc(cell) + '">Text ' + esc(who) + "</a>" : "") + (mail ? '<a class="btn chrome sm" href="mailto:' + esc(mail) + '">Email ' + esc(who) + "</a>" : "") + (cell ? '<a class="btn chrome sm" href="tel:' + esc(cell) + '">Call ' + esc(who) + "</a>" : "") + '</div><button type="button" class="mine-x" data-norep>Not your rep? Tap here</button></div>';
@@ -500,7 +500,7 @@
         : "<p>I’ve been in this industry since 2002. I’m not always right, but I’m not wrong very often either. Send over your question and your setup, and tell me what you’re looking to accomplish. I’ll get you set up right. I can promise you that.</p>" +
       '<span class="sig">' + esc(W.managerName || "Frank") + ", " + esc(W.managerTitle || "") + "</span></div></div>") +
       '<div class="sendrow">' + (W.textNumber ? '<button class="btn gold sm" data-fsms>Text ' + esc(WHO()) + "</button>" : "") + '<button class="btn gold sm" data-femail>Email ' + esc(WHO()) + '</button><button class="btn ghost-d sm" data-fcopy>Copy my question</button></div>' +
-      '<p class="note">' + (cellShow() ? "Text: <b style=\"user-select:all\">" + esc(cellShow()) + "</b> · " : "") + 'Email: <b style="user-select:all">' + esc(mailShow()) + "</b></p></div>";
+      '<p class="note">' + (cellShow() ? "Text: <b style=\"user-select:all\">" + esc(cellShow()) + "</b> · " : "") + (mailShow() ? 'Email: <b style="user-select:all">' + esc(mailShow()) + "</b>" : "") + "</p></div>";
   }
 
   function hitHTML(f, v) {
@@ -1011,7 +1011,7 @@
   function me() { return store.get("me", {}); }
   function myRep() { var r = repBySlug(me().rep); return r && !isBoss(r) ? r : null; }
   function cellShow() { var r = myRep(); return (r && r.cell && prettyPhone(r.cell)) || W.textDisplay || ""; }
-  function mailShow() { var r = myRep(); return (r && r.email) || W.orderEmail || ""; }
+  function mailShow() { var r = myRep(); return r ? (r.email || "") : (W.orderEmail || ""); }
   var BOSSPIC = ((W.reps || []).filter(function (x) { return /frank/i.test(x.name) && x.photo; })[0] || {}).photo || "frank.webp";
   /* How the customer wants the price back: call, text or email. Unset means call or text. */
   var REPLY = { call: ["Call me", "calls you back", "CALL"], text: ["Text me", "texts you back", "TEXT"], email: ["Email me", "emails you back", "EMAIL"] };
@@ -1396,14 +1396,17 @@
     var r = myRep(), cell = (r && r.cell) || W.textNumber || "", mail = (r && r.email) || W.orderEmail || "", who = r ? repFirst(r) : FRANK;
     $$("[data-text-btn]").forEach(function (a) { a.href = "sms:" + cell; if (a.closest(".footact")) a.textContent = "Text " + who; });
     $$("[data-call-btn]").forEach(function (a) { a.href = "tel:" + cell; a.textContent = "Call " + who; });
-    $$("[data-mail-btn]").forEach(function (a) { a.href = "mailto:" + mail; a.textContent = "Email " + who; });
+    var noMail = !!(r && !r.email); if (noMail) mail = "";
+    $$("[data-mail-btn]").forEach(function (a) { a.href = "mailto:" + mail; a.textContent = "Email " + who; a.hidden = noMail; });
     $$("[data-askname]").forEach(function (a) { a.textContent = "Ask " + who; });
     $$("[data-sayname]").forEach(function (a) { a.textContent = (r ? who : "Big " + FRANK) + " says"; });
     $$("[data-askimg]").forEach(function (a) { a.src = askImg(); a.classList.add("repface"); });
     var bfa = $("#bf"); if (bfa) bfa.setAttribute("aria-label", (r ? who : "Big " + FRANK) + " says");
+    $$(".footmgr").forEach(function (fm) { if (fm.firstChild && fm.firstChild.nodeType === 3) fm.firstChild.textContent = noMail ? "Text or call " : "Text, call or email "; });
     $$("[data-mgr]").forEach(function (a) { a.textContent = r ? r.name + ", your rep" : (W.managerName || "Frank") + ", " + (W.managerTitle || ""); });
     $$("[data-text]").forEach(function (a) { a.textContent = cellShow(); a.href = "sms:" + cell; });
-    $$("[data-oemail-link]").forEach(function (a) { a.textContent = mail; a.href = "mailto:" + mail; });
+    $$("[data-oemail-link]").forEach(function (a) { a.textContent = mail; a.href = "mailto:" + mail; a.hidden = noMail; });
+    $$(".footnum").forEach(function (fn) { [].forEach.call(fn.childNodes, function (n) { if (n.nodeType === 3) n.textContent = noMail ? "" : " · "; }); });
     $$("[data-oemail]").forEach(function (a) { a.textContent = mail; });
     $$("[data-bftoggle]").forEach(function (a) { a.setAttribute("aria-label", (r ? who : "Big " + FRANK) + " says"); });
     $$("[data-bfhide]").forEach(function (a) { a.setAttribute("aria-label", "Hide " + (r ? who : "Big " + FRANK)); });
