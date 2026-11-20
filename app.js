@@ -826,8 +826,8 @@
     app.innerHTML = shell("Blade trouble?", 0, 0, h); setNav("");
   }
   function cpfBlock() {
-    return '<section class="cpf"><div class="wrap"><div class="cpf-in"><div class="cpf-ic" aria-hidden="true">$<small>/ft</small></div><div class="cpf-tx"><span class="kick">Free tool · 20 seconds</span><h2>What does a foot of cut really cost you?</h2>' +
-      "<p>Cheaper per box isn’t cheaper per foot. Put in what you pay and how far the blade goes. The calculator shows which blade is costing you money.</p></div>" +
+    return '<section class="cpf"><div class="wrap"><div class="cpf-in"><div class="cpf-ic" aria-hidden="true">$<small>/ft</small></div><div class="cpf-tx"><span class="kick">Free tool · 20 seconds</span><h2>The price on the box isn’t what a blade costs you.</h2>' +
+      "<p>What matters is what it costs to own and run: the <b>cost per foot</b>. A blade that costs more up front and cuts farther is the cheaper blade. Use this free calculator and see for yourself what your cuts are costing you, or saving you, every day, every week, every month and every year.</p></div>" +
       '<a class="btn blue cpf-go" href="#cost">Run the cost per foot calculator</a></div></div></section>';
   }
   function cpfStrip() { return '<a class="cpfstrip" href="#cost"><b>$<small>/ft</small></b><span><strong>Cost per foot calculator</strong> See which blade is really cheaper.</span><em>›</em></a>'; }
@@ -835,7 +835,7 @@
     var d = FAM["dragon-supreme"] || FAM["dragon"], dv = d ? defVar(d, d.vars) : null;
     app.innerHTML = shell("Cost per foot calculator", 0, 0,
       "<h1>Price per box or price per foot?</h1>" + says(QUIP.cost[0]) +
-      '<p class="lead">A blade that costs more and lasts longer is the cheaper blade. Put in what you pay and how many feet you get. Use your own numbers.</p>' +
+      '<p class="lead">The upfront price is not what matters most. What matters is what the blade costs you to own and run, and that is the <b>cost per foot</b>. Put in what you pay and how many feet you get, and see what your cuts cost you every day, every week, every month and every year. Use your own numbers.</p>' +
       '<div class="frank cc"><div class="ccgrid"><div><b class="h">Blade A (what you run now)</b><div class="field"><label for="ca-p">What you pay per blade ($)</label><input id="ca-p" type="number" inputmode="decimal" min="0" placeholder="e.g. 110"></div><div class="field"><label for="ca-f">Feet you get out of one</label><input id="ca-f" type="number" inputmode="decimal" min="0" placeholder="your number"></div></div>' +
       '<div><b class="h">Blade B (the one you’re considering)</b><div class="field"><label for="cb-p">What it costs per blade ($)</label><input id="cb-p" type="number" inputmode="decimal" min="0" value="' + (dv && !HIDE ? dv[3] : "") + '"></div><div class="field"><label for="cb-f">Feet you’d get out of one</label><input id="cb-f" type="number" inputmode="decimal" min="0" placeholder="your number"></div></div></div>' +
       '<div class="field"><label for="c-ft">Feet you cut in a month</label><input id="c-ft" type="number" inputmode="decimal" min="0" placeholder="e.g. 5000"></div><div id="ccout" class="ccout">Fill in both blades to see the cost per foot.</div></div>' +
@@ -851,7 +851,9 @@
     var a = ap / af, b = bp / bf, win = a === b ? "" : a < b ? "A" : "B", diff = Math.abs(a - b);
     o.className = "ccout on";
     o.innerHTML = '<div class="ccrow"><span>Blade A</span><b>' + money(a) + ' / ft</b></div><div class="ccrow"><span>Blade B</span><b>' + money(b) + " / ft</b></div>" +
-      (win ? "<strong>Blade " + win + " is cheaper per foot by " + money(diff) + (ft ? ". On " + ft.toLocaleString() + " feet a month that’s " + money(diff * ft) + " a month, " + money(diff * ft * 12) + " a year." : ".") + "</strong>" : "<strong>Dead even per foot.</strong>") +
+      (win ? "<strong>Blade " + win + " is cheaper per foot by " + money(diff) + (ft ? ". On " + ft.toLocaleString() + " feet a month that’s " + money(diff * ft) + " a month, " + money(diff * ft * 12) + " a year." : ".") + "</strong>" +
+        (ft ? '<div class="ccsave" aria-label="What Blade ' + win + ' saves you"><b class="ccsave-h">Running Blade ' + win + ' saves you</b>' + [["Every day", diff * ft * 12 / 260], ["Every week", diff * ft * 12 / 52], ["Every month", diff * ft], ["Every year", diff * ft * 12]].map(function (x) { return "<div><span>" + x[0] + "</span><b>" + money(x[1]) + "</b></div>"; }).join("") + '<small>Day is a working day, five a week.</small></div>' : '<small class="ccnudge">Add the feet you cut in a month to see it by day, week, month and year.</small>')
+        : "<strong>Dead even per foot.</strong>") +
       "<small>Blades per month: A " + (ft ? (ft / af).toFixed(1) : "?") + ", B " + (ft ? (ft / bf).toFixed(1) : "?") + ". Fewer blade changes is time back on the job.</small>";
   }
   function rentCalc() {
