@@ -625,7 +625,7 @@
       : '<div class="empty d" style="grid-column:1/-1">Nothing matches that. Clear a filter, try fewer words, or ask ' + esc(WHO()) + ".</div>";
     setTimeout(watchMore, 0);
     if ($("#shopgrid")) { $("#shopgrid").innerHTML = grid; $("#shopn").textContent = list.length + (list.length === 1 ? " product" : " products"); $("#shopblurb").textContent = curCat.s; $$(".cat").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.cat === shop.cat); }); $$(".tagc").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.tag === shop.tag); }); return; }
-    app.innerHTML = '<section class="sec"><div class="wrap"><div class="sec-head"><h2>Shop everything</h2><p>Pick what you’re after. The more you buy, the better your price.</p></div>' +
+    app.innerHTML = '<section class="sec"><div class="wrap"><div class="sec-head"><h1 class="h2like">Shop everything</h1><p>Pick what you’re after. The more you buy, the better your price.</p></div>' +
       '<input id="sq" class="shopsearch" type="search" placeholder="Search blade, size or part #" aria-label="Search" value="' + esc(shop.q) + '">' +
       '<b class="flabel">What are you looking for?</b><div class="cats wrapc">' + cats.map(function (c) { return '<button class="cat" data-cat="' + c.k + '" aria-pressed="' + (shop.cat === c.k) + '">' + esc(c.n) + "</button>"; }).join("") + "</div>" +
       '<p class="shopblurb" id="shopblurb">' + esc(curCat.s) + "</p>" +

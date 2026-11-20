@@ -72,7 +72,7 @@ def home_icons(rep):
         else:
             im = Image.new("RGB", (size, size), (9, 22, 58)); dr = ImageDraw.Draw(im)
             dr.text((size // 2, size // 2), "".join(w[0] for w in rep["name"].split()[:2]).upper(), fill="white", font=font(size // 2), anchor="mm")
-        im.save(os.path.join(d, "%s-%d.png" % (rep["slug"], size)))
+        im.quantize(colors=255, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.FLOYDSTEINBERG).save(os.path.join(d, "%s-%d.png" % (rep["slug"], size)), optimize=True)
 
 
 def build(site_url, full=None):
@@ -106,6 +106,7 @@ def build(site_url, full=None):
         sub(r'<meta property="og:title" content="[^"]*">', '<meta property="og:title" content="%s, your blade guy at DBW WISCO">' % name)
         sub(r'<meta property="og:description" content="[^"]*">', '<meta property="og:description" content="Reorder diamond blades in 60 seconds. Your order goes straight to %s.">' % name)
         sub(r'<meta property="og:url" content="[^"]*">', '<meta property="og:url" content="%s%s/">' % (site_url, slug))
+        sub(r'<link rel="canonical" href="[^"]*">', '<link rel="canonical" href="%s%s/">' % (site_url, slug))
         sub(r'<meta property="og:image" content="[^"]*">', '<meta property="og:image" content="%sbrand/share/%s.jpg">' % (site_url, slug))
         sub(r'<link rel="icon" href="[^"]*">', '<link rel="icon" href="brand/repicon/%s-180.png">' % slug)
         sub(r'<link rel="apple-touch-icon" href="[^"]*">', '<link rel="apple-touch-icon" href="brand/repicon/%s-180.png">' % slug)

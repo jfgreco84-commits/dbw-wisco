@@ -824,3 +824,11 @@ body:has(#dock:not([hidden])) .bf { bottom: calc(var(--dockh, 110px) + 26px) !im
 .ccsave small { grid-column: 1 / -1; font: 600 12px var(--sans); color: var(--muted) } .ccnudge { display: block; margin-top: 8px; font: 700 13px var(--sans); color: var(--navy-2) }
 @media (max-width: 520px) { .ccsave { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
 .cpf p b { font-weight: 900; color: var(--navy-2) }
+
+/* v49: thumb-size targets. Nothing a customer taps is under 44px tall. */
+.qty { grid-template-columns: 44px 44px 44px } .hit .qty, .sz .qty { grid-template-columns: 40px 38px 40px; height: 44px } .hit .add, .sz .add { height: 44px }
+.footlinks { gap: 0 18px } .footlinks a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 }
+.footnum a { display: inline-flex; align-items: center; min-height: 44px }
+.mine .mine-x { min-height: 44px; padding: 0 } .qmore { display: inline-flex; align-items: center; min-height: 44px; margin-top: 0 } .bignum { min-height: 44px; display: inline-flex; align-items: center }
+.sec-head h1.h2like { font: 400 clamp(26px, 4vw, 38px)/1.05 var(--slab); text-transform: uppercase; margin: 0 0 6px; color: var(--navy-2); text-wrap: balance; text-shadow: none }
+.sec-head h1.h2like::after { content: "★ ★ ★ ★ ★"; display: block; font: 400 13px var(--sans); letter-spacing: .5em; color: var(--red); margin-top: 8px; -webkit-text-fill-color: var(--red) }
