@@ -803,3 +803,16 @@ body:has(#dock:not([hidden])) .bf { bottom: calc(var(--dockh, 110px) + 26px) !im
 .acct.done.newlead { display: grid; gap: 8px } .acct.done.newlead .btn { min-height: 52px; justify-content: center; text-align: center; white-space: normal; line-height: 1.2 } .acct.done.newlead .link { justify-self: start }
 .acct.done.newlead { grid-template-columns: 1fr } .acct.done.newlead > * { grid-column: 1 / -1 }
 .acct.done.newlead > b { order: 1; grid-row: auto } .acct.done.newlead > span { order: 2; grid-row: auto } .acct.done.newlead > .btn { order: 3; grid-row: auto } .acct.done.newlead > .link { order: 4; grid-row: auto; grid-column: 1 / -1 }
+
+/* v47: the cost per foot calculator is easy to find */
+.cpf { background: #fff; color: var(--navy-2); border-top: 4px solid var(--red); border-bottom: 4px solid var(--royal) }
+.cpf-in { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 16px 22px; align-items: center; padding-block: 22px }
+.cpf-ic { width: 84px; height: 84px; border-radius: 50%; display: grid; place-items: center; background: var(--navy-2); color: #F7C948; font: 900 40px/1 var(--sans); position: relative; box-shadow: 0 0 0 4px #F7C948 } .cpf-ic small { position: absolute; right: 8px; bottom: 18px; font: 900 13px var(--sans); color: #fff }
+.cpf .kick { display: inline-block; font: 900 11.5px var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--red) }
+.cpf h2 { margin: 4px 0 6px; font: 900 26px/1.12 var(--sans); color: var(--navy-2); text-shadow: none; text-transform: none; letter-spacing: 0 } .cpf p { margin: 0; font: 600 15.5px/1.45 var(--sans); color: #2B3A5C; max-width: 60ch }
+.cpf-go { min-height: 56px; padding-inline: 22px; font-size: 14px; white-space: nowrap; justify-content: center; text-align: center }
+@media (max-width: 860px) { .cpf-in { grid-template-columns: 64px minmax(0, 1fr); gap: 12px 14px; padding-block: 18px } .cpf-ic { width: 64px; height: 64px; font-size: 30px } .cpf-ic small { right: 5px; bottom: 13px; font-size: 11px } .cpf h2 { font-size: 21px } .cpf p { font-size: 14.5px } .cpf-go { grid-column: 1 / -1; white-space: normal } }
+.cpfstrip { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; margin: 14px 0; padding: 10px 14px; border-radius: 14px; background: #fff; color: var(--navy-2); text-decoration: none; border-left: 6px solid var(--red); box-shadow: var(--shadow-sm) }
+.cpfstrip b { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--navy-2); color: #F7C948; font: 900 21px/1 var(--sans); position: relative } .cpfstrip b small { position: absolute; right: 3px; bottom: 9px; font: 900 8.5px var(--sans); color: #fff }
+.cpfstrip span { font: 600 13.5px/1.35 var(--sans); color: #2B3A5C } .cpfstrip strong { display: block; font: 900 15px var(--sans); color: var(--navy-2) } .cpfstrip em { font: 900 26px/1 var(--sans); font-style: normal; color: var(--royal) }
+.cpf .kick { background: none; padding: 0; margin: 0; border-radius: 0; box-shadow: none; transform: none; color: var(--red) }

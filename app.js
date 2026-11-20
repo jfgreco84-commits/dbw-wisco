@@ -391,6 +391,7 @@
       '</div><div class="art"><img class="logo" src="brand/logo.webp" alt="DBW WISCO, a division of Diamond Blade Warehouse" width="430" height="458">' +
       '<div class="stage"><div class="lineup">' + line.map(function (n) { return '<img alt="" src="brand/lineup/' + n + '.webp">'; }).join("") + "</div></div></div></div></section>" +
 
+      cpfBlock() +
       (PROMO_ON ? '<section class="promoband"><div class="wrap">' + promoBar() + "</div></section>" : "") +
       '<section class="costco"><div class="wrap"><div><b>' + (HIDE ? "No login. No card. No runaround." : "The more you buy, the better the price.") + "</b><span>" + (HIDE ? "Pick your blades and send the order. A real rep confirms your price before anything ships. Nothing is charged on this site." : RNG ? "Every blade shows a price range. Where you land depends on how many you buy and what you buy with it. Your rep sets your number and confirms it before anything ships." : ACCT ? "The price you see is list. Nobody pays list. Send your order and it’s billed at your account price, and that drops again at 12, 24, 36, 50 and 100." : "We price like Costco. Build your order and the price drops at 12, 24, 36, 50 and 100. Have an account? Your rep’s number beats ours.") + '</span></div><button class="btn gold shine" data-pricing>Get my price</button></div></section>' +
 
@@ -562,7 +563,7 @@
     app.innerHTML = shell("Fast Reorder", 0, 0,
       "<h1>Know what you run?</h1>" +
       '<input class="search-big" id="rq" type="search" placeholder="Search: Dragon 14 or AES14SGC1" autocomplete="off" aria-label="Search by blade, size or part number">' +
-      '<div id="rhints"><div class="pick3" id="pick3">' + pick3HTML() + "</div></div>" +
+      '<div id="rhints"><div class="pick3" id="pick3">' + pick3HTML() + "</div></div>" + cpfStrip() +
       '<div class="hits" id="rhits"></div>' +
       '<div class="pkgbox"><b class="pkg-h">Saw Packages</b><p>Bundle a saw with your blades. One price, one invoice. Tap one to build it.</p>' + pkgButtons(0) + "</div>" +
       (n ? '<div class="last"><div><b>Same as last time?</b><span>' + n + (n === 1 ? " line" : " lines") + " from " + esc(last.date) + '</span></div><button class="btn red sm" data-reorder>Reorder it</button></div>' : "") +
@@ -629,7 +630,7 @@
       '<b class="flabel">What are you looking for?</b><div class="cats wrapc">' + cats.map(function (c) { return '<button class="cat" data-cat="' + c.k + '" aria-pressed="' + (shop.cat === c.k) + '">' + esc(c.n) + "</button>"; }).join("") + "</div>" +
       '<p class="shopblurb" id="shopblurb">' + esc(curCat.s) + "</p>" +
       '<b class="flabel">Narrow it down (optional)</b><div class="cats wrapc tags">' + SHOPTAGS.map(function (g) { return '<button class="cat tagc" data-tag="' + g.k + '" aria-pressed="' + (shop.tag === g.k) + '">' + esc(g.n) + "</button>"; }).join("") + "</div>" +
-      '<div class="shopbar"><select id="ssort" aria-label="Sort"><option value="pop">Most popular</option>' + (HIDE ? "" : '<option value="low">Price: low to high</option><option value="high">Price: high to low</option>') + '<option value="az">A to Z</option></select><b id="shopn">' + list.length + (list.length === 1 ? " product" : " products") + '</b></div><div class="grid" id="shopgrid">' + grid + "</div></div></section>";
+      cpfStrip() + '<div class="shopbar"><select id="ssort" aria-label="Sort"><option value="pop">Most popular</option>' + (HIDE ? "" : '<option value="low">Price: low to high</option><option value="high">Price: high to low</option>') + '<option value="az">A to Z</option></select><b id="shopn">' + list.length + (list.length === 1 ? " product" : " products") + '</b></div><div class="grid" id="shopgrid">' + grid + "</div></div></section>";
     $("#sq").addEventListener("input", function (e) { shop.q = e.target.value.trim(); shop.n = SHOPPAGE; shopScreen(); });
     $("#ssort").value = shop.sort; $("#ssort").addEventListener("change", function (e) { shop.sort = e.target.value; shopScreen(); });
     setNav("#shop");
@@ -824,9 +825,15 @@
     }
     app.innerHTML = shell("Blade trouble?", 0, 0, h); setNav("");
   }
+  function cpfBlock() {
+    return '<section class="cpf"><div class="wrap"><div class="cpf-in"><div class="cpf-ic" aria-hidden="true">$<small>/ft</small></div><div class="cpf-tx"><span class="kick">Free tool · 20 seconds</span><h2>What does a foot of cut really cost you?</h2>' +
+      "<p>Cheaper per box isn’t cheaper per foot. Put in what you pay and how far the blade goes. The calculator shows which blade is costing you money.</p></div>" +
+      '<a class="btn blue cpf-go" href="#cost">Run the cost per foot calculator</a></div></div></section>';
+  }
+  function cpfStrip() { return '<a class="cpfstrip" href="#cost"><b>$<small>/ft</small></b><span><strong>Cost per foot calculator</strong> See which blade is really cheaper.</span><em>›</em></a>'; }
   function costScreen() {
     var d = FAM["dragon-supreme"] || FAM["dragon"], dv = d ? defVar(d, d.vars) : null;
-    app.innerHTML = shell("Cost per cut", 0, 0,
+    app.innerHTML = shell("Cost per foot calculator", 0, 0,
       "<h1>Price per box or price per foot?</h1>" + says(QUIP.cost[0]) +
       '<p class="lead">A blade that costs more and lasts longer is the cheaper blade. Put in what you pay and how many feet you get. Use your own numbers.</p>' +
       '<div class="frank cc"><div class="ccgrid"><div><b class="h">Blade A (what you run now)</b><div class="field"><label for="ca-p">What you pay per blade ($)</label><input id="ca-p" type="number" inputmode="decimal" min="0" placeholder="e.g. 110"></div><div class="field"><label for="ca-f">Feet you get out of one</label><input id="ca-f" type="number" inputmode="decimal" min="0" placeholder="your number"></div></div>' +
