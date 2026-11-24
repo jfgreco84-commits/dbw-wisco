@@ -56,6 +56,8 @@ The blade id is the end of its link, e.g. `.../wisco/#blade-super-g` -> `super-g
 - A rep's own link: `.../wisco/?rep=adam-misurek`
 - A pre-filled cart: `.../wisco/?cart=AES14SGC1*10,AGT7B7*24` (or use "Copy a reorder link" in the cart)
 - Straight to a material: `.../wisco/?m=a` (asphalt). Keys are in `families.py`.
+- Straight to the cost per foot calculator: `.../wisco/?go=cost`, or on a rep's page `.../adammisurek/?go=cost`.
+  Every other link opens on the home page.
 
 ## Refresh product data from the DBW site
 

@@ -1455,6 +1455,12 @@
   })();
   route(); badge();
   if (P.get("tools")) location.hash = "#team";   /* the rep tools are not linked anywhere on the site */
+  /* One link that opens a tool directly: ?go=cost lands on the cost per foot calculator (used in emails and texts).
+     Every other link still opens on the home page. The go is dropped from the address so a refresh goes home. */
+  if (P.get("go") === "cost") {
+    try { var qg = new URLSearchParams(location.search); qg.delete("go"); history.replaceState(null, "", location.pathname + (qg.toString() ? "?" + qg : "")); } catch (e) {}
+    location.hash = "#cost";
+  }
   bfOpen(store.get("bf", 0) === 1);
   if (P.get("cart") && cart.length) { renderCart(); $("#cart").showModal(); }
 })();
