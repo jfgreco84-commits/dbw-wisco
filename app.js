@@ -196,7 +196,7 @@
   var wiz = { mode: "finder", mat: null, saw: null, want: null, all: false, hp: null };
   var LOWHP = W.lowHpMax || 20, WETLINE = "Our wet blades are specifically bonded for your area and what you are cutting, so you get optimal performance every time.";
   var HPS = [{ k: "low", n: "Low horsepower", s: "Up to " + LOWHP + " HP. Push saws and small walk-behinds." }, { k: "high", n: "High horsepower", s: "Over " + LOWHP + " HP. Flat saws from 35 to 110 HP. Blades 14\" to 68\"." }, { k: "any", n: "Not sure", s: "Show me what fits and I’ll ask." }];
-  var SHOPPAGE = 24, ordRef = "";
+  var SHOPPAGE = 12, ordRef = "";
   var shop = { cat: "all", q: "", sort: "pop", n: SHOPPAGE, tag: "" };
   var deal = store.get("deal2", { saw: "", lines: [] });
   var extras = { free: "", stock: false, breaks: [] };
@@ -363,7 +363,7 @@
       '<p class="bfline">“Selling blades ain’t glamorous, but someone has to do it. I’m your guy.”</p>' +
       "<p>I’ve been in the blade business since 2002 and never left. Diamond Blade Warehouse has been at it since 1987.</p><p>That many years teaches you two things: what works, and who to call when you’re not sure. So tell me what you’re cutting and you’ll get a straight answer. If it’s a job I haven’t seen before, I know exactly who has, and I’ll get you the answer.</p><p>Either way you end up with the right blade at a fair price, from a guy who picks up when you call.</p>" +
       (cell ? '<div class="mine-act"><a class="btn gold shine" href="sms:' + esc(cell) + '">Text Big Frank</a><a class="btn chrome" href="tel:' + esc(cell) + '">Call ' + esc(W.textDisplay || "") + "</a></div>" : "") +
-      '</div></div><ul class="why">' + WHY.map(function (x) { return "<li><b>" + x[0] + "</b> " + x[1] + "</li>"; }).join("") + "</ul></div></section>";
+      '</div></div>' + fold("Why contractors buy from us", WHY.length + " reasons", '<ul class="why">' + WHY.map(function (x) { return "<li><b>" + x[0] + "</b> " + x[1] + "</li>"; }).join("") + "</ul>", "foldwhy") + "</div></section>";
   }
   function home() {
     var top = C.families.filter(function (f) { return f.rank < 99 && f.id.indexOf("eagle") !== 0 && f.cats.indexOf("core") < 0; }).slice(0, 16);
@@ -384,8 +384,6 @@
       '<div class="herocta"><a class="btn gold herogo shine" href="#reorder">Reorder my blades</a><a class="btn chrome" href="#finder">Find my blade</a></div>' + acctBox() +
       welcomeBack() + (!lastOrder() && !repBySlug(me().rep) ? '<div class="newhere"><b>New here?</b><span>Text a photo of your old blade, or tell us the size and how many. A real rep texts you back with your price.</span><div class="mine-act"><button class="btn gold sm" data-photo>Text a photo of my blade</button><button class="btn chrome sm" data-pricing>Get my price</button></div></div>' : "") +
       '<div class="doors">' +
-      '<a class="door d1 shine" href="#finder"><div><b>Blade Finder</b><span>Two taps. We line up the right blade.</span></div><em>→</em></a>' +
-      '<a class="door d2" href="#reorder"><div><b>Fast Reorder</b><span>Know what you run? Punch it in and go.</span></div><em>→</em></a>' +
       '<a class="door d3 withav" href="#ask"><img alt="" src="' + askImg() + '"><div><b>Ask ' + esc(WHO()) + "</b><span>Not sure? Get " + esc(SAYER()) + "’s pick in 3 taps.</span></div><em>→</em></a>" +
       "</div>" +
       '</div><div class="art"><img class="logo" src="brand/logo.webp" alt="DBW WISCO, a division of Diamond Blade Warehouse" width="430" height="458">' +
@@ -395,23 +393,21 @@
       (PROMO_ON ? '<section class="promoband"><div class="wrap">' + promoBar() + "</div></section>" : "") +
       '<section class="costco"><div class="wrap"><div><b>' + (HIDE ? "No login. No card. No runaround." : "The more you buy, the better the price.") + "</b><span>" + (HIDE ? "Pick your blades and send the order. A real rep confirms your price before anything ships. Nothing is charged on this site." : RNG ? "Every blade shows a price range. Where you land depends on how many you buy and what you buy with it. Your rep sets your number and confirms it before anything ships." : ACCT ? "The price you see is list. Nobody pays list. Send your order and it’s billed at your account price, and that drops again at 12, 24, 36, 50 and 100." : "We price like Costco. Build your order and the price drops at 12, 24, 36, 50 and 100. Have an account? Your rep’s number beats ours.") + '</span></div><button class="btn gold shine" data-pricing>Get my price</button></div></section>' +
 
-      '<section class="sec alt"><div class="wrap"><div class="sec-head"><h2>Our heavy hitters</h2><p>The blades and bits we put our name on.</p></div><div class="lines">' + lines + "</div></div></section>" +
+      '<section class="sec alt"><div class="wrap"><div class="sec-head"><h2>Our heavy hitters</h2><p>The blades and bits we put our name on.</p></div><div class="lines">' + lines + '</div><div class="center"><a class="btn blue" href="#shop">Shop everything</a></div></div></section>' +
 
-      '<section class="sec deal"><div class="wrap"><div class="sec-head"><h2>If they make it, we can get it</h2><p>Need a saw to go with your blades? Tell us what you’re after. We source it and your rep comes back with a price.</p></div>' + equipPicker("Go find me the best price", 1) + "</div></section>" +
 
-      '<section class="sec"><div class="wrap"><div class="sec-head"><h2>What the crews run</h2><p>Dragon first. Then Extreme, Super G, T-Rex and Viper. Our most common blades, in the order our reps quote them.</p></div><div class="rail">' + top.map(function (f) { return cardHTML(f); }).join("") + '</div><div class="center"><a class="btn blue" href="#shop">Shop everything</a><button class="btn gold" data-pricing>Ask ' + esc(WHO()) + " about pricing" + '</button></div></div></section>' +
 
       '<section class="sec deal"><div class="wrap narrow"><div class="sec-head"><h2>Need a saw?</h2><p>Bundle a saw with your blades. One package price, one invoice. Your rep builds it and confirms your total.</p></div><div class="center"><a class="btn chrome shine" href="#saw-deal">Build my saw package</a><a class="btn ghost" href="#saw-deal" data-rentgo>Renting? Run the math</a></div></div></section>' +
 
       (myRep() ? "" : bigFrank()) +
-      '<section class="sec alt"><div class="wrap narrow"><div class="sec-head"><h2>Real people. Real relationships.</h2><p>It matters more than anything else we do.</p></div><ul class="ppl">' +
+      '<section class="sec alt"><div class="wrap narrow"><div class="sec-head"><h2>Real people. Real relationships.</h2><p>It matters more than anything else we do.</p></div>' + fold("How we do business", "Six things you can count on", '<ul class="ppl">' +
       "<li><b>Like your salesperson? Keep buying from them.</b> Your account stays with the person who earned it.</li>" +
       "<li><b>Nobody here is a robot.</b> We don’t send our sales overseas. We don’t run auto-dialers. No AI bot is ever going to call you. When your phone rings, it’s one of us.</li>" +
       "<li><b>We sell blades to put food on our families’ tables.</b> You run them to put food on yours.</li>" +
       "<li><b>Our reps stay.</b> Every one of them has been here a long time. They’re trained to know the answer, and smart enough to go ask when they don’t.</li>" +
       "<li><b>Once you buy from us, we work for you.</b> And you don’t even have to put us on payroll.</li>" +
       "<li><b>We know we’re not the only game in town.</b> But if we’re not the best, we’re pretty damn close.</li>" +
-      "</ul></div></section>" +
+      "</ul>", "foldppl") + "</div></section>" +
 
       (HIDE ? "" : '<section class="sec levels"><div class="wrap"><div class="sec-head"><h2>Your account has a level</h2><p>The site price is the price with no account behind it. Your real price depends on your account level.</p></div><div class="three swipe">' +
       '<div class="lvl"><em>1</em><b>' + (HIDE ? "Pick it" : RNG ? "Price range" : ACCT ? "List price" : "Site price") + "</b><p>" + (HIDE ? "Find your blade and tap a quantity. No account or login needed." : RNG ? "What you see here. Your price lands inside it. Your rep sets the number." : ACCT ? "What you see here. It’s the ceiling. Nobody with an account pays it." : "What you see here. No account needed. It drops as the quantity goes up.") + "</p></div>" +
@@ -419,15 +415,15 @@
       '<div class="lvl top"><em>3</em><b>Account pricing</b><p>Every account has a level, and the price drops at each one. One quick text or email and we send back what your level gets you.</p><div class="lvls">' + (W.levels || ["Contractor", "Pro", "Gold", "Distributor", "Platinum"]).map(function (x, i, a) { return "<span" + (i === a.length - 1 ? ' class="top"' : "") + ">" + esc(x) + "</span>"; }).join("<i>›</i>") + "</div></div>" +
       '</div><div class="center"><button class="btn gold shine" data-account>Open a free account</button><button class="btn chrome" data-pricing>Check my account pricing</button><button class="btn ghost-d" data-terms>Apply for Net 30 terms</button></div></div></section>') +
 
-      '<section class="sec"><div class="wrap narrow"><div class="sec-head"><h2>Straight answers</h2><p>The questions we hear every day.</p></div><div class="qa">' + ANSWERS.filter(function (x, i) { return !HIDE || [0, 2, 3, 5].indexOf(i) >= 0; }).map(function (x) { return "<details><summary>" + esc(x[0]) + "</summary><p>" + esc(x[1]) + "</p></details>"; }).join("") + '</div><div class="promise"><b>Our word</b><span>If my blades don’t do everything I said they would, and more, I’ll do whatever it takes to make it right.</span><small>We don’t build our blades down to a cost. We build them up to a standard.</small></div><div class="center"><a class="btn blue" href="#cost">Run the cost-per-cut math</a><a class="btn ghost-d" href="#fix">Blade giving you trouble?</a></div></div></section>' +
+      '<section class="sec"><div class="wrap narrow">' + fold("Straight answers", "The questions we hear every day", '<div class="qa">' + ANSWERS.filter(function (x, i) { return !HIDE || [0, 2, 3, 5].indexOf(i) >= 0; }).map(function (x) { return "<details><summary>" + esc(x[0]) + "</summary><p>" + esc(x[1]) + "</p></details>"; }).join("") + "</div>", "foldqa") + '<div class="promise"><b>Our word</b><span>If my blades don’t do everything I said they would, and more, I’ll do whatever it takes to make it right.</span><small>We don’t build our blades down to a cost. We build them up to a standard.</small></div></div></section>' +
 
       (T.length ? '<section class="sec alt"><div class="wrap"><div class="sec-head"><h2>Straight from the jobsite</h2><p>Real customers. Their words.</p></div><div class="three">' + T.map(function (t) { return '<figure class="quote"><blockquote>' + esc(t.quote) + "</blockquote><figcaption>" + esc(t.who || "") + "</figcaption></figure>"; }).join("") + "</div></div></section>" : "") +
 
-      '<section class="sec dark"><div class="wrap"><div class="sec-head"><h2>Two ways to save</h2><p>No points, no fine print. Your rep applies it to your next order.</p></div><div class="three swipe">' +
+      '<section class="sec dark"><div class="wrap">' + fold("Two ways to save", "Leave a review or refer a contractor", '<div class="three swipe">' +
       '<div class="point"><b>Leave a review</b><p>Tell us how the blades held up, good or bad. An honest review earns you ' + esc(RW.review) + '.</p><button class="btn chrome sm" data-review style="margin-top:12px">Leave a review</button></div>' +
       '<div class="point"><b>Refer a contractor</b><p>Send someone our way. When they place a first order and name you, you get ' + esc(RW.referrer) + '.</p><button class="btn chrome sm" data-refer style="margin-top:12px">Refer a contractor</button></div>' +
       '<div class="point"><b>Just tell us</b><p>Something off with an order, a blade or a rep? ' + (myRep() ? esc(WHO()) + " and " + FRANK + " read" : esc(WHO()) + " reads") + ' every note.</p><button class="btn ghost sm" data-feedback style="margin-top:12px">Send ' + esc(WHO()) + " a note</button></div>" +
-      "</div></div></section>";
+      "</div>", "foldsave") + "</div></section>";
     setNav("#home");
   }
 
@@ -567,7 +563,7 @@
       '<div class="hits" id="rhits"></div>' +
       '<div class="pkgbox"><b class="pkg-h">Saw Packages</b><p>Bundle a saw with your blades. One price, one invoice. Tap one to build it.</p>' + pkgButtons(0) + "</div>" +
       (n ? '<div class="last"><div><b>Same as last time?</b><span>' + n + (n === 1 ? " line" : " lines") + " from " + esc(last.date) + '</span></div><button class="btn red sm" data-reorder>Reorder it</button></div>' : "") +
-      '<h2 class="wiz-h2">Tap a quantity</h2><p class="lead sm">Our most common blades. ' + (HIDE ? "Bigger quantities get better pricing. Your rep confirms the number. " : RNG ? "The more you buy, the closer you land to the low end of the range. " : "The price drops at every button. ") + esc(mixLine()) + "</p>" + quickRows() +
+      fold("Browse our most common blades", "14 blades, tap a quantity", '<p class="lead sm">Our most common blades. ' + (HIDE ? "Bigger quantities get better pricing. Your rep confirms the number. " : RNG ? "The more you buy, the closer you land to the low end of the range. " : "The price drops at every button. ") + esc(mixLine()) + "</p>" + quickRows(), "foldrows") +
       '<div class="center"><a class="btn gold" href="#shop">Browse our full catalog</a><button class="btn gold" data-pricing>Ask ' + esc(WHO()) + " about pricing" + "</button></div>" +
       (W.textNumber ? '<div class="frank photo"><b class="h">Easiest reorder there is</b><p>Snap a picture of your old blade and send it to ' + esc(WHO()) + '. We’ll read the label and write it up.</p><a class="bignum" href="#" data-photo>' + esc(cellShow()) + '</a><div class="sendrow"><button class="btn gold" data-photo>Text ' + esc(WHO()) + ' a photo</button><button class="btn blue" data-photomail>Email a photo</button></div></div>' : "") +
       '<h2 class="wiz-h2">Not sure what to reorder?</h2><p class="lead sm">Pick your crew and we walk you to the right blade.</p><div class="tiles">' + CREWS.map(function (c) { return '<button class="tile" data-crew="' + c.mat + '"><b>' + esc(c.n) + "</b><span>" + esc(c.s) + "</span></button>"; }).join("") + "</div>" +
@@ -620,7 +616,7 @@
     else if (shop.sort === "az") list.sort(function (a, b) { return a.n.localeCompare(b.n); });
     list = list.filter(function (f) { return f.id.indexOf("eagle") !== 0; }).concat(list.filter(function (f) { return f.id.indexOf("eagle") === 0; }));
     var left = list.length - shop.n;
-    var grid = list.length ? list.slice(0, shop.n).map(function (f) { return cardHTML(f); }).join("") + (left > 0 ? '<div id="shopmore" style="grid-column:1/-1;height:1px"></div>' : "")
+    var grid = list.length ? list.slice(0, shop.n).map(function (f) { return cardHTML(f); }).join("") + (left > 0 ? '<div class="shopmorewrap" style="grid-column:1/-1"><button type="button" class="btn blue" data-shopmore>Show ' + Math.min(SHOPPAGE, left) + ' more</button><small>Showing ' + Math.min(shop.n, list.length) + " of " + list.length + "</small></div>" : "")
       : shop.tag === "highhp" ? '<div class="frank" style="grid-column:1/-1"><b class="h">High-horsepower blades are built for you</b><p>' + esc(WETLINE) + ' Tell us the saw, the horsepower and where you cut.</p><div class="sendrow"><button class="btn gold sm" data-wetspec>Spec my blade</button></div></div>'
       : '<div class="empty d" style="grid-column:1/-1">Nothing matches that. Clear a filter, try fewer words, or ask ' + esc(WHO()) + ".</div>";
     setTimeout(watchMore, 0);
@@ -825,6 +821,8 @@
     }
     app.innerHTML = shell("Blade trouble?", 0, 0, h); setNav("");
   }
+  /* A section that stays one line tall until it is tapped. */
+  function fold(title, sub, inner, id) { return '<details class="fold"' + (id ? ' id="' + id + '"' : "") + "><summary><span><b>" + title + "</b>" + (sub ? "<small>" + sub + "</small>" : "") + '</span><i aria-hidden="true">+</i></summary><div class="fold-in">' + inner + "</div></details>"; }
   function cpfBlock() {
     return '<section class="cpf"><div class="wrap"><div class="cpf-in"><div class="cpf-ic" aria-hidden="true">$<small>/ft</small></div><div class="cpf-tx"><span class="kick">Free tool · 20 seconds</span><h2>The price on the box isn’t what a blade costs you.</h2>' +
       "<p>What matters is what it costs to own and run: the <b>cost per foot</b>. A blade that costs more up front and cuts farther is the cheaper blade. Use this free calculator and see for yourself what your cuts are costing you, or saving you, every day, every week, every month and every year.</p></div>" +
