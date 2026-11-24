@@ -851,3 +851,6 @@ body:has(#dock:not([hidden])) .bf { bottom: calc(var(--dockh, 110px) + 26px) !im
   .foot img.footlogo { display: none } .foot .wrap { padding-top: 18px }
   .sec { padding-block: 26px }
 }
+
+/* v52: the date this copy of the site was built */
+.buildstamp { margin-top: 10px; font: 700 12px var(--sans); letter-spacing: .04em; color: #9FB2DE }
