@@ -1401,6 +1401,14 @@
   window.addEventListener("resize", dockLift);
   /* The cart note is saved as it is typed, so it survives adding more items or closing the cart. */
   document.addEventListener("input", function (e) { if (e.target && e.target.id === "cnote") store.set("cnote", e.target.value.slice(0, 400)); });
+  /* The date and time this copy of the site was built, in Milwaukee time, so anyone can tell if they have the newest one. */
+  function buildStamp() {
+    var el = $("#buildstamp"), v = parseInt(window.WISCO_VER, 10); if (!el || !(v > 0)) return;
+    var d = new Date(v * 1000), txt;
+    try { txt = d.toLocaleString("en-US", { timeZone: "America/Chicago", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }); } catch (e) { txt = d.toLocaleString(); }
+    el.textContent = "Updated " + txt + " CT"; el.title = "Build " + v; el.hidden = false;
+  }
+  buildStamp();
   function contactWire() {
     var r = myRep(), cell = (r && r.cell) || W.textNumber || "", mail = (r && r.email) || W.orderEmail || "", who = r ? repFirst(r) : FRANK;
     $$("[data-text-btn]").forEach(function (a) { a.href = "sms:" + cell; if (a.closest(".footact")) a.textContent = "Text " + who; });
