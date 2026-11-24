@@ -832,3 +832,22 @@ body:has(#dock:not([hidden])) .bf { bottom: calc(var(--dockh, 110px) + 26px) !im
 .mine .mine-x { min-height: 44px; padding: 0 } .qmore { display: inline-flex; align-items: center; min-height: 44px; margin-top: 0 } .bignum { min-height: 44px; display: inline-flex; align-items: center }
 .sec-head h1.h2like { font: 400 clamp(26px, 4vw, 38px)/1.05 var(--slab); text-transform: uppercase; margin: 0 0 6px; color: var(--navy-2); text-wrap: balance; text-shadow: none }
 .sec-head h1.h2like::after { content: "★ ★ ★ ★ ★"; display: block; font: 400 13px var(--sans); letter-spacing: .5em; color: var(--red); margin-top: 8px; -webkit-text-fill-color: var(--red) }
+
+/* v50: shorter pages. Long sections stay one line tall until tapped. */
+.fold { border-radius: 14px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.28); margin-top: 14px; overflow: hidden }
+.fold > summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 60px; padding: 10px 16px; cursor: pointer; list-style: none; color: #fff } .fold > summary::-webkit-details-marker { display: none }
+.fold > summary span { display: grid; gap: 2px } .fold > summary b { font: 900 16.5px/1.2 var(--sans) } .fold > summary small { font: 600 12.5px var(--sans); opacity: .8 }
+.fold > summary i { flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: #F7C948; color: #3A2800; font: 900 22px/1 var(--sans); font-style: normal } .fold[open] > summary i { transform: rotate(45deg) }
+.fold-in { padding: 4px 14px 16px } .fold-in > .why, .fold-in > .ppl { margin-top: 6px }
+.sec:not(.dark):not(.bfsec):not(.deal) .fold, .sec.alt .fold { background: #fff; border-color: #DCE3F2; box-shadow: var(--shadow-sm) } .sec:not(.dark):not(.bfsec):not(.deal) .fold > summary, .sec.alt .fold > summary { color: var(--navy-2) }
+.screen.wiz .fold { background: rgba(7,20,51,.5) } .screen.wiz .fold-in { padding: 4px 10px 14px }
+.shopmorewrap { display: grid; justify-items: center; gap: 8px; padding: 10px 0 4px } .shopmorewrap .btn { min-height: 54px; min-width: min(100%, 300px); justify-content: center } .shopmorewrap small { font: 700 13px var(--sans); color: var(--muted) }
+@media (max-width: 860px) { .footlinks { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; text-align: left } }
+
+/* v51: home on a phone. The product lines swipe sideways, and the footer drops its third logo. */
+@media (max-width: 860px) {
+  .lines { display: flex; overflow-x: auto; gap: 10px; scroll-snap-type: x mandatory; padding-bottom: 8px; -webkit-overflow-scrolling: touch; scrollbar-width: none } .lines::-webkit-scrollbar { display: none }
+  .lines .linecard { flex: 0 0 62%; scroll-snap-align: start }
+  .foot img.footlogo { display: none } .foot .wrap { padding-top: 18px }
+  .sec { padding-block: 26px }
+}
