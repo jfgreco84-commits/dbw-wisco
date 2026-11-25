@@ -854,3 +854,18 @@ body:has(#dock:not([hidden])) .bf { bottom: calc(var(--dockh, 110px) + 26px) !im
 
 /* v52: the date this copy of the site was built */
 .buildstamp { margin-top: 10px; font: 700 12px var(--sans); letter-spacing: .04em; color: #9FB2DE }
+
+/* v53: the National Sales Director's page */
+.natl .brand b { font-size: 15px; line-height: 1.08; letter-spacing: .04em; white-space: nowrap }
+.natl .brand small { display: block; color: #F7C948; letter-spacing: .1em; white-space: nowrap } .natl .brand small .nm { font-style: normal }
+@media (max-width: 860px) { .natl .brand small .nm { display: none } .natl .brand small { font-size: 8.5px; letter-spacing: .06em } }
+@media (max-width: 400px) { .natl .brand b { font-size: 13.5px } .natl .brand small { font-size: 7.6px } }
+@media (min-width: 861px) { .natl .brand b { font-size: 22px } .natl .brand b br { display: none } .natl .footlogo { width: 170px; height: auto } }
+.natlart { margin: 0; display: grid; justify-items: center; gap: 14px; text-align: center }
+.natlart img { width: min(360px, 80%); height: auto; aspect-ratio: 1; border-radius: 50%; border: 5px solid #F7C948; box-shadow: 0 0 0 8px rgba(247,201,72,.2), 0 18px 46px rgba(0,0,0,.5); object-fit: cover }
+.natlart figcaption b { display: block; font: 900 30px/1.1 var(--sans); color: #fff }
+.natlart figcaption span { display: block; margin-top: 6px; font: 900 14px var(--sans); letter-spacing: .2em; text-transform: uppercase; color: #F7C948 }
+.natlart figcaption small { display: block; margin-top: 4px; font: 700 12px var(--sans); letter-spacing: .16em; text-transform: uppercase; color: #c9d5ff }
+.mine.natl { border: 2px solid #F7C948; background: linear-gradient(135deg, rgba(7,20,51,.9), rgba(20,40,96,.82)); box-shadow: 0 6px 22px rgba(0,0,0,.35) }
+.mine.natl img, .mine.natl .av { border-color: #F7C948; box-shadow: 0 0 0 3px rgba(247,201,72,.28) }
+@media (max-width: 860px) { .hero .art .natlart { display: none } }
