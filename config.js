@@ -48,6 +48,7 @@ window.WISCO = {
   // manager = that rep's manager's email. They get a copy. You (orderEmail) are always copied.
   // aka     = old nicknames, so links already texted out keep working.
   // title   = shown in place of "Your Blade Guy" (optional). national: true = their page carries the United States logo.
+  // solo: true = everything from their page goes to them alone. Nobody else is named, copied or offered as a choice.
   reps: [
     { name: "Big Frank Greco", photo: "frank.webp", email: "", cell: "", manager: "", aka: ["frankgreco", "frank", "bigfrank"] },
     { name: "John Anthony", photo: "johnanthony.webp", email: "janthony@diamondbladewarehouse.com", cell: "+14143630323", manager: "", aka: ["johnanthony", "ronny", "ronny-b", "john-anthony"] },
@@ -61,7 +62,7 @@ window.WISCO = {
     { name: "Geoff Nurse", photo: "geoffnurse.webp", email: "gnurse@diamondbladewarehouse.com", cell: "+14142544197", manager: "", aka: ["geoffnurse", "geoff", "jeff"] },
     { name: "Joyner Lucas", photo: "joynerlucas.webp", email: "lmillan@diamondbladewarehouse.com", cell: "+14142161941", manager: "", aka: ["joynerlucas", "joyner", "joyner-lucas", "luismillan", "luis", "luis-milan"] },
     { name: "Michael Gerald", photo: "michaelgerald.webp", email: "mgerald@diamondbladewarehouse.com", cell: "+18035240565", manager: "", aka: ["michaelgerald", "michael-gerald", "michael"] },
-    { name: "Jeff Johnson", title: "National Sales Director", national: true, photo: "jeffjohnson.webp", email: "jjohnson@diamondbladewarehouse.com", cell: "+18475297584", manager: "", aka: ["jeffjohnson", "jeff-johnson", "jjohnson"] },
+    { name: "Jeff Johnson", title: "National Sales Director", national: true, solo: true, photo: "jeffjohnson.webp", email: "jjohnson@diamondbladewarehouse.com", cell: "+18475297584", manager: "", aka: ["jeffjohnson", "jeff-johnson", "jjohnson"] },
     { name: "Les", photo: "les.webp", email: "lkubeny@diamondbladewarehouse.com", cell: "+14142072487", manager: "", aka: ["les"] }
   ],
 

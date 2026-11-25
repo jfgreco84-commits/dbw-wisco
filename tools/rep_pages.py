@@ -21,8 +21,9 @@ def roster():
     for m in re.finditer(r'\{\s*name:\s*"([^"]+)",[^{}]*?photo:\s*"([^"]*)".*?aka:\s*\[([^\]]*)\]', block):
         aka = re.findall(r'"([^"]+)"', m.group(3))
         em = re.search(r'email:\s*"([^"]*)"', m.group(0)); ce = re.search(r'cell:\s*"([^"]*)"', m.group(0))
+        so = re.search(r'solo:\s*true', m.group(0))
         ti = re.search(r'title:\s*"([^"]*)"', m.group(0)); na = re.search(r'national:\s*true', m.group(0))
-        if aka and aka[0] not in RESERVED: out.append(dict(title=ti.group(1) if ti else "", national=bool(na), name=m.group(1), photo=m.group(2), slug=aka[0], also=[x for x in aka[1:] if x not in RESERVED], email=em.group(1) if em else "", cell=ce.group(1) if ce else ""))
+        if aka and aka[0] not in RESERVED: out.append(dict(solo=bool(so), title=ti.group(1) if ti else "", national=bool(na), name=m.group(1), photo=m.group(2), slug=aka[0], also=[x for x in aka[1:] if x not in RESERVED], email=em.group(1) if em else "", cell=ce.group(1) if ce else ""))
     return out
 
 
@@ -106,7 +107,12 @@ def build(site_url, full=None):
         if r.get("national"):   # the United States logo and the full company name, already in place before the script runs
             page = page.replace('src="brand/logo.webp"', 'src="brand/logo-usa.webp"')
             page = page.replace('<span><b>DBW WISCO</b><small>A division of Diamond Blade Warehouse, LLC</small></span>', '<span><b>Diamond Blade <br>Warehouse</b><small><i class="nm">%s · </i>%s</small></span>' % (name, html.escape(r["title"])))
+            page = page.replace('aria-label="DBW WISCO home"', 'aria-label="Diamond Blade Warehouse home"').replace('alt="DBW WISCO"', 'alt="Diamond Blade Warehouse"').replace('<b class="footname">DBW WISCO</b>', '<b class="footname">Diamond Blade Warehouse</b>')
+            for a, b in (('<span>★ A division of Diamond Blade Warehouse, LLC</span>', '<span data-orig="★ A division of Diamond Blade Warehouse, LLC">★ In business since 1987</span>'),
+                         ('<span class="footsub">A division of Diamond Blade Warehouse, LLC. In business since 1987.</span>', '<span class="footsub" data-orig="A division of Diamond Blade Warehouse, LLC. In business since 1987.">Diamond Blade Warehouse, LLC. In business since 1987.</span>')):
+                assert page.count(a) == 1, a; page = page.replace(a, b)
             page = page.replace('<html lang="en">', '<html lang="en" class="natl">', 1); assert 'class="natl"' in page and "logo-usa" in page
+        if r.get("solo"): page = page.replace(">Text it to Frank<", ">Text it to %s<" % html.escape(short_name(r["name"]).split(" ")[0]))
         sub(r"<title>.*?</title>", "<title>%s%s</title>" % (name, tagline))
         sub(r'<meta name="description" content="[^"]*">', '<meta name="description" content="Reorder diamond blades in 60 seconds. Your order goes straight to %s.">' % name)
         sub(r'<meta property="og:title" content="[^"]*">', '<meta property="og:title" content="%s%s">' % (name, tagline))
