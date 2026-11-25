@@ -343,7 +343,7 @@
       '<div class="acct-seg" role="group" aria-label="Are you on account">' + [["yes", "Yes, I’m on account"], ["new", "I’m new"], ["unsure", "Not sure"]].map(function (x) { return '<button type="button" data-acctkind="' + x[0] + '" aria-pressed="' + (kind === x[0]) + '">' + x[1] + "</button>"; }).join("") + "</div>" +
       '<div class="acct-more" id="acctmore"' + (kind === "yes" ? "" : " hidden") + ">" +
       '<label for="ac-co">What name is the account under?</label><input id="ac-co" autocomplete="organization" autocapitalize="words" placeholder="Company name" value="' + esc(i.company || "") + '">' +
-      '<label for="ac-rep">Who’s your rep?</label><select id="ac-rep"><option value="">Not sure</option>' + (W.reps || []).map(function (x) { var sl = slug(x.name); return '<option value="' + sl + '"' + (r && slug(r.name) === sl ? " selected" : "") + ">" + esc(x.name) + "</option>"; }).join("") + "</select>" +
+      (soloRep() ? '<input type="hidden" id="ac-rep" value="' + esc(slug(soloRep().name)) + '"><div hidden><select>' : '<label for="ac-rep">Who’s your rep?</label><select id="ac-rep"><option value="">Not sure</option>') + (soloRep() ? [] : W.reps || []).map(function (x) { var sl = slug(x.name); return '<option value="' + sl + '"' + (r && slug(r.name) === sl ? " selected" : "") + ">" + esc(x.name) + "</option>"; }).join("") + "</select>" + (soloRep() ? "</div>" : "") +
       '<label>When did you last buy from us?</label><div class="acct-seg three" role="group" aria-label="Last order">' + LASTS.map(function (x) { return '<button type="button" data-acctlast="' + x[0] + '" aria-pressed="' + (i.last === x[0]) + '">' + x[1] + "</button>"; }).join("") + "</div>" +
       '<p class="acct-note">Don’t remember? No problem. We only ask because relationships are everything here. Like your salesperson? Keep buying from them.</p></div>' +
       '<button type="button" class="btn gold sm acct-save" data-acctsave' + (kind ? "" : " hidden") + ">Save</button>" + fine + "</div>";
@@ -422,7 +422,7 @@
       '<section class="sec dark"><div class="wrap">' + fold("Two ways to save", "Leave a review or refer a contractor", '<div class="three swipe">' +
       '<div class="point"><b>Leave a review</b><p>Tell us how the blades held up, good or bad. An honest review earns you ' + esc(RW.review) + '.</p><button class="btn chrome sm" data-review style="margin-top:12px">Leave a review</button></div>' +
       '<div class="point"><b>Refer a contractor</b><p>Send someone our way. When they place a first order and name you, you get ' + esc(RW.referrer) + '.</p><button class="btn chrome sm" data-refer style="margin-top:12px">Refer a contractor</button></div>' +
-      '<div class="point"><b>Just tell us</b><p>Something off with an order, a blade or a rep? ' + (myRep() ? esc(WHO()) + " and " + FRANK + " read" : esc(WHO()) + " reads") + ' every note.</p><button class="btn ghost sm" data-feedback style="margin-top:12px">Send ' + esc(WHO()) + " a note</button></div>" +
+      '<div class="point"><b>Just tell us</b><p>Something off with an order, a blade or a rep? ' + (myRep() && !soloRep() ? esc(WHO()) + " and " + FRANK + " read" : esc(WHO()) + " reads") + ' every note.</p><button class="btn ghost sm" data-feedback style="margin-top:12px">Send ' + esc(WHO()) + " a note</button></div>" +
       "</div>", "foldsave") + "</div></section>";
     setNav("#home");
   }
@@ -1037,8 +1037,8 @@
   function repBySlug(s) { if (!s) return undefined; return (W.reps || []).filter(function (r) { return slug(r.name) === s || (r.aka || []).indexOf(s) >= 0; })[0]; }
   function initials(n) { return n.split(/\s+/).map(function (x) { return x[0]; }).join("").slice(0, 2).toUpperCase(); }
   function renderReps(cur) {
-    var lockR = store.get("replock", 0) === 1 && repBySlug(cur);
-    if (lockR) { $("#reps").innerHTML = '<div class="replock"><span class="av">' + (lockR.photo ? '<img alt="" src="brand/reps/' + esc(lockR.photo) + '">' : esc(initials(lockR.name))) + "</span><div><b>" + esc(lockR.name) + "</b><small>" + (lockR.title ? esc(lockR.title) + "." : "Your salesman.") + ' This goes straight to them.</small></div><button type="button" class="link" data-repchange>Not your rep?</button></div>'; $("#f-rep").value = slug(lockR.name); $("#replabel").textContent = "Your salesman"; var rd0 = $("#repd"); if (rd0) { rd0.open = true; rd0.classList.add("locked"); } return; }
+    var lockR = store.get("replock", 0) === 1 && repBySlug(cur); if (soloRep()) lockR = soloRep();
+    if (lockR) { $("#reps").innerHTML = '<div class="replock"><span class="av">' + (lockR.photo ? '<img alt="" src="brand/reps/' + esc(lockR.photo) + '">' : esc(initials(lockR.name))) + "</span><div><b>" + esc(lockR.name) + "</b><small>" + (lockR.title ? esc(lockR.title) + "." : "Your salesman.") + (lockR.solo ? " This goes straight to " + esc(lockR.name.split(" ")[0]) + ".</small></div></div>" : ' This goes straight to them.</small></div><button type="button" class="link" data-repchange>Not your rep?</button></div>'); $("#f-rep").value = slug(lockR.name); $("#replabel").textContent = lockR.solo ? "Goes to" : "Your salesman"; var rd0 = $("#repd"); if (rd0) { rd0.open = true; rd0.classList.add("locked"); } return; }
     var rd = $("#repd"); if (rd) rd.classList.remove("locked");
     $("#reps").innerHTML = '<button type="button" class="rep' + (!cur ? " on" : "") + '" data-rep=""><span class="av q">?</span><b>Not sure</b></button>' + (W.reps || []).map(function (r) {
       var s = slug(r.name);
@@ -1057,7 +1057,7 @@
     $("#f-acct").value = v;
     $$("#acctseg [data-acct]").forEach(function (x) { x.setAttribute("aria-pressed", x.dataset.acct === v); });
     $("#newwrap").hidden = !(order && v === "new");
-    $("#replabel").textContent = v === "new" ? "New to DBW? We’ll match you with a rep." : "Your salesman";
+    $("#replabel").textContent = soloRep() ? "Goes to" : v === "new" ? "New to DBW? We’ll match you with a rep." : "Your salesman";
     $("#creditsum").textContent = v === "new" ? "Want terms? Add trade references to set up credit" : "Need a higher credit limit? Add trade references";
     $("#creditnote").textContent = v === "new" ? "Three trade references get a Net 30 or Net 45 account moving. Skip this if you’re paying by card or check." : "Tell us the limit you need and give us current references. Your rep takes it to credit.";
     if (v === "new" && /terms/i.test(f.elements.pay.value)) $("#creditwrap").open = true;
@@ -1174,7 +1174,8 @@
   }
   /* Who gets it. A rep with an email in config.js gets the order; Frank and the rep's manager are copied. No rep email = it goes to Frank. */
   function route2(slugv) {
-    var r = repBySlug(slugv) || {}, main = W.orderEmail || "", toRep = W.ordersTo === "rep", uniq = function (a) { var seen = {}; return a.filter(function (x) { x = (x || "").toLowerCase(); if (!x || seen[x]) return false; seen[x] = 1; return true; }); };
+    var r = repBySlug(slugv) || soloRep() || {}, main = W.orderEmail || "", toRep = W.ordersTo === "rep", uniq = function (a) { var seen = {}; return a.filter(function (x) { x = (x || "").toLowerCase(); if (!x || seen[x]) return false; seen[x] = 1; return true; }); };
+    if (r.solo) return { to: r.email || "", cc: [], cell: r.cell || "", who: (r.name || "").split(" ")[0] };
     var both = W.ordersTo === "both";
     /* "both": the manager AND the customer's rep each get the email (both on the To line) and the text (one group text). */
     var tos = both ? uniq([r.email, main]) : [toRep && r.email ? r.email : main], to = tos.join(",");
@@ -1183,10 +1184,14 @@
     var first = function (n) { return (n || "").replace(/^Big /, "").split(" ")[0]; };
     return { to: to, cc: cc, cell: cells.join(","), who: both && cells.length > 1 ? first(r.name) + " and " + FRANK : repText || (toRep && r.email) ? r.name : FRANK };
   }
-  function mailWho(slugv) { var r = repBySlug(slugv), rt = route2(slugv), f1 = function (n) { return (n || "").replace(/^Big /, "").split(" ")[0]; }; return r && r.email && rt.to.toLowerCase().indexOf(r.email.toLowerCase()) >= 0 && !isBoss(r) ? f1(r.name) + " and " + FRANK : FRANK; }
+  function mailWho(slugv) { var r = repBySlug(slugv) || soloRep(), rt = route2(slugv); if (r && r.solo) return rt.who; var f1 = function (n) { return (n || "").replace(/^Big /, "").split(" ")[0]; }; return r && r.email && rt.to.toLowerCase().indexOf(r.email.toLowerCase()) >= 0 && !isBoss(r) ? f1(r.name) + " and " + FRANK : FRANK; }
   function sendLabels(slugv) { $("#textbtn").textContent = "Text it to " + route2(slugv).who; var eb = $("[data-email]"); if (eb) eb.textContent = "Email it to " + mailWho(slugv); }
-  function mailto(to, subj, body, cc) { location.href = "mailto:" + (to || "").split(",").map(encodeURIComponent).join(",") + "?" + (cc && cc.length ? "cc=" + encodeURIComponent(cc.join(",")) + "&" : "") + "subject=" + encodeURIComponent(subj) + "&body=" + encodeURIComponent(body); }
+  /* On the national page everything says the company's name, not the Wisconsin store's. */
+  function soloRep() { var r = myRep(); return r && r.solo ? r : null; }
+  function nat(s) { var r = myRep(); return r && r.national ? String(s == null ? "" : s).replace(/(the )?DBW WISCO( site| store)?/g, function (m, the, tail) { return (the || "") + "Diamond Blade Warehouse" + (tail || ""); }) : s; }
+  function mailto(to, subj, body, cc) { subj = nat(subj); body = nat(body); location.href = "mailto:" + (to || "").split(",").map(encodeURIComponent).join(",") + "?" + (cc && cc.length ? "cc=" + encodeURIComponent(cc.join(",")) + "&" : "") + "subject=" + encodeURIComponent(subj) + "&body=" + encodeURIComponent(body); }
   function sms(body, cell) {
+    body = nat(body);
     cell = cell || W.textNumber; var many = cell.indexOf(",") > 0, ios = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (/Mac/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
     /* Group text: iPhone needs the /open?addresses= form, Android takes a comma list. */
     location.href = many && ios ? "sms:/open?addresses=" + cell + "&body=" + encodeURIComponent(body) : "sms:" + cell + "?&body=" + encodeURIComponent(body);
@@ -1195,7 +1200,7 @@
     if (needName()) return;
     var o = formData(), rep = repBySlug(o.rep), body = buildText(o);
     var subj = (mode === "order" && o.intent !== "buy" ? "Quote request" : MODES[mode].subj) + " from " + (o.company || o.name) + (rep ? " (salesman: " + rep.name + ")" : "") + (o.po ? " PO " + o.po : "") + (ordRef ? " [" + ordRef + "]" : "");
-    var viaMail = function () { try { navigator.clipboard.writeText(body).catch(function () {}); } catch (e) {} var rt = route2(o.rep); mailto(rt.to, subj, body, rt.cc); afterSend("email"); };
+    var viaMail = function () { try { navigator.clipboard.writeText(nat(body)).catch(function () {}); } catch (e) {} var rt = route2(o.rep); mailto(rt.to, subj, body, rt.cc); afterSend("email"); };
     if (W.formEndpoint && !isPreview) {
       fetch(W.formEndpoint, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify({ _subject: subj, name: o.name, company: o.company, phone: o.phone, email: o.email, salesman: rep ? rep.name : "", message: body }) })
         .then(function (r) { if (!r.ok) throw 0; afterSend("posted"); }).catch(viaMail);
@@ -1203,7 +1208,7 @@
   }
   function copyText(txt, done) {
     var fb = function () { toast("Couldn’t copy automatically. Press and hold the text to copy."); };
-    try { navigator.clipboard.writeText(txt).then(function () { done && done(); }, fb); } catch (e) { fb(); }
+    txt = nat(txt); try { navigator.clipboard.writeText(txt).then(function () { done && done(); }, fb); } catch (e) { fb(); }
   }
   function shareLink() { var o = formData(); return ROOT + "?cart=" + cartLines().map(function (l) { return encodeURIComponent(l.v[0]) + "*" + l.c.q; }).join(",") + (o.rep ? "&rep=" + o.rep : "") + linkExtras(); }
   function repMode() { return false; }   /* price entry on the site is gone: a price typed here could be edited or forwarded */
@@ -1416,11 +1421,26 @@
     if (!BRAND0 && b && sm) BRAND0 = { b: b.textContent, sm: sm.textContent, fn: fn ? fn.textContent : "" };
     document.documentElement.classList.toggle("natl", on);
     $$(".brand img, .footlogo").forEach(function (im) { var want = on ? "brand/logo-usa.webp" : "brand/logo.webp"; if (im.getAttribute("src") !== want) im.setAttribute("src", want); });
+    [[".trust span", "★ In business since 1987"], [".footsub", "Diamond Blade Warehouse, LLC. In business since 1987."]].forEach(function (x) { var e = $(x[0]); if (!e) return; if (e.dataset.orig == null) e.dataset.orig = e.textContent; var want = on ? x[1] : e.dataset.orig; if (e.textContent !== want) e.textContent = want; });
     if (!BRAND0) return;
     if (on) b.innerHTML = "Diamond Blade <br>Warehouse"; else b.textContent = BRAND0.b; if (on) sm.innerHTML = '<i class="nm">' + esc(r.name) + " · </i>" + esc(r.title); else sm.textContent = BRAND0.sm; if (fn) fn.textContent = on ? "Diamond Blade Warehouse" : BRAND0.fn;
   }
+  var natObs = null;
+  function natSweep(root) {
+    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), n, fix = [];
+    while ((n = w.nextNode())) if (n.nodeValue.indexOf("DBW WISCO") >= 0 && !/^(SCRIPT|STYLE|TEXTAREA)$/.test(n.parentNode.nodeName)) fix.push(n);
+    fix.forEach(function (x) { x.nodeValue = nat(x.nodeValue); });
+    [].forEach.call(root.querySelectorAll ? root.querySelectorAll("[alt*='DBW WISCO'],[aria-label*='DBW WISCO'],[placeholder*='DBW WISCO'],[title*='DBW WISCO']") : [], function (e) { ["alt", "aria-label", "placeholder", "title"].forEach(function (a) { var v = e.getAttribute(a); if (v && v.indexOf("DBW WISCO") >= 0) e.setAttribute(a, nat(v)); }); });
+  }
+  function natWatch() {
+    var r = myRep(), on = !!(r && r.national);
+    if (!on) { if (natObs) { natObs.disconnect(); natObs = null; } return; }
+    natSweep(document.body); if (natObs || !window.MutationObserver) return;
+    natObs = new MutationObserver(function () { natObs.disconnect(); natSweep(document.body); natObs.observe(document.body, { childList: true, subtree: true, characterData: true }); });
+    natObs.observe(document.body, { childList: true, subtree: true, characterData: true });
+  }
   function contactWire() {
-    natlWire();
+    natlWire(); natWatch();
     var r = myRep(), cell = (r && r.cell) || W.textNumber || "", mail = (r && r.email) || W.orderEmail || "", who = r ? repFirst(r) : FRANK;
     $$("[data-text-btn]").forEach(function (a) { a.href = "sms:" + cell; if (a.closest(".footact")) a.textContent = "Text " + who; });
     $$("[data-call-btn]").forEach(function (a) { a.href = "tel:" + cell; a.textContent = "Call " + who; });
