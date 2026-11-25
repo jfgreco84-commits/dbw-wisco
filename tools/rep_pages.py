@@ -34,6 +34,10 @@ def font(size):
 
 def share_image(rep, dest):
     base = Image.open(os.path.join(SITE, "brand", "share.jpg")).convert("RGB")
+    if rep.get("national"):   # the United States logo in place of the Wisconsin one
+        strip = base.crop((704, 0, 712, 430)).resize((496, 430), Image.BILINEAR); base.paste(strip, (704, 0))
+        usa = Image.open(os.path.join(SITE, "brand", "logo-usa.webp")).convert("RGBA"); uw = 400; usa = usa.resize((uw, int(usa.height * uw / usa.width)), Image.LANCZOS)
+        base.paste(usa, (950 - uw // 2, 215 - usa.height // 2), usa)
     d = ImageDraw.Draw(base)
     d.rectangle([0, 40, 700, 600], fill=(9, 22, 58))
     y = 70
@@ -51,9 +55,17 @@ def share_image(rep, dest):
     size = 62
     while size > 30 and d.textlength(name, font=font(size)) > 600: size -= 2
     d.text((60, 330), name, fill="white", font=font(size))
-    d.text((60, 410), (rep.get("title") or "YOUR BLADE GUY").upper(), fill=(255, 196, 37), font=font(40 if not rep.get("title") else 36))
-    d.text((60, 480), "Reorder diamond blades in 60 seconds.", fill=(214, 224, 255), font=font(27))
-    d.text((60, 530), "Diamond Blade Warehouse" if rep.get("national") else "DBW WISCO", fill=(255, 255, 255), font=font(27))
+    title = (rep.get("title") or "YOUR BLADE GUY").upper()
+    lines = title.split(" AND ", 1) if len(title) > 30 and " AND " in title else [title]
+    ty = 410
+    for ln in lines:
+        ts = 40 if not rep.get("title") else 36
+        while ts > 20 and d.textlength(ln, font=font(ts)) > 610: ts -= 1
+        d.text((60, ty), ln, fill=(255, 196, 37), font=font(ts)); ty += ts + 10
+    if len(lines) == 1: ty = 480
+    else: ty += 8
+    d.text((60, ty), "Reorder diamond blades in 60 seconds.", fill=(214, 224, 255), font=font(25 if len(lines) > 1 else 27))
+    d.text((60, ty + (42 if len(lines) > 1 else 50)), "Diamond Blade Warehouse" if rep.get("national") else "DBW WISCO", fill=(255, 255, 255), font=font(25 if len(lines) > 1 else 27))
     os.makedirs(os.path.dirname(dest), exist_ok=True)
     base.save(dest, quality=84)
 
@@ -106,7 +118,7 @@ def build(site_url, full=None):
             if r.get("photo"): page = page.replace('src="brand/reps/frank.webp" alt="" width="64" height="64" class="repface" data-askimg', 'src="brand/reps/%s" alt="" width="64" height="64" class="repface" data-askimg' % r["photo"])
         if r.get("national"):   # the United States logo and the full company name, already in place before the script runs
             page = page.replace('src="brand/logo.webp"', 'src="brand/logo-usa.webp"')
-            page = page.replace('<span><b>DBW WISCO</b><small>A division of Diamond Blade Warehouse, LLC</small></span>', '<span><b>Diamond Blade <br>Warehouse</b><small><i class="nm">%s · </i>%s</small></span>' % (name, html.escape(r["title"])))
+            page = page.replace('<span><b>DBW WISCO</b><small>A division of Diamond Blade Warehouse, LLC</small></span>', ('<span><b>Diamond Blade <br>Warehouse</b><small class="two">%s</small></span>' % html.escape(r["title"]).replace(" and ", "<br>", 1)) if len(r["title"]) > 30 and " and " in r["title"] else '<span><b>Diamond Blade <br>Warehouse</b><small><i class="nm">%s · </i>%s</small></span>' % (name, html.escape(r["title"])))
             page = page.replace('aria-label="DBW WISCO home"', 'aria-label="Diamond Blade Warehouse home"').replace('alt="DBW WISCO"', 'alt="Diamond Blade Warehouse"').replace('<b class="footname">DBW WISCO</b>', '<b class="footname">Diamond Blade Warehouse</b>')
             for a, b in (('<span>★ A division of Diamond Blade Warehouse, LLC</span>', '<span data-orig="★ A division of Diamond Blade Warehouse, LLC">★ In business since 1987</span>'),
                          ('<span class="footsub">A division of Diamond Blade Warehouse, LLC. In business since 1987.</span>', '<span class="footsub" data-orig="A division of Diamond Blade Warehouse, LLC. In business since 1987.">Diamond Blade Warehouse, LLC. In business since 1987.</span>')):
