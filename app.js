@@ -436,7 +436,7 @@
 
   function aggBox() {
     return '<div class="frank aggbox"><b class="h">What’s in your concrete matters</b>' +
-      "<p>Limestone, dolomite, sandstone, pit gravel, river rock, traprock, granite, basalt, quartzite, chert, flint. They don’t cut the same, and they change from one part of the country to the next. Houston river rock is some of the hardest there is, so the bond has to be very soft. That same blade is the wrong blade in Wisconsin.</p>" +
+      "<p>Limestone, dolomite, sandstone, pit gravel, river rock, traprock, granite, basalt, quartzite, chert, flint. They don’t cut the same, and they change from one part of the country to the next. Houston river rock is some of the hardest there is, so the bond has to be very soft. That same blade is the wrong blade " + (myRep() && myRep().national ? "where the rock is softer" : "in Wisconsin") + ".</p>" +
       "<p><b>We take that seriously.</b> Tell me where you cut and I’ll recommend the bond for the aggregate you actually have. The goal is the most footage for your money, not the most blades sold per year. We want to save you money and be your blade guys every year after this one.</p>" +
       '<div class="hprow"><input id="aggloc" type="text" placeholder="City, state" autocomplete="address-level2" aria-label="City and state"><button class="btn gold sm" data-aggask>Get ' + esc(WHO()) + '’s recommendation</button></div>' +
       '<div class="center" style="margin-top:10px"><a class="btn ghost-d sm" href="#early">See the aggregate map</a></div></div>';
