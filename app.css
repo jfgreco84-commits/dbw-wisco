@@ -869,3 +869,8 @@ body:has(#dock:not([hidden])) .bf { bottom: calc(var(--dockh, 110px) + 26px) !im
 .mine.natl { border: 2px solid #F7C948; background: linear-gradient(135deg, rgba(7,20,51,.9), rgba(20,40,96,.82)); box-shadow: 0 6px 22px rgba(0,0,0,.35) }
 .mine.natl img, .mine.natl .av { border-color: #F7C948; box-shadow: 0 0 0 3px rgba(247,201,72,.28) }
 @media (max-width: 860px) { .hero .art .natlart { display: none } }
+
+/* v54: a long first name still fits the small buttons on a phone */
+.mine .mine-act .btn i { font-style: normal }
+@media (max-width: 480px) { .mine.longn .mine-act .btn .nm { display: none } }
+.bf.longn .bf-av em { font-size: 9px; letter-spacing: .02em; padding-inline: 7px }

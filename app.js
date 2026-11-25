@@ -326,9 +326,9 @@
   function prettyPhone(c) { var d = String(c || "").replace(/\D/g, "").slice(-10); return d.length === 10 ? "(" + d.slice(0, 3) + ") " + d.slice(3, 6) + "-" + d.slice(6) : ""; }
   function mineCard(r) {
     var cell = r.cell || W.textNumber || "", mail = r.email || (isBoss(r) ? W.orderEmail || "" : ""), who = isBoss(r) ? FRANK : repFirst(r);
-    return '<div class="mine' + (r.national ? " natl" : "") + '">' + (r.photo ? '<img alt="" src="brand/reps/' + esc(r.photo) + '">' : '<span class="av">' + esc(initials(r.name)) + "</span>") +
+    return '<div class="mine' + (r.national ? " natl" : "") + (String(who).length > 7 ? " longn" : "") + '">' + (r.photo ? '<img alt="" src="brand/reps/' + esc(r.photo) + '">' : '<span class="av">' + esc(initials(r.name)) + "</span>") +
       '<div class="mine-id"><b>' + esc(isBoss(r) ? "Big Frank" : r.name) + "</b><span>" + esc(r.title || "Your Blade Guy") + "</span>" + (prettyPhone(cell) ? '<a class="mine-num" href="tel:' + esc(cell) + '">' + prettyPhone(cell) + "</a>" : "") + "<small>Goes straight to " + esc(String(who).replace(/\.$/, "")) + (isBoss(r) ? " himself" : "") + ". Nothing automated. No AI bots.</small>" + (isBoss(r) ? '<small class="mine-247">My phone is on 24/7. Need bailing out past midnight? I’ll expect a big order in the morning.</small>' : "") + "</div>" +
-      '<div class="mine-act">' + (cell ? '<a class="btn chrome sm" href="sms:' + esc(cell) + '">Text ' + esc(who) + "</a>" : "") + (mail ? '<a class="btn chrome sm" href="mailto:' + esc(mail) + '">Email ' + esc(who) + "</a>" : "") + (cell ? '<a class="btn chrome sm" href="tel:' + esc(cell) + '">Call ' + esc(who) + "</a>" : "") + '</div><button type="button" class="mine-x" data-norep>Not your rep? Tap here</button></div>';
+      '<div class="mine-act">' + (cell ? '<a class="btn chrome sm" href="sms:' + esc(cell) + '"><i>Text<i class="nm"> ' + esc(who) + "</i></i></a>" : "") + (mail ? '<a class="btn chrome sm" href="mailto:' + esc(mail) + '"><i>Email<i class="nm"> ' + esc(who) + "</i></i></a>" : "") + (cell ? '<a class="btn chrome sm" href="tel:' + esc(cell) + '"><i>Call<i class="nm"> ' + esc(who) + "</i></i></a>" : "") + '</div><button type="button" class="mine-x" data-norep>Not your rep? Tap here</button></div>';
   }
   var LASTS = [["recent", "Within 18 months"], ["old", "Longer than that"], ["unsure", "Don’t remember"]];
   function lastTxt(k) { return k === "recent" ? "within the past 18 months" : k === "old" ? "more than 18 months ago" : k === "unsure" ? "not sure" : ""; }
@@ -1446,7 +1446,7 @@
     $$("[data-call-btn]").forEach(function (a) { a.href = "tel:" + cell; a.textContent = "Call " + who; });
     var noMail = !!(r && !r.email); if (noMail) mail = "";
     $$("[data-mail-btn]").forEach(function (a) { a.href = "mailto:" + mail; a.textContent = "Email " + who; a.hidden = noMail; });
-    $$("[data-askname]").forEach(function (a) { a.textContent = "Ask " + who; });
+    $$("[data-askname]").forEach(function (a) { a.textContent = "Ask " + who; }); var bfl = $("#bf"); if (bfl) bfl.classList.toggle("longn", String(who).length > 7);
     $$("[data-sayname]").forEach(function (a) { a.textContent = (r ? who : "Big " + FRANK) + " says"; });
     $$("[data-askimg]").forEach(function (a) { a.src = askImg(); a.classList.add("repface"); });
     var bfa = $("#bf"); if (bfa) bfa.setAttribute("aria-label", (r ? who : "Big " + FRANK) + " says");
