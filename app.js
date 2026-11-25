@@ -1423,7 +1423,7 @@
     $$(".brand img, .footlogo").forEach(function (im) { var want = on ? "brand/logo-usa.webp" : "brand/logo.webp"; if (im.getAttribute("src") !== want) im.setAttribute("src", want); });
     [[".trust span", "★ In business since 1987"], [".footsub", "Diamond Blade Warehouse, LLC. In business since 1987."]].forEach(function (x) { var e = $(x[0]); if (!e) return; if (e.dataset.orig == null) e.dataset.orig = e.textContent; var want = on ? x[1] : e.dataset.orig; if (e.textContent !== want) e.textContent = want; });
     if (!BRAND0) return;
-    if (on) b.innerHTML = "Diamond Blade <br>Warehouse"; else b.textContent = BRAND0.b; if (on) sm.innerHTML = '<i class="nm">' + esc(r.name) + " · </i>" + esc(r.title); else sm.textContent = BRAND0.sm; if (fn) fn.textContent = on ? "Diamond Blade Warehouse" : BRAND0.fn;
+    if (on) b.innerHTML = "Diamond Blade <br>Warehouse"; else b.textContent = BRAND0.b; if (on) { var two = r.title.length > 30 && r.title.indexOf(" and ") > 0; sm.innerHTML = two ? esc(r.title).replace(" and ", "<br>") : '<i class="nm">' + esc(r.name) + " · </i>" + esc(r.title); sm.classList.toggle("two", two); } else { sm.textContent = BRAND0.sm; sm.classList.remove("two"); } if (fn) fn.textContent = on ? "Diamond Blade Warehouse" : BRAND0.fn;
   }
   var natObs = null;
   function natSweep(root) {

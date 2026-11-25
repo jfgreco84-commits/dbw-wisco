@@ -874,3 +874,10 @@ body:has(#dock:not([hidden])) .bf { bottom: calc(var(--dockh, 110px) + 26px) !im
 .mine .mine-act .btn i { font-style: normal }
 @media (max-width: 480px) { .mine.longn .mine-act .btn .nm { display: none } }
 .bf.longn .bf-av em { font-size: 9px; letter-spacing: .02em; padding-inline: 7px }
+
+/* v55: a two-part title sits on two lines under the company name */
+.natl .brand small.two { line-height: 1.25 }
+@media (max-width: 860px) { .natl .brand small.two { font-size: 7.6px; letter-spacing: .03em } }
+@media (max-width: 400px) { .natl .brand small.two { font-size: 6.9px; letter-spacing: .02em } }
+.mine.natl .mine-id span { display: block; line-height: 1.3 }
+.natlart figcaption span { max-width: 26em; margin-inline: auto; line-height: 1.35 }

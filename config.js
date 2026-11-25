@@ -63,7 +63,7 @@ window.WISCO = {
     { name: "Joyner Lucas", photo: "joynerlucas.webp", email: "lmillan@diamondbladewarehouse.com", cell: "+14142161941", manager: "", aka: ["joynerlucas", "joyner", "joyner-lucas", "luismillan", "luis", "luis-milan"] },
     { name: "Michael Gerald", photo: "michaelgerald.webp", email: "mgerald@diamondbladewarehouse.com", cell: "+18035240565", manager: "", aka: ["michaelgerald", "michael-gerald", "michael"] },
     { name: "Jeff Johnson", title: "National Sales Director", national: true, solo: true, photo: "jeffjohnson.webp", email: "jjohnson@diamondbladewarehouse.com", cell: "+18475297584", manager: "", aka: ["jeffjohnson", "jeff-johnson", "jjohnson"] },
-    { name: "Christian Tuska", title: "Your Blade Guy", national: true, solo: true, photo: "christiantuska.webp", email: "ctuska@diamondbladewarehouse.com", cell: "+12627054478", manager: "", aka: ["christiantuska", "christian-tuska", "christian", "ctuska"] },
+    { name: "Christian Tuska", title: "Regional Sales Manager and Equipment & Parts Specialist", national: true, solo: true, photo: "christiantuska.webp", email: "ctuska@diamondbladewarehouse.com", cell: "+12627054478", manager: "", aka: ["christiantuska", "christian-tuska", "christian", "ctuska"] },
     { name: "Les", photo: "les.webp", email: "lkubeny@diamondbladewarehouse.com", cell: "+14142072487", manager: "", aka: ["les"] }
   ],
 
