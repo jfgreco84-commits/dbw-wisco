@@ -326,8 +326,8 @@
   function prettyPhone(c) { var d = String(c || "").replace(/\D/g, "").slice(-10); return d.length === 10 ? "(" + d.slice(0, 3) + ") " + d.slice(3, 6) + "-" + d.slice(6) : ""; }
   function mineCard(r) {
     var cell = r.cell || W.textNumber || "", mail = r.email || (isBoss(r) ? W.orderEmail || "" : ""), who = isBoss(r) ? FRANK : repFirst(r);
-    return '<div class="mine">' + (r.photo ? '<img alt="" src="brand/reps/' + esc(r.photo) + '">' : '<span class="av">' + esc(initials(r.name)) + "</span>") +
-      '<div class="mine-id"><b>' + esc(isBoss(r) ? "Big Frank" : r.name) + "</b><span>Your Blade Guy</span>" + (prettyPhone(cell) ? '<a class="mine-num" href="tel:' + esc(cell) + '">' + prettyPhone(cell) + "</a>" : "") + "<small>Goes straight to " + esc(String(who).replace(/\.$/, "")) + (isBoss(r) ? " himself" : "") + ". Nothing automated. No AI bots.</small>" + (isBoss(r) ? '<small class="mine-247">My phone is on 24/7. Need bailing out past midnight? I’ll expect a big order in the morning.</small>' : "") + "</div>" +
+    return '<div class="mine' + (r.national ? " natl" : "") + '">' + (r.photo ? '<img alt="" src="brand/reps/' + esc(r.photo) + '">' : '<span class="av">' + esc(initials(r.name)) + "</span>") +
+      '<div class="mine-id"><b>' + esc(isBoss(r) ? "Big Frank" : r.name) + "</b><span>" + esc(r.title || "Your Blade Guy") + "</span>" + (prettyPhone(cell) ? '<a class="mine-num" href="tel:' + esc(cell) + '">' + prettyPhone(cell) + "</a>" : "") + "<small>Goes straight to " + esc(String(who).replace(/\.$/, "")) + (isBoss(r) ? " himself" : "") + ". Nothing automated. No AI bots.</small>" + (isBoss(r) ? '<small class="mine-247">My phone is on 24/7. Need bailing out past midnight? I’ll expect a big order in the morning.</small>' : "") + "</div>" +
       '<div class="mine-act">' + (cell ? '<a class="btn chrome sm" href="sms:' + esc(cell) + '">Text ' + esc(who) + "</a>" : "") + (mail ? '<a class="btn chrome sm" href="mailto:' + esc(mail) + '">Email ' + esc(who) + "</a>" : "") + (cell ? '<a class="btn chrome sm" href="tel:' + esc(cell) + '">Call ' + esc(who) + "</a>" : "") + '</div><button type="button" class="mine-x" data-norep>Not your rep? Tap here</button></div>';
   }
   var LASTS = [["recent", "Within 18 months"], ["old", "Longer than that"], ["unsure", "Don’t remember"]];
@@ -377,7 +377,7 @@
     var T = (W.testimonials || []).filter(function (t) { return t && t.quote; });
     app.innerHTML =
       '<section class="hero"><div class="wrap"><div>' +
-      (function () { var r = repBySlug(me().rep); var rf = store.get("ref", ""); return '<span class="pill"><i>★</i> ' + (r ? "Your salesman: " + esc(r.name) : rf ? "Referred by " + esc(rf) : "A division of Diamond Blade Warehouse, LLC") + " <i>★</i></span>"; })() +
+      (function () { var r = repBySlug(me().rep); var rf = store.get("ref", ""); return '<span class="pill"><i>★</i> ' + (r ? (r.title ? esc(r.name) + ", " + esc(r.title) : "Your salesman: " + esc(r.name)) : rf ? "Referred by " + esc(rf) : "A division of Diamond Blade Warehouse, LLC") + " <i>★</i></span>"; })() +
       (r0 ? mineCard(r0) : "") + '<span class="kick">Simplified reorder</span>' +
       "<h1>The right blade. Right now.</h1>" +
       '<p class="sub">Tell us what you cut. We ship it anywhere in the USA, same day or next. <b>Your blades, your price, 60 seconds.</b></p>' +
@@ -386,7 +386,7 @@
       '<div class="doors">' +
       '<a class="door d3 withav" href="#ask"><img alt="" src="' + askImg() + '"><div><b>Ask ' + esc(WHO()) + "</b><span>Not sure? Get " + esc(SAYER()) + "’s pick in 3 taps.</span></div><em>→</em></a>" +
       "</div>" +
-      '</div><div class="art"><img class="logo" src="brand/logo.webp" alt="DBW WISCO, a division of Diamond Blade Warehouse" width="430" height="458">' +
+      '</div><div class="art">' + (myRep() && myRep().national ? '<figure class="natlart"><img src="brand/reps/' + esc(String(myRep().photo).replace(/\.webp$/, "-lg.webp")) + '" alt="' + esc(myRep().name) + '" width="360" height="360"><figcaption><b>' + esc(myRep().name) + "</b><span>" + esc(myRep().title) + "</span><small>Diamond Blade Warehouse</small></figcaption></figure>" : '<img class="logo" src="brand/logo.webp" alt="DBW WISCO, a division of Diamond Blade Warehouse" width="430" height="458">') +
       '<div class="stage"><div class="lineup">' + line.map(function (n) { return '<img alt="" src="brand/lineup/' + n + '.webp">'; }).join("") + "</div></div></div></div></section>" +
 
       cpfBlock() +
@@ -493,7 +493,7 @@
   }
   function frankBox(pickName) {
     return '<div class="frank" data-frank="' + esc(pickName) + '"><div class="frankme"><img alt="' + esc(SAYER()) + '" src="' + askImg(1) + '" width="96" height="104" loading="lazy"><div><b class="h">Talk it through with me.</b>' +
-      (myRep() ? "<p>Send over your question and your setup, and tell me what you’re looking to accomplish. I’ll get you set up right.</p>" + '<span class="sig">' + esc(myRep().name) + ", your rep at DBW WISCO</span></div></div>"
+      (myRep() ? "<p>Send over your question and your setup, and tell me what you’re looking to accomplish. I’ll get you set up right.</p>" + '<span class="sig">' + esc(myRep().name) + (myRep().title ? ", " + esc(myRep().title) + ", Diamond Blade Warehouse" : ", your rep at DBW WISCO") + "</span></div></div>"
         : "<p>I’ve been in this industry since 2002. I’m not always right, but I’m not wrong very often either. Send over your question and your setup, and tell me what you’re looking to accomplish. I’ll get you set up right. I can promise you that.</p>" +
       '<span class="sig">' + esc(W.managerName || "Frank") + ", " + esc(W.managerTitle || "") + "</span></div></div>") +
       '<div class="sendrow">' + (W.textNumber ? '<button class="btn gold sm" data-fsms>Text ' + esc(WHO()) + "</button>" : "") + '<button class="btn gold sm" data-femail>Email ' + esc(WHO()) + '</button><button class="btn ghost-d sm" data-fcopy>Copy my question</button></div>' +
@@ -1038,7 +1038,7 @@
   function initials(n) { return n.split(/\s+/).map(function (x) { return x[0]; }).join("").slice(0, 2).toUpperCase(); }
   function renderReps(cur) {
     var lockR = store.get("replock", 0) === 1 && repBySlug(cur);
-    if (lockR) { $("#reps").innerHTML = '<div class="replock"><span class="av">' + (lockR.photo ? '<img alt="" src="brand/reps/' + esc(lockR.photo) + '">' : esc(initials(lockR.name))) + "</span><div><b>" + esc(lockR.name) + '</b><small>Your salesman. This goes straight to them.</small></div><button type="button" class="link" data-repchange>Not your rep?</button></div>'; $("#f-rep").value = slug(lockR.name); $("#replabel").textContent = "Your salesman"; var rd0 = $("#repd"); if (rd0) { rd0.open = true; rd0.classList.add("locked"); } return; }
+    if (lockR) { $("#reps").innerHTML = '<div class="replock"><span class="av">' + (lockR.photo ? '<img alt="" src="brand/reps/' + esc(lockR.photo) + '">' : esc(initials(lockR.name))) + "</span><div><b>" + esc(lockR.name) + "</b><small>" + (lockR.title ? esc(lockR.title) + "." : "Your salesman.") + ' This goes straight to them.</small></div><button type="button" class="link" data-repchange>Not your rep?</button></div>'; $("#f-rep").value = slug(lockR.name); $("#replabel").textContent = "Your salesman"; var rd0 = $("#repd"); if (rd0) { rd0.open = true; rd0.classList.add("locked"); } return; }
     var rd = $("#repd"); if (rd) rd.classList.remove("locked");
     $("#reps").innerHTML = '<button type="button" class="rep' + (!cur ? " on" : "") + '" data-rep=""><span class="av q">?</span><b>Not sure</b></button>' + (W.reps || []).map(function (r) {
       var s = slug(r.name);
@@ -1409,7 +1409,18 @@
     el.textContent = "Updated " + txt + " CT"; el.title = "Build " + v; el.hidden = false;
   }
   buildStamp();
+  /* The National Sales Director's page carries the United States logo and the full company name. */
+  var BRAND0 = null;
+  function natlWire() {
+    var r = myRep(), on = !!(r && r.national), b = $(".brand b"), sm = $(".brand small"), fn = $(".footname");
+    if (!BRAND0 && b && sm) BRAND0 = { b: b.textContent, sm: sm.textContent, fn: fn ? fn.textContent : "" };
+    document.documentElement.classList.toggle("natl", on);
+    $$(".brand img, .footlogo").forEach(function (im) { var want = on ? "brand/logo-usa.webp" : "brand/logo.webp"; if (im.getAttribute("src") !== want) im.setAttribute("src", want); });
+    if (!BRAND0) return;
+    if (on) b.innerHTML = "Diamond Blade <br>Warehouse"; else b.textContent = BRAND0.b; if (on) sm.innerHTML = '<i class="nm">' + esc(r.name) + " · </i>" + esc(r.title); else sm.textContent = BRAND0.sm; if (fn) fn.textContent = on ? "Diamond Blade Warehouse" : BRAND0.fn;
+  }
   function contactWire() {
+    natlWire();
     var r = myRep(), cell = (r && r.cell) || W.textNumber || "", mail = (r && r.email) || W.orderEmail || "", who = r ? repFirst(r) : FRANK;
     $$("[data-text-btn]").forEach(function (a) { a.href = "sms:" + cell; if (a.closest(".footact")) a.textContent = "Text " + who; });
     $$("[data-call-btn]").forEach(function (a) { a.href = "tel:" + cell; a.textContent = "Call " + who; });
@@ -1420,7 +1431,7 @@
     $$("[data-askimg]").forEach(function (a) { a.src = askImg(); a.classList.add("repface"); });
     var bfa = $("#bf"); if (bfa) bfa.setAttribute("aria-label", (r ? who : "Big " + FRANK) + " says");
     $$(".footmgr").forEach(function (fm) { if (fm.firstChild && fm.firstChild.nodeType === 3) fm.firstChild.textContent = noMail ? "Text or call " : "Text, call or email "; });
-    $$("[data-mgr]").forEach(function (a) { a.textContent = r ? r.name + ", your rep" : (W.managerName || "Frank") + ", " + (W.managerTitle || ""); });
+    $$("[data-mgr]").forEach(function (a) { a.textContent = r ? r.name + ", " + (r.title || "your rep") : (W.managerName || "Frank") + ", " + (W.managerTitle || ""); });
     $$("[data-text]").forEach(function (a) { a.textContent = cellShow(); a.href = "sms:" + cell; });
     $$("[data-oemail-link]").forEach(function (a) { a.textContent = mail; a.href = "mailto:" + mail; a.hidden = noMail; });
     $$(".footnum").forEach(function (fn) { [].forEach.call(fn.childNodes, function (n) { if (n.nodeType === 3) n.textContent = noMail ? "" : " · "; }); });

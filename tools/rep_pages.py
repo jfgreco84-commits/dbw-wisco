@@ -21,7 +21,8 @@ def roster():
     for m in re.finditer(r'\{\s*name:\s*"([^"]+)",[^{}]*?photo:\s*"([^"]*)".*?aka:\s*\[([^\]]*)\]', block):
         aka = re.findall(r'"([^"]+)"', m.group(3))
         em = re.search(r'email:\s*"([^"]*)"', m.group(0)); ce = re.search(r'cell:\s*"([^"]*)"', m.group(0))
-        if aka and aka[0] not in RESERVED: out.append(dict(name=m.group(1), photo=m.group(2), slug=aka[0], also=[x for x in aka[1:] if x not in RESERVED], email=em.group(1) if em else "", cell=ce.group(1) if ce else ""))
+        ti = re.search(r'title:\s*"([^"]*)"', m.group(0)); na = re.search(r'national:\s*true', m.group(0))
+        if aka and aka[0] not in RESERVED: out.append(dict(title=ti.group(1) if ti else "", national=bool(na), name=m.group(1), photo=m.group(2), slug=aka[0], also=[x for x in aka[1:] if x not in RESERVED], email=em.group(1) if em else "", cell=ce.group(1) if ce else ""))
     return out
 
 
@@ -49,9 +50,9 @@ def share_image(rep, dest):
     size = 62
     while size > 30 and d.textlength(name, font=font(size)) > 600: size -= 2
     d.text((60, 330), name, fill="white", font=font(size))
-    d.text((60, 410), "YOUR BLADE GUY", fill=(255, 196, 37), font=font(40))
+    d.text((60, 410), (rep.get("title") or "YOUR BLADE GUY").upper(), fill=(255, 196, 37), font=font(40 if not rep.get("title") else 36))
     d.text((60, 480), "Reorder diamond blades in 60 seconds.", fill=(214, 224, 255), font=font(27))
-    d.text((60, 530), "DBW WISCO", fill=(255, 255, 255), font=font(27))
+    d.text((60, 530), "Diamond Blade Warehouse" if rep.get("national") else "DBW WISCO", fill=(255, 255, 255), font=font(27))
     os.makedirs(os.path.dirname(dest), exist_ok=True)
     base.save(dest, quality=84)
 
@@ -82,9 +83,10 @@ def build(site_url, full=None):
     for r in roster():
         slug = r["slug"]
         share_image(r, os.path.join(SITE, "brand", "share", slug + ".jpg")); home_icons(r)
-        name = html.escape(r["name"], quote=True); short = html.escape(short_name(r["name"]), quote=True)
+        tagline = (", %s, Diamond Blade Warehouse" % r["title"]) if r.get("title") else ", your blade guy at DBW WISCO"
+        name = html.escape(r["name"], quote=True); tagline = html.escape(tagline, quote=True); short = html.escape(short_name(r["name"]), quote=True)
         d = os.path.join(SITE, slug); os.makedirs(d, exist_ok=True)
-        json.dump({"name": short_name(r["name"]) + " · DBW WISCO", "short_name": short_name(r["name"]), "start_url": "./", "scope": "./", "display": "standalone",
+        json.dump({"name": short_name(r["name"]) + (" · Diamond Blade Warehouse" if r.get("national") else " · DBW WISCO"), "short_name": short_name(r["name"]), "start_url": "./", "scope": "./", "display": "standalone",
                    "background_color": "#071433", "theme_color": "#071433",
                    "icons": [{"src": "../brand/repicon/%s-%d.png" % (slug, z), "sizes": "%dx%d" % (z, z), "type": "image/png"} for z in (180, 512)]},
                   open(os.path.join(d, "manifest.webmanifest"), "w", encoding="utf8"), ensure_ascii=False, indent=1)
@@ -101,9 +103,13 @@ def build(site_url, full=None):
             for a, b in (("Text Frank", "Text " + first), ("Call Frank", "Call " + first), ("Email Frank", "Email " + first), ("Ask Frank", "Ask " + first), ("Big Frank says", first + " says"), ("Hide Big Frank", "Hide " + first)):
                 page = page.replace(">" + a + "<", ">" + b + "<").replace('"' + a + '"', '"' + b + '"')
             if r.get("photo"): page = page.replace('src="brand/reps/frank.webp" alt="" width="64" height="64" class="repface" data-askimg', 'src="brand/reps/%s" alt="" width="64" height="64" class="repface" data-askimg' % r["photo"])
-        sub(r"<title>.*?</title>", "<title>%s, your blade guy at DBW WISCO</title>" % name)
+        if r.get("national"):   # the United States logo and the full company name, already in place before the script runs
+            page = page.replace('src="brand/logo.webp"', 'src="brand/logo-usa.webp"')
+            page = page.replace('<span><b>DBW WISCO</b><small>A division of Diamond Blade Warehouse, LLC</small></span>', '<span><b>Diamond Blade <br>Warehouse</b><small><i class="nm">%s · </i>%s</small></span>' % (name, html.escape(r["title"])))
+            page = page.replace('<html lang="en">', '<html lang="en" class="natl">', 1); assert 'class="natl"' in page and "logo-usa" in page
+        sub(r"<title>.*?</title>", "<title>%s%s</title>" % (name, tagline))
         sub(r'<meta name="description" content="[^"]*">', '<meta name="description" content="Reorder diamond blades in 60 seconds. Your order goes straight to %s.">' % name)
-        sub(r'<meta property="og:title" content="[^"]*">', '<meta property="og:title" content="%s, your blade guy at DBW WISCO">' % name)
+        sub(r'<meta property="og:title" content="[^"]*">', '<meta property="og:title" content="%s%s">' % (name, tagline))
         sub(r'<meta property="og:description" content="[^"]*">', '<meta property="og:description" content="Reorder diamond blades in 60 seconds. Your order goes straight to %s.">' % name)
         sub(r'<meta property="og:url" content="[^"]*">', '<meta property="og:url" content="%s%s/">' % (site_url, slug))
         sub(r'<link rel="canonical" href="[^"]*">', '<link rel="canonical" href="%s%s/">' % (site_url, slug))
@@ -119,12 +125,12 @@ def build(site_url, full=None):
             ad = os.path.join(SITE, nm); os.makedirs(ad, exist_ok=True)
             open(os.path.join(ad, "index.html"), "w", encoding="utf8").write(
                 '<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
-                '<title>%s, your blade guy at DBW WISCO</title><meta property="og:title" content="%s, your blade guy at DBW WISCO">'
+                '<title>%s%s</title><meta property="og:title" content="%s%s">'
                 '<meta property="og:image" content="%sbrand/share/%s.jpg"><meta name="twitter:card" content="summary_large_image">'
                 '<link rel="canonical" href="%s%s/"><meta http-equiv="refresh" content="0; url=../%s/">'
                 '<script>location.replace("../%s/" + location.search);</script></head>'
                 '<body style="font:16px system-ui;background:#071433;color:#fff;padding:24px"><a style="color:#fff" href="../%s/">Open DBW WISCO with %s</a></body></html>\n'
-                % (name, name, site_url, slug, site_url, slug, slug, slug, slug, name))
+                % (name, tagline, name, tagline, site_url, slug, site_url, slug, slug, slug, slug, name))
         made.append(slug)
     # The rep tools are not linked anywhere on the site. Reps reach them at <site>/team/.
     d = os.path.join(SITE, "team"); os.makedirs(d, exist_ok=True)
