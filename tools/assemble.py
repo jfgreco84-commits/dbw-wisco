@@ -11,7 +11,7 @@ SITE_URL = "https://dbwwisco.com/"
 DESC = "Reorder diamond blades, core bits and chain from DBW WISCO, a division of Diamond Blade Warehouse. Shipping nationwide. Pick your material, pick your saw, send the order to your rep."
 FONTS = '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Montserrat:wght@500;600;700;800;900&display=swap">'
 body = open(os.path.join(HERE, "page_body.html"), encoding="utf8").read()
-ver = str(int(max(os.path.getmtime(os.path.join(SITE, f)) for f in ("app.js", "app.css", "catalog.js", "config.js"))))
+ver = str(int(max(os.path.getmtime(os.path.join(SITE, f)) for f in ["app.js", "app.css", "catalog.js", "config.js"] + [os.path.join("brand", "reps", x) for x in os.listdir(os.path.join(SITE, "brand", "reps"))])))   # a new rep picture is a new build too
 
 full = f"""<!DOCTYPE html>
 <html lang="en">
